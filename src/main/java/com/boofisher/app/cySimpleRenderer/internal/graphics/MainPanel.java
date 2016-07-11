@@ -36,9 +36,8 @@ public class MainPanel extends AbstractRenderingPanel{
 			VisualLexicon visualLexicon, 
 			EventBusProvider eventBusProvider, 
 			GraphicsConfiguration configuration,						
-			JComponent inputComponent,
-			GraphicsData graphicsData){
-		super(networkView, visualLexicon, eventBusProvider, configuration, inputComponent, true, graphicsData); 
+			JComponent inputComponent){
+		super(networkView, visualLexicon, eventBusProvider, configuration, inputComponent, true); 
 	}
 	
 	@Override
@@ -49,7 +48,7 @@ public class MainPanel extends AbstractRenderingPanel{
 		
 		CyNetworkView networkView = graphicsData.getNetworkView();
 		
-		zoom = graphicsData.getMainZoom();
+		zoom = graphicsData.getZoomFactor();
 		
 		//logger.warn("MAIN ZOOM = " + zoom);
 		
@@ -58,7 +57,7 @@ public class MainPanel extends AbstractRenderingPanel{
 
 		bImage = this.getGraphicsConfiguration().createCompatibleImage(width, height);
 		Graphics2D imageGraphics = bImage.createGraphics();
-		graphicsData.setMainBufferedImage(bImage);
+		graphicsData.setBufferedImage(bImage);
 		
 		//paint background
 		imageGraphics.setColor((Color) networkView.getVisualProperty(BasicVisualLexicon.NETWORK_BACKGROUND_PAINT));
@@ -70,7 +69,7 @@ public class MainPanel extends AbstractRenderingPanel{
 		//now call the graphics configuration rendering procedures
 		configuration.drawScene();
 				
-		graphicsData.setMainBufferedImage(bImage);
+		graphicsData.setBufferedImage(bImage);
 		
 		iImage = new ImageIcon(bImage);
 		

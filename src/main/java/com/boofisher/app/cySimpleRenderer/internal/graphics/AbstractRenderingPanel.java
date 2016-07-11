@@ -62,8 +62,7 @@ public abstract class AbstractRenderingPanel extends JPanel{
 			EventBusProvider eventBusProvider, 
 			GraphicsConfiguration configuration,									
 			JComponent inputComponent,
-			boolean isMain,
-			GraphicsData graphicsData ) {
+			boolean isMain ) {
 		super();		
 		
 		this.configuration = checkNotNull(configuration);
@@ -95,8 +94,8 @@ public abstract class AbstractRenderingPanel extends JPanel{
         //Put it in this panel.
         add(pictureScrollPane);
         
-		this.graphicsData = graphicsData;
-		initializeGraphicsData(networkView, visualLexicon, eventBus, pictureScrollPane, inputComponent, isMain);
+		this.graphicsData = new GraphicsData(networkView, visualLexicon, eventBus, this, inputComponent, pictureScrollPane, isMain);
+		//initializeGraphicsData(networkView, visualLexicon, eventBus, pictureScrollPane, inputComponent, isMain);
 		
 		configuration.initialize(graphicsData);
 	}
@@ -105,21 +104,6 @@ public abstract class AbstractRenderingPanel extends JPanel{
     public abstract void paintComponent(Graphics g);
     public abstract void drawNodeLabels(View<CyNode> nodeView, Graphics2D g, int midWidth, int midHeight, float x, float y);
     
-    private void initializeGraphicsData(CySRNetworkView networkView, 
-			VisualLexicon visualLexicon, 
-			EventBus eventBus, 
-			JScrollPane pictureScrollPane,									
-			JComponent inputComponent,
-			boolean isMain){
-    	graphicsData.setNetworkView(networkView);
-    	graphicsData.setVisualLexicon(visualLexicon);
-    	graphicsData.setEventBus(eventBus);
-    	graphicsData.setScrollPane(pictureScrollPane);
-    	graphicsData.setInputComponent(inputComponent);
-    	graphicsData.setContainer(this);
-    	graphicsData.setIsMain(isMain);    	
-    }	
-	
 	public static Shape getShape(CyNetworkView networkView, CyNode node, int midWidth, int midHeight, int zoomFactor){
 		Shape shape = null;
 		

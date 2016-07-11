@@ -29,9 +29,9 @@ public class CameraZoomCommand implements MouseWheelCommand {
 
 	@Override
 	public void execute(int dWheel) {		
-		if( (graphicsData.getMainZoom() + dWheel) > 0 ){
+		if( (graphicsData.getZoomFactor() + dWheel) > 0 ){
 			//logger.warn("In Camera Zoom command changing main zoom incrementing by: " + dWheel);
-			graphicsData.changeMainZoom(dWheel);
+			graphicsData.changeZoomFactor(dWheel);
 		}
 	}
 

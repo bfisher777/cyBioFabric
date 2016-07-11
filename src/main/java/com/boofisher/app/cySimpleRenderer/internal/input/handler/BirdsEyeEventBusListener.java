@@ -40,7 +40,7 @@ public class BirdsEyeEventBusListener {
 		
 		int zoom = (int)NetworkToolkit.fitInView(nodeViews, GraphicsData.DISTANCE_SCALE, 1.9, 5.0);				
 		
-		graphicsData.setBirdsEyeZoom(zoom);
+		graphicsData.setZoomFactor(zoom);
 	}
 
 	

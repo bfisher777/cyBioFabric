@@ -38,9 +38,9 @@ public class GraphicsData {
 	public static final float VERTICAL_VOF = 45.0f;
 	
 	
-	private CyNetworkView networkView;
-	private EventBus eventBus;
-	private VisualLexicon visualLexicon;	
+	private final CyNetworkView networkView;
+	private final EventBus eventBus;
+	private final VisualLexicon visualLexicon;	
 	private final int MAX_ZOOM = 100;
 	
 	private int mouseCurrentX;
@@ -50,8 +50,8 @@ public class GraphicsData {
 	
 	//private PixelConverter pixelConverter;//used in cy3d to convert between window units and pixel units.
 	
-	private JComponent container;
-	private JComponent inputComponent;
+	private final JComponent container;
+	private final JComponent inputComponent;
 	
 	private TaskFactoryListener taskFactoryListener;
 	private DialogTaskManager taskManager;
@@ -59,32 +59,12 @@ public class GraphicsData {
 	
 	private boolean showLabels = false;
 	
-	private int mainZoom;
-	private int birdZoom;
+	private int zoom;	
 	
-	private BufferedImage mainBI;
-	private BufferedImage birdsEyeBI;
+	private BufferedImage bufferedImage;	
 	
 	private JScrollPane scrollPane;
-	private boolean isMain;
-	
-	public GraphicsData(){
-		this.networkView = null;
-		this.eventBus = null;
-		this.visualLexicon = null;
-		this.container = null;
-		this.inputComponent = null;
-		this.scrollPane = null;
-		this.isMain = false;
-		
-		//needs to be initialized to zero to trigger fit in view event in graphics configuration
-		mainZoom = 0;
-		birdZoom = 0;
-		
-		edgeAnalyser = new EdgeAnalyser();
-		mainBI = null;
-		birdsEyeBI = null;
-	}
+	private boolean isMain;	
 	
 	public GraphicsData(CyNetworkView networkView, VisualLexicon visualLexicon, EventBus eventBus, JComponent container, JComponent inputComponent, JScrollPane scrollPane, boolean isMain) {
 		this.networkView = networkView;
@@ -96,12 +76,10 @@ public class GraphicsData {
 		this.isMain = isMain;
 		
 		//needs to be initialized to zero to trigger fit in view event in graphics configuration
-		mainZoom = 0;
-		birdZoom = 0;
+		zoom = 0;
 		
 		edgeAnalyser = new EdgeAnalyser();
-		mainBI = null;
-		birdsEyeBI = null;				
+		bufferedImage = null;				
 	}
 	
 	
@@ -118,18 +96,9 @@ public class GraphicsData {
 		return networkView;
 	}
 	
-	public void setNetworkView(CyNetworkView networkView) {
-		this.networkView = networkView;
-	}
-
-	
 	public VisualLexicon getVisualLexicon() {
 		return visualLexicon;
 	}	
-	
-	public void setVisualLexicon(VisualLexicon visualLexicon ) {
-		this.visualLexicon = visualLexicon;
-	}
 	
 	public void setScreenHeight(int screenHeight) {
 		this.screenHeight = screenHeight;
@@ -143,35 +112,22 @@ public class GraphicsData {
 		this.screenWidth = screenWidth;
 	}	
 	
-	public void setMainZoom(int scroll){
-		this.mainZoom = scroll;
+	public void setZoomFactor(int scroll){
+		this.zoom = scroll;
 	}
+
 	
-	public void setBirdsEyeZoom(int scroll){
-		this.birdZoom = scroll;
-	}
-	
-	public void changeMainZoom(int scroll) {
-		int temp = this.mainZoom;
+	public void changeZoomFactor(int scroll) {
+		int temp = this.zoom;
 		
 		logger.warn("Scroll is " + scroll );
 		
 		if(scroll >= 0  && (temp + scroll) < MAX_ZOOM){
-			this.mainZoom += scroll;
+			this.zoom += scroll;
 		}else if(scroll < 0  && (temp + scroll) > 0){
-			this.mainZoom += scroll;			
+			this.zoom += scroll;			
 		}
-		logger.warn("Main panel zoom is now set to: " + mainZoom);
-	}
-	
-	public void changeBirdsEyeZoom(int scroll) {
-		int temp = this.birdZoom;
-		
-		if(scroll >= 0  && (temp + scroll) < MAX_ZOOM){
-			this.birdZoom += scroll;
-		}else if(scroll < 0  && (temp + scroll) > 0){
-			this.birdZoom += scroll;			
-		}
+		logger.warn("Main panel zoom is now set to: " + zoom);
 	}
 
 	public int getScreenWidth() {
@@ -182,17 +138,9 @@ public class GraphicsData {
 	public JComponent getContainer() {
 		return container;
 	}
-	
-	public void setContainer(JComponent container) {
-		this.container = container;
-	}
 
 	public JComponent getInputComponent() {
 		return inputComponent;
-	}
-	
-	public void setInputComponent(JComponent inputComponent) {
-		this.inputComponent = inputComponent;
 	}
 	
 	public TaskFactoryListener getTaskFactoryListener() {
@@ -227,11 +175,6 @@ public class GraphicsData {
 	public EventBus getEventBus() {
 		return eventBus;
 	}
-	
-	public void setEventBus(EventBus eventBus) {
-		this.eventBus = eventBus;
-	}
-
 
 	public void setShowLabels(boolean showLabels) {
 		this.showLabels = showLabels;
@@ -249,34 +192,20 @@ public class GraphicsData {
 		return showLabels;
 	}
 	
-	public int getMainZoom() {
-		return mainZoom;
-	}
-	
-	public int getBirdZoom() {
-		return birdZoom;
+	public int getZoomFactor() {
+		return zoom;
 	}
 
-	public BufferedImage getMainBufferedImage() {
-		return mainBI;
+	public BufferedImage getBufferedImage() {
+		return bufferedImage;
 	}
 	
-	public BufferedImage getBirdsEyeBufferedImage() {
-		return birdsEyeBI;
-	}
-	
-	public void setBirdsEyeBufferedImage(BufferedImage bi) {
+	public void setBufferedImage(BufferedImage bi) {
 		if(bi != null){
-			birdsEyeBI = bi;
+			this.bufferedImage = bi;
 		}
 	}
-	
-	public void setMainBufferedImage(BufferedImage bi) {
-		if(bi != null){
-			mainBI = bi;
-		}
-	}
-	
+
 	public JScrollPane getScrollPane() {
 		return scrollPane;
 	}

@@ -60,7 +60,7 @@ public class MainGraphicsConfiguration extends AbstractGraphicsConfiguration {
 		eventBus.register(eventBusListener);		
 		
 		// Manually fit the network into the view for the first frame
-		if(graphicsData.getMainZoom() == 0){
+		if(graphicsData.getZoomFactor() == 0){
 			logger.warn("main zoom == 0");
 			Collection<View<CyNode>> nodeViews = graphicsData.getNetworkView().getNodeViews();				
 			eventBusListener.handleFitInViewEvent(new FitInViewEvent(nodeViews));

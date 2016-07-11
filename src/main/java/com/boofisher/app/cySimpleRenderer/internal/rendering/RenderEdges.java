@@ -40,11 +40,11 @@ public class RenderEdges implements GraphicsProcedure {
 		int midWidth = width/2;
 		int midHeight = height/2;
 		
-		int zoom = graphicsData.isMain() ? graphicsData.getMainZoom() : graphicsData.getBirdZoom();
+		int zoom = graphicsData.getZoomFactor();
 
 		CyNetworkView networkView = graphicsData.getNetworkView();
 		
-		BufferedImage bImage = graphicsData.isMain() ? graphicsData.getMainBufferedImage() : graphicsData.getBirdsEyeBufferedImage();
+		BufferedImage bImage = graphicsData.getBufferedImage();
 		Graphics2D imageGraphics = bImage.createGraphics();		
 		
 		drawEdges(imageGraphics, networkView, midWidth, midHeight, zoom);

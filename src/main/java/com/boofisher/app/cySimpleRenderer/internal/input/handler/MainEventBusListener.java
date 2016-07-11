@@ -37,7 +37,7 @@ public class MainEventBusListener {
 		Collection<View<CyNode>> nodeViews = graphicsData.getNetworkView().getNodeViews(); 
 		
 		int zoom = (int)NetworkToolkit.fitInView(nodeViews, GraphicsData.DISTANCE_SCALE, 1.9, 5.0);		
-		graphicsData.setMainZoom(zoom);		
+		graphicsData.setZoomFactor(zoom);		
 	}
 		
 }

@@ -39,7 +39,7 @@ public class BirdsEyeGraphicsConfiguration extends AbstractGraphicsConfiguration
 		BirdsEyeEventBusListener eventBusListener = new BirdsEyeEventBusListener(graphicsData);
 		eventBus.register(eventBusListener);
 		
-		if(graphicsData.getBirdZoom() == 0){			
+		if(graphicsData.getZoomFactor() == 0){			
 			// Manually fit graph into the correct size for the first frame.
 			eventBusListener.handleFitInViewEvent(null);
 		}

@@ -16,7 +16,7 @@ import javax.swing.RootPaneContainer;
 import com.boofisher.app.cySimpleRenderer.internal.cytoscape.view.CySRNetworkView;
 import com.boofisher.app.cySimpleRenderer.internal.data.GraphicsData;
 import com.boofisher.app.cySimpleRenderer.internal.eventbus.EventBusProvider;
-import com.boofisher.app.cySimpleRenderer.internal.graphics.BirdPanel;
+import com.boofisher.app.cySimpleRenderer.internal.graphics.BirdsEyePanel;
 import com.boofisher.app.cySimpleRenderer.internal.graphics.GraphicsConfiguration;
 import com.boofisher.app.cySimpleRenderer.internal.graphics.MainPanel;
 import com.boofisher.app.cySimpleRenderer.internal.task.TaskFactoryListener;
@@ -38,8 +38,6 @@ public class CySRRenderingEngine implements RenderingEngine<CyNetwork> {
 	private final VisualLexicon visualLexicon;
 	
 	private JPanel panel;	
-	private GraphicsData mainGraphicsData;
-	private GraphicsData birdsEyeGraphicsData;
 	
 	
 	public CySRRenderingEngine(
@@ -54,9 +52,6 @@ public class CySRRenderingEngine implements RenderingEngine<CyNetwork> {
 		
 		this.networkView = viewModel;
 		this.visualLexicon = visualLexicon;
-				
-		this.mainGraphicsData = new GraphicsData();
-		this.birdsEyeGraphicsData = new GraphicsData();
 		
 		setUpCanvas(component, inputComponent, configuration, eventBusProvider, taskFactoryListener, taskManager);
 	}
@@ -75,7 +70,7 @@ public class CySRRenderingEngine implements RenderingEngine<CyNetwork> {
 		if (container instanceof RootPaneContainer) {
 						
 			MainPanel mp = new MainPanel(networkView, visualLexicon, eventBusProvider, 
-					configuration, inputComponent, mainGraphicsData);	
+					configuration, inputComponent);	
 			panel = mp;			
 			mp.setIgnoreRepaint(false); 
 			mp.setDoubleBuffered(true);			
@@ -85,8 +80,8 @@ public class CySRRenderingEngine implements RenderingEngine<CyNetwork> {
 			pane.setLayout(new BorderLayout());
 			pane.add(panel, BorderLayout.CENTER);
 		} else {
-			BirdPanel bp = new BirdPanel(networkView, visualLexicon, eventBusProvider,
-					configuration, inputComponent, birdsEyeGraphicsData); 	
+			BirdsEyePanel bp = new BirdsEyePanel(networkView, visualLexicon, eventBusProvider,
+					configuration, inputComponent); 	
 			panel = bp;								
 			bp.setIgnoreRepaint(false); 
 			bp.setDoubleBuffered(true);					

@@ -36,12 +36,12 @@ public class RenderLabels implements GraphicsProcedure {
 		int midWidth = width/2;
 		int midHeight = height/2;
 		
-		int zoom = graphicsData.isMain() ? graphicsData.getMainZoom() : graphicsData.getBirdZoom();
+		int zoom = graphicsData.getZoomFactor();
 
 		float x, y;
 		CyNetworkView networkView = graphicsData.getNetworkView();
 		
-		BufferedImage bImage = graphicsData.isMain() ? graphicsData.getMainBufferedImage() : graphicsData.getBirdsEyeBufferedImage();
+		BufferedImage bImage = graphicsData.getBufferedImage();
 		Graphics2D imageGraphics = bImage.createGraphics();		
 		
 		if(graphicsData.getShowLabels()){

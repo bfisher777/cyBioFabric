@@ -19,19 +19,18 @@ import com.boofisher.app.cySimpleRenderer.internal.cytoscape.view.CySRNetworkVie
 import com.boofisher.app.cySimpleRenderer.internal.data.GraphicsData;
 import com.boofisher.app.cySimpleRenderer.internal.eventbus.EventBusProvider;
 
-public class BirdPanel extends AbstractRenderingPanel{
+public class BirdsEyePanel extends AbstractRenderingPanel{
 	
 	private static final long serialVersionUID = -8440123285895117402L;
 	final Logger logger = Logger.getLogger(CyUserLog.NAME);
 	
-	public BirdPanel(
+	public BirdsEyePanel(
 			CySRNetworkView networkView, 
 			VisualLexicon visualLexicon, 
 			EventBusProvider eventBusProvider, 
 			GraphicsConfiguration configuration,									
-			JComponent inputComponent,
-			GraphicsData graphicsData){
-		super(networkView, visualLexicon, eventBusProvider, configuration, inputComponent, false, graphicsData); 
+			JComponent inputComponent){
+		super(networkView, visualLexicon, eventBusProvider, configuration, inputComponent, false); 
 				
 	}
 	
@@ -41,32 +40,31 @@ public class BirdPanel extends AbstractRenderingPanel{
 		configuration.initialize(graphicsData);
 		CyNetworkView networkView = graphicsData.getNetworkView();
 		
-		zoom = graphicsData.getBirdZoom();		
+		zoom = graphicsData.getZoomFactor();		
 		
 		int width = this.getWidth();
 		int height = this.getHeight();				
 
 		//check if birds eye buffered image has already been created
-		if(graphicsData.getBirdsEyeBufferedImage() == null){			
-			
+		if(graphicsData.getBufferedImage() == null){						
 			bImage = this.getGraphicsConfiguration().createCompatibleImage(width, height);
 			Graphics2D imageGraphics = bImage.createGraphics();
 			//paint background
 			imageGraphics.setColor((Color) networkView.getVisualProperty(BasicVisualLexicon.NETWORK_BACKGROUND_PAINT));
 			imageGraphics.fillRect(0,0, getWidth(), getHeight());
 			
-			graphicsData.setBirdsEyeBufferedImage(bImage);
+			graphicsData.setBufferedImage(bImage);
 			//drawEdges(imageGraphics, networkView, midWidth, midHeight, zoom);
 			//drawNodesAndLabels(imageGraphics, networkView, midWidth, midHeight, zoom);
 
 			//now call the graphics configuration rendering procedures
 			configuration.drawScene();
 			
-		}else{			
-			bImage = graphicsData.getBirdsEyeBufferedImage();
+		}else{					
+			bImage = graphicsData.getBufferedImage();
 		}
 			
-		graphicsData.setBirdsEyeBufferedImage(bImage);
+		graphicsData.setBufferedImage(bImage);
 		iImage = new ImageIcon(bImage);
 		
 		//Set up the scroll pane.
