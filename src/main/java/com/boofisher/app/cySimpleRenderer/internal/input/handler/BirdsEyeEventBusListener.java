@@ -38,6 +38,7 @@ public class BirdsEyeEventBusListener {
 		// ignore selected node views, always use all of them
 		Collection<View<CyNode>> nodeViews = graphicsData.getNetworkView().getNodeViews(); 
 		
+		//TODO: need to look at this and try to calculate the value 1.9
 		int zoom = (int)NetworkToolkit.fitInView(nodeViews, GraphicsData.DISTANCE_SCALE, 1.9, 5.0);				
 		
 		graphicsData.setZoomFactor(zoom);

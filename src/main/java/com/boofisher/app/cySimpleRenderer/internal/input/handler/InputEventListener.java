@@ -37,6 +37,7 @@ import org.cytoscape.view.model.CyNetworkView;
 public class InputEventListener implements MouseListener, MouseMotionListener, MouseWheelListener {
 
 	final Logger logger = Logger.getLogger(CyUserLog.NAME);
+	private int counter;
 	
 	protected final GraphicsData graphicsData;
 	protected final CyNetworkView networkView;
@@ -53,7 +54,7 @@ public class InputEventListener implements MouseListener, MouseMotionListener, M
 	private KeyCommand keyCommand = KeyCommand.EMPTY;
 	
 	private MouseCommand currentDragCommand;
-
+	
 	
 	public InputEventListener(GraphicsData graphicsData) {
 		this.graphicsData = graphicsData;
@@ -105,7 +106,9 @@ public class InputEventListener implements MouseListener, MouseMotionListener, M
 	
 	@Override
 	public void mouseWheelMoved(MouseWheelEvent e) {
-		e.consume();
+		++counter;
+		logger.warn("wheel moved event # " + counter);
+
 		mouseWheelCommand.execute(e.getWheelRotation());		
 		updateBothRenderers();		
 	}
@@ -130,7 +133,7 @@ public class InputEventListener implements MouseListener, MouseMotionListener, M
 
 	@Override
 	public void mousePressed(MouseEvent e) {
-		//logger.warn("mouse pressed event handled");
+		//logger.warn("mouse pressed currentDragCommand == null? " + (currentDragCommand == null));
 		currentDragCommand = getModifiedMouseCommand(e);		
 		currentDragCommand.dragStart(e.getX(), e.getY());
 		updateBothRenderers();
@@ -145,7 +148,7 @@ public class InputEventListener implements MouseListener, MouseMotionListener, M
 
 	@Override
 	public void mouseReleased(MouseEvent e) {	
-		//logger.warn("mouse released event handled");
+		//logger.warn("mouse released currentDragCommand == null? " + (currentDragCommand == null));
 		currentDragCommand.dragEnd(e.getX(), e.getY());
 		updateBothRenderers();
 	}

@@ -1,4 +1,5 @@
 package com.boofisher.app.cySimpleRenderer.internal.data;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JComponent;
@@ -8,6 +9,8 @@ import com.boofisher.app.cySimpleRenderer.internal.cytoscape.edges.EdgeAnalyser;
 import com.boofisher.app.cySimpleRenderer.internal.task.TaskFactoryListener;
 
 import org.apache.log4j.Logger;
+import com.boofisher.app.cySimpleRenderer.internal.data.GraphicsSelectionData;
+import com.boofisher.app.cySimpleRenderer.internal.data.PickingData;
 import org.cytoscape.application.CyUserLog;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.VisualLexicon;
@@ -46,7 +49,7 @@ public class GraphicsData {
 	private int mouseCurrentX;
 	private int mouseCurrentY;
 	private int screenHeight;
-	private int screenWidth;
+	private int screenWidth;	
 	
 	//private PixelConverter pixelConverter;//used in cy3d to convert between window units and pixel units.
 	
@@ -56,6 +59,9 @@ public class GraphicsData {
 	private TaskFactoryListener taskFactoryListener;
 	private DialogTaskManager taskManager;
 	private EdgeAnalyser edgeAnalyser;
+	private PickingData pickingData;
+	private GraphicsSelectionData selectionData;
+	private AffineTransform aTransform;
 	
 	private boolean showLabels = false;
 	
@@ -66,22 +72,39 @@ public class GraphicsData {
 	private JScrollPane scrollPane;
 	private boolean isMain;	
 	
-	public GraphicsData(CyNetworkView networkView, VisualLexicon visualLexicon, EventBus eventBus, JComponent container, JComponent inputComponent, JScrollPane scrollPane, boolean isMain) {
+	public GraphicsData(CyNetworkView networkView, VisualLexicon visualLexicon, EventBus eventBus,
+			JComponent container, JComponent inputComponent, JScrollPane scrollPane) {
 		this.networkView = networkView;
 		this.eventBus = eventBus;
 		this.visualLexicon = visualLexicon;
 		this.container = container;
 		this.inputComponent = inputComponent;
 		this.scrollPane = scrollPane;
-		this.isMain = isMain;
-		
-		//needs to be initialized to zero to trigger fit in view event in graphics configuration
+		this.aTransform = new AffineTransform();
+		this.isMain = false;
+				
 		zoom = 0;
-		
+		selectionData = new GraphicsSelectionData();
+		pickingData = new PickingData();
 		edgeAnalyser = new EdgeAnalyser();
 		bufferedImage = null;				
 	}
 	
+	public void setATransform(AffineTransform aTransform) {
+		this.aTransform = aTransform;
+	}
+
+	public AffineTransform getATranform() {
+		return aTransform;
+	}
+	
+	public GraphicsSelectionData getSelectionData() {
+		return selectionData;
+	}
+	
+	public PickingData getPickingData() {
+		return pickingData;
+	}
 	
 	public void setTaskFactoryListener(TaskFactoryListener taskFactoryListener) {
 		this.taskFactoryListener = taskFactoryListener;
@@ -116,18 +139,15 @@ public class GraphicsData {
 		this.zoom = scroll;
 	}
 
-	
 	public void changeZoomFactor(int scroll) {
-		int temp = this.zoom;
-		
-		logger.warn("Scroll is " + scroll );
+		int temp = this.zoom;		
 		
 		if(scroll >= 0  && (temp + scroll) < MAX_ZOOM){
 			this.zoom += scroll;
 		}else if(scroll < 0  && (temp + scroll) > 0){
 			this.zoom += scroll;			
 		}
-		logger.warn("Main panel zoom is now set to: " + zoom);
+
 	}
 
 	public int getScreenWidth() {

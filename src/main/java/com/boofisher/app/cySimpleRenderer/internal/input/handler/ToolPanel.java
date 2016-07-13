@@ -63,7 +63,7 @@ public class ToolPanel {
 	
 	public ToolPanel(RootPaneContainer rootPaneContainer, JComponent component) {
 		setUpGlassPane(rootPaneContainer);
-		setUpKeyboardInput(component);
+		setUpKeyboardInput(component);		
 	}
 	
 	public void setEventBus(EventBus eventBus) {
@@ -96,7 +96,6 @@ public class ToolPanel {
 		labelsButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if(eventBus != null) {
-					logger.warn("ShowLabelsEvent fired");;
 					eventBus.post(new ShowLabelsEvent(labelsButton.isSelected()));
 				}else{
 					logger.warn("Event bus is null");;

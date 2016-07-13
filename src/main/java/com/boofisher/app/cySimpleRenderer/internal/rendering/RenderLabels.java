@@ -5,6 +5,7 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import org.cytoscape.model.CyNode;
@@ -28,7 +29,7 @@ public class RenderLabels implements GraphicsProcedure {
 	}
 	
 	
-	
+	//TODO this doesn't work
 	@Override
 	public void execute(GraphicsData graphicsData) {
 		int width = graphicsData.getContainer().getWidth();
@@ -36,28 +37,31 @@ public class RenderLabels implements GraphicsProcedure {
 		int midWidth = width/2;
 		int midHeight = height/2;
 		
-		int zoom = graphicsData.getZoomFactor();
 
 		float x, y;
 		CyNetworkView networkView = graphicsData.getNetworkView();
 		
 		BufferedImage bImage = graphicsData.getBufferedImage();
-		Graphics2D imageGraphics = bImage.createGraphics();		
+		Graphics2D imageGraphics = bImage.createGraphics();	
+		
+		JPanel overLay = new JPanel();
+		graphicsData.getContainer().add(overLay);
 		
 		if(graphicsData.getShowLabels()){
 			JScrollPane pictureScrollPane = graphicsData.getScrollPane();
 			// networkView.updateView();
 			for (View<CyNode> nodeView : networkView.getNodeViews()) {
-				x = nodeView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION).floatValue()/zoom;
-				y = nodeView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION).floatValue()/zoom;
+				x = nodeView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION).floatValue();
+				y = nodeView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION).floatValue();
 				//abstract method implementing class will write 
-				drawNodeLabels(nodeView, imageGraphics, midWidth, midHeight, x, y, zoom, pictureScrollPane);
+				drawNodeLabels(nodeView, imageGraphics, midWidth, midHeight, x, y, pictureScrollPane);
 			}
 		}
+		imageGraphics.dispose();
 	}
 	
 	public void drawNodeLabels(View<CyNode> nodeView, Graphics2D g2, int midWidth, int midHeight, 
-			float x, float y, int zoom, JScrollPane pictureScrollPane) {
+			float x, float y, JScrollPane pictureScrollPane) {
 		//handle text labels drawing
 		String text = nodeView.getVisualProperty(BasicVisualLexicon.NODE_LABEL);		
 		Color textColor = null;
@@ -75,7 +79,7 @@ public class RenderLabels implements GraphicsProcedure {
 					// Use black as default if no node label color was found
 					textColor = TEXT_DEFAULT_COLOR;
 				}
-				int textFontSize = DEFAULT_TEXT_FONT_SIZE - zoom;
+				int textFontSize = DEFAULT_TEXT_FONT_SIZE;
 				
 				textFontSize = (textFontSize > 14 ) ? 14 : textFontSize;
 				textFontSize = (textFontSize < 2 ) ? 2 : textFontSize;

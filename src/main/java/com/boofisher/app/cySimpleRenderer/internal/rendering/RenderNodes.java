@@ -12,20 +12,18 @@ import org.cytoscape.view.model.View;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 
 import com.boofisher.app.cySimpleRenderer.internal.data.GraphicsData;
-import com.boofisher.app.cySimpleRenderer.internal.graphics.AbstractRenderingPanel;
+import com.boofisher.app.cySimpleRenderer.internal.graphics.RenderingPanel;
 
-public class RenderNodes implements GraphicsProcedure {
+public class RenderNodes { //implements GraphicsProcedure {
 	
-	GraphicsData graphicsData;
+	/*GraphicsData graphicsData;
 	
 	
 	@Override
 	public void initialize(GraphicsData graphicsData) {
 		this.graphicsData = graphicsData;
 	}
-	
-	
-	
+			
 	@Override
 	public void execute(GraphicsData graphicsData) {
 		int width = graphicsData.getContainer().getWidth();
@@ -40,10 +38,11 @@ public class RenderNodes implements GraphicsProcedure {
 		BufferedImage bImage = graphicsData.getBufferedImage();
 		Graphics2D imageGraphics = bImage.createGraphics();		
 		
-		drawNodesAndLabels(imageGraphics, networkView, midWidth, midHeight, zoom);
+		drawNodes(imageGraphics, networkView, midWidth, midHeight, zoom);
+		imageGraphics.dispose();
 	}
 	
-	public void drawNodesAndLabels(Graphics2D g2, CyNetworkView networkView, int midWidth, int midHeight, int zoomFactor){
+	public void drawNodes(Graphics2D g2, CyNetworkView networkView, int midWidth, int midHeight, int zoomFactor){
 		Shape shape = null;
 		
 		// networkView.updateView();
@@ -60,11 +59,11 @@ public class RenderNodes implements GraphicsProcedure {
 						
 			// Draw it only if the visual property says it is visible
 			if (nodeView.getVisualProperty(BasicVisualLexicon.NODE_VISIBLE)) {
-				shape = AbstractRenderingPanel.getShape(networkView, nodeView.getModel(), midWidth, midHeight, zoomFactor);						
+				shape = RenderingPanel.getShape(networkView, nodeView.getModel(), midWidth, midHeight, zoomFactor);						
 				// draw Rectangle2D.Double
 				g2.fill(shape);																
 			}
 		}
 	}
-
+*/
 }

@@ -9,8 +9,7 @@ import com.boofisher.app.cySimpleRenderer.internal.input.handler.BirdsEyeEventBu
 
 import com.boofisher.app.cySimpleRenderer.internal.data.GraphicsData;
 import com.boofisher.app.cySimpleRenderer.internal.graphics.AbstractGraphicsConfiguration;
-import com.boofisher.app.cySimpleRenderer.internal.rendering.RenderEdges;
-import com.boofisher.app.cySimpleRenderer.internal.rendering.RenderNodes;
+import com.boofisher.app.cySimpleRenderer.internal.rendering.RenderNetwork;
 import com.google.common.eventbus.EventBus;
 
 public class BirdsEyeGraphicsConfiguration extends AbstractGraphicsConfiguration {
@@ -18,8 +17,7 @@ public class BirdsEyeGraphicsConfiguration extends AbstractGraphicsConfiguration
 	private JComponent frame;	
 	
 	public BirdsEyeGraphicsConfiguration() {			
-		add(new RenderEdges());
-		add(new RenderNodes());
+		add(new RenderNetwork());
 	}
 	
 	@Override
@@ -34,16 +32,13 @@ public class BirdsEyeGraphicsConfiguration extends AbstractGraphicsConfiguration
 //		MouseZoneInputListener mouseZoneListener = MouseZoneInputListener.attach(frame, graphicsData.getInputComponent(), graphicsData);
 //		mouseZoneListener.setMouseMode(MouseMode.CAMERA); // always stay in camera mode
 //		BirdsEyeInputEventListener.attach(graphicsData.getInputComponent(), graphicsData, mouseZoneListener);
-		
+
 		EventBus eventBus = graphicsData.getEventBus();
 		BirdsEyeEventBusListener eventBusListener = new BirdsEyeEventBusListener(graphicsData);
 		eventBus.register(eventBusListener);
 		
-		if(graphicsData.getZoomFactor() == 0){			
-			// Manually fit graph into the correct size for the first frame.
-			eventBusListener.handleFitInViewEvent(null);
-		}
-				
+		// Manually fit graph into the correct size for the first frame.
+		eventBusListener.handleFitInViewEvent(null);				
 	}
 	
 	

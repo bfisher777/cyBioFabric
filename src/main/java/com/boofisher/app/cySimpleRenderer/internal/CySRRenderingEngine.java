@@ -10,15 +10,12 @@ import java.util.Properties;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
-import javax.swing.JPanel;
 import javax.swing.RootPaneContainer;
 
 import com.boofisher.app.cySimpleRenderer.internal.cytoscape.view.CySRNetworkView;
-import com.boofisher.app.cySimpleRenderer.internal.data.GraphicsData;
 import com.boofisher.app.cySimpleRenderer.internal.eventbus.EventBusProvider;
-import com.boofisher.app.cySimpleRenderer.internal.graphics.BirdsEyePanel;
 import com.boofisher.app.cySimpleRenderer.internal.graphics.GraphicsConfiguration;
-import com.boofisher.app.cySimpleRenderer.internal.graphics.MainPanel;
+import com.boofisher.app.cySimpleRenderer.internal.graphics.RenderingPanel;
 import com.boofisher.app.cySimpleRenderer.internal.task.TaskFactoryListener;
 
 import org.apache.log4j.Logger;
@@ -37,7 +34,7 @@ public class CySRRenderingEngine implements RenderingEngine<CyNetwork> {
 	private final CySRNetworkView networkView;
 	private final VisualLexicon visualLexicon;
 	
-	private JPanel panel;	
+	private RenderingPanel panel;	
 	
 	
 	public CySRRenderingEngine(
@@ -67,32 +64,27 @@ public class CySRRenderingEngine implements RenderingEngine<CyNetwork> {
 			                 GraphicsConfiguration configuration, EventBusProvider eventBusProvider, 
 			                 TaskFactoryListener taskFactoryListener, DialogTaskManager taskManager) {				
 		
-		if (container instanceof RootPaneContainer) {
-						
-			MainPanel mp = new MainPanel(networkView, visualLexicon, eventBusProvider, 
-					configuration, inputComponent);	
-			panel = mp;			
-			mp.setIgnoreRepaint(false); 
-			mp.setDoubleBuffered(true);			
-			
+		
+		panel = new RenderingPanel(networkView, visualLexicon, eventBusProvider, 
+				configuration, inputComponent);
+		panel.setIgnoreRepaint(false); 
+		panel.setDoubleBuffered(true);
+		
+		// When networkView.updateView() is called it will repaint all containers it owns
+		networkView.addContainer(panel); 
+		
+		if (container instanceof RootPaneContainer) {			
 			RootPaneContainer rootPaneContainer = (RootPaneContainer) container;
 			Container pane = rootPaneContainer.getContentPane();
 			pane.setLayout(new BorderLayout());
 			pane.add(panel, BorderLayout.CENTER);
-		} else {
-			BirdsEyePanel bp = new BirdsEyePanel(networkView, visualLexicon, eventBusProvider,
-					configuration, inputComponent); 	
-			panel = bp;								
-			bp.setIgnoreRepaint(false); 
-			bp.setDoubleBuffered(true);					
-			
+			logger.warn("Added main view");
+		} else {			
 			container.setLayout(new BorderLayout());
 			container.add(panel, BorderLayout.CENTER);
+			logger.warn("Added birds eye view");
 		}
-						
-		// When networkView.updateView() is called it will repaint all containers it owns
-		networkView.addContainer(panel); 
-		
+									
 		configuration.initializeFrame(container, inputComponent);
 	}
 	

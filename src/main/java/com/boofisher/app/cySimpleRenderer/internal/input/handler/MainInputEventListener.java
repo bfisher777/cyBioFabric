@@ -8,6 +8,9 @@ import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
+import com.boofisher.app.cySimpleRenderer.internal.input.handler.commands.PopupMenuMouseCommand;
+import com.boofisher.app.cySimpleRenderer.internal.input.handler.commands.SelectionMouseCommand;
+
 import com.boofisher.app.cySimpleRenderer.internal.data.GraphicsData;
 import com.boofisher.app.cySimpleRenderer.internal.eventbus.MouseModeChangeEvent;
 import com.boofisher.app.cySimpleRenderer.internal.input.handler.InputEventListener;
@@ -85,7 +88,7 @@ public class MainInputEventListener extends InputEventListener {
 				//setSecondaryMouseCommand(orbitCommand); 
 				break;
 			case SELECT: 
-				//setPrimaryMouseCommand(new SelectionMouseCommand(graphicsData)); 
+				setPrimaryMouseCommand(new SelectionMouseCommand(graphicsData)); 
 				//setSecondaryMouseCommand(new PopupMenuMouseCommand(graphicsData));
 				break;
 		}

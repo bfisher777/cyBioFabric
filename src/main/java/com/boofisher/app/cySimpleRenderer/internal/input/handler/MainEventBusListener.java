@@ -25,7 +25,7 @@ public class MainEventBusListener {
 	
 	@Subscribe
 	public void handleShowLabelsEvent(ShowLabelsEvent showLabelsEvent) {
-		logger.warn("handleShowLabelsEvent handled");
+		//logger.warn("handleShowLabelsEvent handled");
 		
 		graphicsData.setShowLabels(showLabelsEvent.showLabels());
 		graphicsData.getNetworkView().updateView();
@@ -36,7 +36,7 @@ public class MainEventBusListener {
 		// ignore selected node views, always use all of them
 		Collection<View<CyNode>> nodeViews = graphicsData.getNetworkView().getNodeViews(); 
 		
-		int zoom = (int)NetworkToolkit.fitInView(nodeViews, GraphicsData.DISTANCE_SCALE, 1.9, 5.0);		
+		int zoom = (int)NetworkToolkit.fitInView(nodeViews, GraphicsData.DISTANCE_SCALE, 1.0, 5.0);		
 		graphicsData.setZoomFactor(zoom);		
 	}
 		

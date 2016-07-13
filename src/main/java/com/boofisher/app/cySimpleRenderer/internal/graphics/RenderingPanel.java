@@ -42,7 +42,7 @@ import com.boofisher.app.cySimpleRenderer.internal.tools.NetworkToolkit;
 import com.boofisher.app.cySimpleRenderer.internal.tools.PairIdentifier;
 import com.google.common.eventbus.EventBus;
 
-public abstract class AbstractRenderingPanel extends JPanel{
+public class RenderingPanel extends JPanel{
 	
 	final Logger logger = Logger.getLogger(CyUserLog.NAME);
 	
@@ -50,19 +50,16 @@ public abstract class AbstractRenderingPanel extends JPanel{
 	protected final GraphicsData graphicsData;
 	protected final GraphicsConfiguration configuration;
 	
-	protected BufferedImage bImage;
 	protected ImageIcon iImage;
 	protected JLabel picture;
 	protected JScrollPane pictureScrollPane;
-	protected int zoom;
 	    
-	public AbstractRenderingPanel(
+	public RenderingPanel(
 			CySRNetworkView networkView, 
 			VisualLexicon visualLexicon, 
 			EventBusProvider eventBusProvider, 
 			GraphicsConfiguration configuration,									
-			JComponent inputComponent,
-			boolean isMain ) {
+			JComponent inputComponent) {
 		super();		
 		
 		this.configuration = checkNotNull(configuration);
@@ -80,6 +77,7 @@ public abstract class AbstractRenderingPanel extends JPanel{
             protected void processMouseWheelEvent(MouseWheelEvent e) {
                 if (!isWheelScrollingEnabled()) {
                     if (getParent() != null) 
+                    	//send event to parent
                         getParent().dispatchEvent(
                                 SwingUtilities.convertMouseEvent(this, e, getParent()));
                     return;
@@ -94,28 +92,48 @@ public abstract class AbstractRenderingPanel extends JPanel{
         //Put it in this panel.
         add(pictureScrollPane);
         
-		this.graphicsData = new GraphicsData(networkView, visualLexicon, eventBus, this, inputComponent, pictureScrollPane, isMain);
-		//initializeGraphicsData(networkView, visualLexicon, eventBus, pictureScrollPane, inputComponent, isMain);
+		this.graphicsData = new GraphicsData(networkView, visualLexicon, eventBus, this, inputComponent, pictureScrollPane);
 		
+		//set up event listeners / handlers / fit graph in view
 		configuration.initialize(graphicsData);
 	}
 	
-
-    public abstract void paintComponent(Graphics g);
-    public abstract void drawNodeLabels(View<CyNode> nodeView, Graphics2D g, int midWidth, int midHeight, float x, float y);
+	@Override
+    public void paintComponent(Graphics g) {										
+		
+		graphicsData.setScreenHeight(this.getHeight());
+		graphicsData.setScreenWidth(this.getWidth());
+		
+		//now call the graphics configuration rendering procedures
+		// Doesn't really need to be split into two methods, but it allows GrapicsConfigurations to 
+		// only override update() and leave the drawing to AbstractGraphicsConfiguration.
+		//update() handles picking and picked node rendering 
+		//configuration.update();
+		configuration.drawScene();
+		
+		iImage = new ImageIcon(graphicsData.getBufferedImage());
+		
+		//Set up the scroll pane.
+        picture = new JLabel(iImage);
+        
+        pictureScrollPane.setViewportView(picture);
+    }	
     
-	public static Shape getShape(CyNetworkView networkView, CyNode node, int midWidth, int midHeight, int zoomFactor){
+	
+	/*
+	 * Utility method to create a shape for the network (ellipse, triangle, or rectangle)*/
+	public static Shape getShape(CyNetworkView networkView, CyNode node, int midWidth, int midHeight){
 		Shape shape = null;
 		
 		
 		View<CyNode> nodeView = networkView.getNodeView(node);
 		
 		//cast floats and doubles to int
-		float x = nodeView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION).floatValue()/zoomFactor;// / distanceScale;
-		float y = nodeView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION).floatValue()/zoomFactor;// / distanceScale;			
+		float x = nodeView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION).floatValue();// / distanceScale;
+		float y = nodeView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION).floatValue();// / distanceScale;			
 		
-		double width  = nodeView.getVisualProperty(BasicVisualLexicon.NODE_WIDTH)/zoomFactor;
-		double height = nodeView.getVisualProperty(BasicVisualLexicon.NODE_HEIGHT)/zoomFactor;
+		double width  = nodeView.getVisualProperty(BasicVisualLexicon.NODE_WIDTH);
+		double height = nodeView.getVisualProperty(BasicVisualLexicon.NODE_HEIGHT);
 		shape = new Rectangle2D.Double((x+midWidth), (y+midHeight), width, height);
 		
 		
@@ -140,17 +158,6 @@ public abstract class AbstractRenderingPanel extends JPanel{
 				
 		return shape;
 	}
-	
-	/*Method not used*/
-	public static BufferedImage scale(BufferedImage sbi, int imageType, int dWidth, int dHeight, double fWidth, double fHeight) {
-	    BufferedImage dbi = null;
-	    if(sbi != null) {
-	        dbi = new BufferedImage(dWidth, dHeight, imageType);
-	        Graphics2D g = dbi.createGraphics();
-	        AffineTransform at = AffineTransform.getScaleInstance(fWidth, fHeight);
-	        g.drawRenderedImage(sbi, at);
-	    }
-	    return dbi;
-	}				
+					
 }
 

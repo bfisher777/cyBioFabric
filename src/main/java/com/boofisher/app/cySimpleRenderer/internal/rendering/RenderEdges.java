@@ -16,13 +16,13 @@ import org.cytoscape.view.model.View;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 
 import com.boofisher.app.cySimpleRenderer.internal.data.GraphicsData;
-import com.boofisher.app.cySimpleRenderer.internal.graphics.AbstractRenderingPanel;
+import com.boofisher.app.cySimpleRenderer.internal.graphics.RenderingPanel;
 import com.boofisher.app.cySimpleRenderer.internal.tools.NetworkToolkit;
 import com.boofisher.app.cySimpleRenderer.internal.tools.PairIdentifier;
 
-public class RenderEdges implements GraphicsProcedure {
+public class RenderEdges { //implements GraphicsProcedure {
 	
-	GraphicsData graphicsData;
+	/*GraphicsData graphicsData;
 	boolean isMain;
 	
 	
@@ -40,7 +40,7 @@ public class RenderEdges implements GraphicsProcedure {
 		int midWidth = width/2;
 		int midHeight = height/2;
 		
-		int zoom = graphicsData.getZoomFactor();
+		int zoom = graphicsData.getZoomFactor();				
 
 		CyNetworkView networkView = graphicsData.getNetworkView();
 		
@@ -48,6 +48,7 @@ public class RenderEdges implements GraphicsProcedure {
 		Graphics2D imageGraphics = bImage.createGraphics();		
 		
 		drawEdges(imageGraphics, networkView, midWidth, midHeight, zoom);
+		imageGraphics.dispose();
 	}
 	
 	public void drawEdges(Graphics2D g2, CyNetworkView networkView, int midWidth, int midHeight, int zoomFactor){
@@ -65,7 +66,7 @@ public class RenderEdges implements GraphicsProcedure {
 			target = edgeView.getModel().getTarget();
 			
 			if(!rectMade){
-				shape = AbstractRenderingPanel.getShape(networkView, edgeView.getModel().getTarget(), midWidth, midHeight, zoomFactor);
+				shape = RenderingPanel.getShape(networkView, edgeView.getModel().getTarget(), midWidth, midHeight, zoomFactor);
 				rectMade = true;
 				
 				//set stroke and color			
@@ -103,5 +104,5 @@ public class RenderEdges implements GraphicsProcedure {
 			}
 		}	
 	}
-
+*/
 }
