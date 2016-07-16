@@ -1,20 +1,33 @@
 package com.boofisher.app.cySimpleRenderer.internal.picking;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.IntBuffer;
+import java.awt.Point;
+import java.awt.Shape;
+import java.awt.geom.Line2D;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
+import org.apache.log4j.Logger;
+import org.cytoscape.application.CyUserLog;
+import org.cytoscape.model.CyEdge;
+import org.cytoscape.model.CyNode;
+import org.cytoscape.view.model.CyNetworkView;
+import org.cytoscape.view.model.View;
+import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 
 import com.boofisher.app.cySimpleRenderer.internal.data.GraphicsData;
 import com.boofisher.app.cySimpleRenderer.internal.data.GraphicsSelectionData;
 import com.boofisher.app.cySimpleRenderer.internal.data.PickingData;
-import com.boofisher.app.cySimpleRenderer.internal.geometric.Vector3;
 import com.boofisher.app.cySimpleRenderer.internal.picking.ShapePickingProcessor;
 import com.boofisher.app.cySimpleRenderer.internal.rendering.GraphicsProcedure;
-import com.boofisher.app.cySimpleRenderer.internal.tools.SUIDToolkit;
+import com.boofisher.app.cySimpleRenderer.internal.rendering.RenderNetwork;
+import com.boofisher.app.cySimpleRenderer.internal.tools.NetworkToolkit;
+import com.boofisher.app.cySimpleRenderer.internal.tools.PairIdentifier;
 
 public class DefaultShapePickingProcessor implements ShapePickingProcessor {
 
+	final Logger logger = Logger.getLogger(CyUserLog.NAME);
+	
 	/** A constant that stands for "no type is here" */
 	public static final int NO_TYPE = -1;
 
@@ -83,153 +96,130 @@ public class DefaultShapePickingProcessor implements ShapePickingProcessor {
 	 * @return The edges and nodes found in the region, as a {@link PickResults}
 	 *         object
 	 */
-	private void performPick(int x, int y, int width, int height, boolean selectAll, GraphicsData graphicsData) {
-		/*int bufferSize = 1024;
-		if (selectAll) {
-			bufferSize = Math.max(4096, graphicsData.getNetworkView().getAllViews().size() * 64);
-		}
-
-		GL2 gl = graphicsData.getGlContext();
-		int screenHeight = graphicsData.getScreenHeight();
-		int screenWidth = graphicsData.getScreenWidth();
+	private void performPick(int x, int y, int width, int height, boolean selectAll, GraphicsData graphicsData) {		
+			
+		Point screenCoords = new Point(x, y);
+		ArrayList<Long> edgeHits = new ArrayList<Long>();
+		ArrayList<Long> nodeHits = new ArrayList<Long>();			
+	
+		int midHeight = graphicsData.getScreenHeight()/2;
+		int midWidth = graphicsData.getScreenWidth()/2;
 		
-		ByteBuffer byteBuffer = ByteBuffer.allocateDirect(bufferSize);
-		byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
-		IntBuffer buffer = byteBuffer.asIntBuffer();
-
-		IntBuffer viewport = IntBuffer.allocate(4);
-		gl.glGetIntegerv(GL2.GL_VIEWPORT, viewport);
-
-		gl.glSelectBuffer(bufferSize / 4, buffer);
-		gl.glRenderMode(GL2.GL_SELECT);
-		gl.glInitNames();
-
-		gl.glMatrixMode(GL2.GL_PROJECTION);
-		gl.glPushMatrix();
-
-		GLU glu = new GLU();
-		gl.glLoadIdentity();
-
-		glu.gluPickMatrix(x, screenHeight - y, width, height, viewport);
+		CyNetworkView networkView = graphicsData.getNetworkView();
 		
-		if (screenHeight != 0) {
-			glu.gluPerspective(45.0f, (float) screenWidth / screenHeight, 0.2f, 50.0f);
-		} else {
-			glu.gluPerspective(45.0f, 1, 0.2f, 50.0f);
-		}
-
-		// don't think this ortho call is needed
-		// gl.glOrtho(0.0, 8.0, 0.0, 8.0, -0.5, 2.5);
-
-		// --Begin Drawing--
-		performSelectionDrawing(graphicsData);
-		// --End Drawing--
-
-		gl.glMatrixMode(GL2.GL_PROJECTION);
-		gl.glPopMatrix();
-
-		gl.glMatrixMode(GL2.GL_MODELVIEW);
-
-		// not sure if this is needed
-		// gl.glFlush();
-
-		int hits = gl.glRenderMode(GL2.GL_RENDER);
+		getEdges(edgeHits, screenCoords, networkView, midWidth, midHeight, graphicsData.getZoomFactor(), graphicsData);
+		getNodes(nodeHits, screenCoords, networkView, midWidth, midHeight, graphicsData.getZoomFactor(), graphicsData);
+		
+		//logger.warn("world coords are " + screenCoords.toString() + "hits size is " + edgeHits.size() + nodeHits.size());	
 		
 		if (selectAll) {
-			parseSelectionBufferMultipleSelection(buffer, hits, graphicsData.getPickingData());
+			parseSelectionBufferMultipleSelection(edgeHits, nodeHits,graphicsData.getPickingData());			
 		} else {
-			parseSelectionBufferSingleSelection(buffer, hits, graphicsData.getPickingData());
-		}*/
+			parseSelectionBufferSingleEdgeSelection(edgeHits, nodeHits, graphicsData.getPickingData());			
+		}
 	}
 	
-	
-	// Render objects into the selection buffer
-	private void performSelectionDrawing(GraphicsData graphicsData) {
-		/*GL2 gl = graphicsData.getGlContext();
-		CameraPosition camera = graphicsData.getCamera();
-		GLU glu = GLU.createGLU(gl);
+	//TODO learn difference between view and model
+	public void getNodes(ArrayList<Long> hits, Point screenCoords, CyNetworkView networkView, int midWidth, 
+			int midHeight, int zoomFactor, GraphicsData graphicsData){
+				
+		Shape shape = null;
 		
-		gl.glMatrixMode(GL2.GL_MODELVIEW);
-		gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
-		gl.glLoadIdentity();
-
-		// gl.glPushMatrix();
-		Vector3 position = camera.getPosition();
-		Vector3 target = camera.getTarget();
-		Vector3 up = camera.getUp();
-
-		glu.gluLookAt(position.x(), position.y(), position.z(), target.x(),
-				target.y(), target.z(), up.x(), up.y(), up.z());
-
-		gl.glPushName(NODE_TYPE);
-		gl.glPushName(NO_INDEX);
-
-		// Render nodes for picking
-		drawNodesProcedure.execute(graphicsData);
-		
-		gl.glPopName();
-		gl.glPopName();
-
-		gl.glPushName(EDGE_TYPE);
-		gl.glPushName(NO_INDEX);
-
-		// Render edges for picking
-		drawEdgesProcedure.execute(graphicsData);
-		
-		gl.glPopName();
-		gl.glPopName();*/
+		// networkView.updateView();
+		for (View<CyNode> nodeView : networkView.getNodeViews()) {
+			
+			if(nodeView == null) {
+				// MKTODO why does this happen?
+				System.err.println("nodeView is null: networkView.getNodeViews() returns: " + networkView.getNodeViews());
+				continue;
+			}					
+					
+						
+			// Draw it only if the visual property says it is visible
+			if (nodeView.getVisualProperty(BasicVisualLexicon.NODE_VISIBLE)) {
+				shape = RenderNetwork.getShape(networkView, nodeView.getModel(), midWidth, midHeight, zoomFactor);						
+				// draw Rectangle2D.Double
+				if(shape.contains(screenCoords)){
+					hits.add(nodeView.getModel().getSUID());
+					break;
+				}													
+			}
+		}
 	}
 	
-	private void parseSelectionBufferSingleSelection(IntBuffer buffer, int hits, PickingData pickingData) {
+	public void getEdges(ArrayList<Long> hits, Point screenCoords, CyNetworkView networkView, int midWidth, 
+			int midHeight, int zoomFactor, GraphicsData graphicsData){
+		// A set containing all pairs of nodes that have had an edge drawn between them
+		Set<PairIdentifier> drawnPairs = new HashSet<PairIdentifier>();
+		CyNode source, target;		
+		
+		Shape shape = graphicsData.getMyShape();
+
+		
+		double x1=0, x2=0, y1=0, y2=0;
+		for (View<CyEdge> edgeView : networkView.getEdgeViews()) {
+			source = edgeView.getModel().getSource();
+			target = edgeView.getModel().getTarget();			
+			
+			PairIdentifier pairIdentifier = NetworkToolkit.obtainPairIdentifier(source, target, networkView.getModel().getNodeList().size());
+			
+			if(shape == null){
+				shape = RenderNetwork.getShape(networkView, edgeView.getModel().getTarget(), midWidth, midHeight, zoomFactor);			
+				
+				float edgeWidth = edgeView.getVisualProperty(BasicVisualLexicon.EDGE_WIDTH).intValue();
+				edgeWidth = (zoomFactor > 0) ? (edgeWidth /(int)(zoomFactor)) : edgeWidth;
+				//set stroke and color							
+				graphicsData.setMyShape(shape);
+			}
+			
+			// Only draw an edge between this source-target pair if one has not been drawn already
+			//TODO mulit edges 
+			if (!drawnPairs.contains(pairIdentifier)) {
+			
+				if(edgeView.getVisualProperty(BasicVisualLexicon.EDGE_LINE_TYPE).toString().equals("SOLID") || true){
+					
+					View<CyNode> sourceView = networkView.getNodeView(source);
+					View<CyNode> targetView = networkView.getNodeView(target);
+					
+					if (sourceView != null && targetView != null) {
+						x1 = sourceView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION)/zoomFactor + shape.getBounds2D().getWidth()/2;
+						y1 = sourceView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION)/zoomFactor + shape.getBounds2D().getHeight()/2;
+						
+						x2 = targetView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION)/zoomFactor + shape.getBounds2D().getWidth()/2;
+						y2 = targetView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION)/zoomFactor + shape.getBounds2D().getHeight()/2;
+					}else{
+						continue;
+					}
+					
+					Shape line = new Line2D.Double((x1+midWidth), (y1+midHeight), (x2+midWidth), (y2+midHeight));
+					if(line.contains(screenCoords)){
+						hits.add(edgeView.getModel().getSUID());
+						break;
+					}
+				}
+				
+				drawnPairs.add(pairIdentifier);
+			}
+		}	
+	}
+	
+	private void parseSelectionBufferSingleEdgeSelection(ArrayList<Long> edgeHits, ArrayList<Long> nodeHits, PickingData pickingData) {
 		pickingData.setClosestPickedNodeIndex(NO_INDEX);
 		pickingData.setClosestPickedEdgeIndex(NO_INDEX);
-		
-		// Current hit record is size 5 because we have
-		// (numNames, minZ, maxZ, nameType, suidUpper, suidLower) for
-		// indices 0-5 respectively
-		final int sizeOfHitRecord = 6;
-
-		if (hits > 0) {
-			// The variable max helps keep track of the polygon that is closest
-			// to the front of the screen
-			int max = buffer.get(2);
-			int maxType = buffer.get(3);
-
-			int selectedType = buffer.get(3);
-			int selectedSuidUpper = buffer.get(4);
-			int selectedSuidLower = buffer.get(5);
-
-			for (int i = 0; i < hits; i++) {
-
-				int offset = i * sizeOfHitRecord;
 				
-				if (buffer.get(offset + 2) <= max && buffer.get(offset + 3) <= maxType) {
 
-					max = buffer.get(offset + 2);
-					maxType = buffer.get(offset + 3);
-
-					// We have that name1 represents the object type
-					selectedType = buffer.get(offset + 3);
-
-					// name2 represents the object index
-					selectedSuidUpper = buffer.get(offset + 4);
-					selectedSuidLower = buffer.get(offset + 5);
-				}
-			}
-			
-			long suid = SUIDToolkit.combineInts(selectedSuidUpper, selectedSuidLower);
-			
-			if (selectedType == NODE_TYPE) {
-				pickingData.setClosestPickedNodeIndex(suid);
-			} else if (selectedType == EDGE_TYPE) {
-				pickingData.setClosestPickedEdgeIndex(suid);
-			}
+		for (long v : nodeHits) {			
+			pickingData.setClosestPickedNodeIndex(v);
+		}
+		
+		for (long v : edgeHits) {			
+			pickingData.setClosestPickedEdgeIndex(v);
 		}
 	}
 	
-	
-	private void parseSelectionBufferMultipleSelection(IntBuffer buffer, int hits, PickingData pickingData) {
-		pickingData.getPickedNodeIndices().clear();
+	//TODO add drag and select function
+	private void parseSelectionBufferMultipleSelection(ArrayList<Long> edgeHits, ArrayList<Long> nodeHits, PickingData pickingData) {
+		/*pickingData.getPickedNodeIndices().clear();
 		pickingData.getPickedEdgeIndices().clear();
 
 		// Current hit record is size 5 because we have
@@ -263,7 +253,7 @@ public class DefaultShapePickingProcessor implements ShapePickingProcessor {
 					pickingData.getPickedEdgeIndices().add(suid);
 				}
 			}
-		}
+		}*/
 	}
 
 }

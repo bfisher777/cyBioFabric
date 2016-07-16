@@ -44,9 +44,6 @@ public class RenderLabels implements GraphicsProcedure {
 		BufferedImage bImage = graphicsData.getBufferedImage();
 		Graphics2D imageGraphics = bImage.createGraphics();	
 		
-		JPanel overLay = new JPanel();
-		graphicsData.getContainer().add(overLay);
-		
 		if(graphicsData.getShowLabels()){
 			JScrollPane pictureScrollPane = graphicsData.getScrollPane();
 			// networkView.updateView();

@@ -86,6 +86,8 @@ public class CySRRenderingEngine implements RenderingEngine<CyNetwork> {
 		}
 									
 		configuration.initializeFrame(container, inputComponent);
+		//set up event listeners / handlers / fit graph in view
+		configuration.initialize(panel.getGraphicsData());
 	}
 	
 	

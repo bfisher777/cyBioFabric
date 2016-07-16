@@ -37,7 +37,6 @@ import org.cytoscape.view.model.CyNetworkView;
 public class InputEventListener implements MouseListener, MouseMotionListener, MouseWheelListener {
 
 	final Logger logger = Logger.getLogger(CyUserLog.NAME);
-	private int counter;
 	
 	protected final GraphicsData graphicsData;
 	protected final CyNetworkView networkView;
@@ -105,9 +104,8 @@ public class InputEventListener implements MouseListener, MouseMotionListener, M
 	
 	
 	@Override
-	public void mouseWheelMoved(MouseWheelEvent e) {
-		++counter;
-		logger.warn("wheel moved event # " + counter);
+	public void mouseWheelMoved(MouseWheelEvent e) {		
+		//logger.warn("wheel moved event # " + counter);
 
 		mouseWheelCommand.execute(e.getWheelRotation());		
 		updateBothRenderers();		
@@ -155,7 +153,7 @@ public class InputEventListener implements MouseListener, MouseMotionListener, M
 
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		//logger.warn("mouse clicked event handled");
+		logger.warn("mouse clicked event handled");
 		MouseCommand clickCommand = getModifiedMouseCommand(e);		
 		clickCommand.clicked(e.getX(), e.getY());
 		updateBothRenderers();
@@ -165,10 +163,10 @@ public class InputEventListener implements MouseListener, MouseMotionListener, M
 	public void mouseMoved(MouseEvent e) {
 		//graphicsData.getPixelConverter().convertMouse(e, coords);
 		// needed for hover highlight
-		//graphicsData.setMouseCurrentX(coords[0]);
-		//graphicsData.setMouseCurrentY(coords[1]);
-		//primaryMouseCommand.moved(coords[0], coords[1]);
-		//updateBothRenderers();
+		graphicsData.setMouseCurrentX(e.getX());
+		graphicsData.setMouseCurrentY(e.getY());
+		primaryMouseCommand.moved(e.getX(), e.getY());
+		updateBothRenderers();
 	}
 
 	@Override

@@ -6,6 +6,9 @@ import java.util.Set;
 import com.boofisher.app.cySimpleRenderer.internal.geometric.Vector3;
 import com.boofisher.app.cySimpleRenderer.internal.tools.NetworkToolkit;
 import com.boofisher.app.cySimpleRenderer.internal.tools.PairIdentifier;
+
+import org.apache.log4j.Logger;
+import org.cytoscape.application.CyUserLog;
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
@@ -16,7 +19,8 @@ import org.cytoscape.view.model.View;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 
 public class NetworkToolkit {
-
+	
+	final static Logger logger = Logger.getLogger(CyUserLog.NAME);
 	private static final String SELECTED_COLUMN_NAME = "selected";
 	
 	/**
@@ -266,18 +270,17 @@ public class NetworkToolkit {
 	// Sets data in CyTable as well as View<CyNode>
 	public static void setNodeSelected(long suid, CyNetworkView networkView, boolean selected) {
 		CyNetwork network = networkView.getModel();
-		CyTable table = network.getDefaultNodeTable();
+		CyTable table = network.getDefaultNodeTable();	
 		CyRow row = table.getRow(network.getNode(suid).getSUID());
 		
-		row.set(SELECTED_COLUMN_NAME, selected);
-		
+		row.set(SELECTED_COLUMN_NAME, selected);			
 		networkView.getNodeView(network.getNode(suid)).setVisualProperty(
-				BasicVisualLexicon.NODE_SELECTED, selected);
+				BasicVisualLexicon.NODE_SELECTED, selected);		
 	}
 
 	public static boolean checkNodeSelected(long index, CyNetworkView networkView) {
 		CyNetwork network = networkView.getModel();
-		CyTable table = network.getDefaultNodeTable();
+		CyTable table = network.getDefaultNodeTable();		
 		CyRow row = table.getRow(network.getNode(index).getSUID());
 		
 		return row.get(SELECTED_COLUMN_NAME, Boolean.class);

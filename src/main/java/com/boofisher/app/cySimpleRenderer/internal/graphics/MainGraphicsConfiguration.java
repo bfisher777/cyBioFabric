@@ -12,8 +12,6 @@ import com.boofisher.app.cySimpleRenderer.internal.input.handler.MainInputEventL
 import com.boofisher.app.cySimpleRenderer.internal.input.handler.InputEventListener;
 
 import org.apache.log4j.Logger;
-import com.boofisher.app.cySimpleRenderer.internal.picking.DefaultShapePickingProcessor;
-import com.boofisher.app.cySimpleRenderer.internal.picking.ShapePickingProcessor;
 import org.cytoscape.application.CyUserLog;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.view.model.View;
@@ -21,13 +19,9 @@ import org.cytoscape.view.model.View;
 import com.boofisher.app.cySimpleRenderer.internal.data.GraphicsData;//open-gl
 import com.boofisher.app.cySimpleRenderer.internal.graphics.AbstractGraphicsConfiguration;//open-gl
 import com.boofisher.app.cySimpleRenderer.internal.input.handler.ToolPanel;
-import com.boofisher.app.cySimpleRenderer.internal.rendering.RenderEdges;
-import com.boofisher.app.cySimpleRenderer.internal.rendering.RenderLabels;
+import com.boofisher.app.cySimpleRenderer.internal.picking.DefaultShapePickingProcessor;
+import com.boofisher.app.cySimpleRenderer.internal.picking.ShapePickingProcessor;
 import com.boofisher.app.cySimpleRenderer.internal.rendering.RenderNetwork;
-import com.boofisher.app.cySimpleRenderer.internal.rendering.RenderNodes;
-import com.boofisher.app.cySimpleRenderer.internal.rendering.UpdateEdges;
-import com.boofisher.app.cySimpleRenderer.internal.rendering.UpdateNodes;
-import com.boofisher.app.cySimpleRenderer.internal.rendering.UpdateView;
 import com.google.common.eventbus.EventBus;
 
 public class MainGraphicsConfiguration extends AbstractGraphicsConfiguration {
@@ -35,13 +29,14 @@ public class MainGraphicsConfiguration extends AbstractGraphicsConfiguration {
 	private JComponent frame;
 	private ToolPanel toolPanel;
 	private InputEventListener inputHandler;
+	private final ShapePickingProcessor shapePickingProcessor;
 	
 	//private final ShapePickingProcessor shapePickingProcessor;
 	
 	public MainGraphicsConfiguration() {
 		
 		//TODO fix this
-		//shapePickingProcessor = new DefaultShapePickingProcessor(new RenderNodesProcedure(), new RenderArcEdgesProcedure());
+		shapePickingProcessor = new DefaultShapePickingProcessor(null, null);
 		
 		add(new RenderNetwork());
 		//add(new UpdateEdges());//draw updated edges over bImage
@@ -56,8 +51,7 @@ public class MainGraphicsConfiguration extends AbstractGraphicsConfiguration {
 		this.frame = component;
 		if(component instanceof RootPaneContainer) {
 			logger.warn("Added tool bar to main");
-			this.toolPanel = new ToolPanel((RootPaneContainer)component, inputComponent);
-			graphicsData.setIsMain(true);
+			this.toolPanel = new ToolPanel((RootPaneContainer)component, inputComponent);			
 		}
 	}
 	
@@ -65,7 +59,7 @@ public class MainGraphicsConfiguration extends AbstractGraphicsConfiguration {
 	@Override
 	public void initialize(GraphicsData graphicsData) {
 		super.initialize(graphicsData);				
-		
+		logger.warn("Initializing Rendering Panel");
 		// Input handler		
 		inputHandler = MainInputEventListener.attach(graphicsData.getInputComponent(), graphicsData);
 		
@@ -85,10 +79,10 @@ public class MainGraphicsConfiguration extends AbstractGraphicsConfiguration {
 	
 	
 	//TODO: still needed here?
-	/*@Override
+	@Override
 	public void update() {
 		shapePickingProcessor.processPicking(graphicsData);
-	}*/
+	}
 
 	
 	@Override

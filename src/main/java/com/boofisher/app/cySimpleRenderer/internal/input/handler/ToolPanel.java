@@ -263,6 +263,8 @@ public class ToolPanel {
 		showCurrentMode();
 		if(eventBus != null) {
 			eventBus.post(new MouseModeChangeEvent(getCurrentMouseMode()));
+		}else{
+			logger.warn("Tool panel eventBus is null");
 		}
 	}
 	

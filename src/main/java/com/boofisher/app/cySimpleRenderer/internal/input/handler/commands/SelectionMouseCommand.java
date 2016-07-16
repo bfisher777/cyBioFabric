@@ -7,6 +7,9 @@ import com.boofisher.app.cySimpleRenderer.internal.input.handler.MouseCommand;
 import com.boofisher.app.cySimpleRenderer.internal.input.handler.MouseCommandAdapter;
 import com.boofisher.app.cySimpleRenderer.internal.input.handler.commands.SelectionAddMouseCommand;
 import com.boofisher.app.cySimpleRenderer.internal.tools.NetworkToolkit;
+
+import org.apache.log4j.Logger;
+import org.cytoscape.application.CyUserLog;
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.model.CyTableUtil;
@@ -18,7 +21,7 @@ import org.cytoscape.view.model.CyNetworkView;
  * @author mkucera
  */
 public class SelectionMouseCommand extends MouseCommandAdapter {
-
+	final Logger logger = Logger.getLogger(CyUserLog.NAME);
 	private final GraphicsData graphicsData;
 	private final SelectionAddMouseCommand addCommand;
 	
@@ -29,6 +32,7 @@ public class SelectionMouseCommand extends MouseCommandAdapter {
 
 	@Override
 	public void clicked(int x, int y) {
+		logger.warn("Selection mouse command clicked event handled");
 		deselectOther();
 		addCommand.clicked(x, y);
 	}

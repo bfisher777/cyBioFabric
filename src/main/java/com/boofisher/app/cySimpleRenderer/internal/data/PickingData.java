@@ -3,12 +3,17 @@ package com.boofisher.app.cySimpleRenderer.internal.data;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+import org.cytoscape.application.CyUserLog;
+
 /**
  * A PickingData object responsible for storing data related to the 
  * current picking state of the renderer, such as the index and type
  * of the object that was found under the current mouse cursor.
  */
 public class PickingData {
+	final Logger logger = Logger.getLogger(CyUserLog.NAME);
+	
 	private Set<Long> pickedNodeIndices;
 	private Set<Long> pickedEdgeIndices;
 	
@@ -40,7 +45,7 @@ public class PickingData {
 		return closestPickedNodeIndex;
 	}
 	
-	public void setClosestPickedNodeIndex(long closestPickedNodeIndex) {
+	public void setClosestPickedNodeIndex(long closestPickedNodeIndex) {		
 		this.closestPickedNodeIndex = closestPickedNodeIndex;
 	}
 	

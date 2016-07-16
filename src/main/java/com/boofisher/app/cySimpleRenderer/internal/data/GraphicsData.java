@@ -1,8 +1,11 @@
 package com.boofisher.app.cySimpleRenderer.internal.data;
+import java.awt.Graphics;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JComponent;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import com.boofisher.app.cySimpleRenderer.internal.cytoscape.edges.EdgeAnalyser;
@@ -62,15 +65,20 @@ public class GraphicsData {
 	private PickingData pickingData;
 	private GraphicsSelectionData selectionData;
 	private AffineTransform aTransform;
+	private Shape shape;
 	
 	private boolean showLabels = false;
 	
 	private int zoom;	
 	
-	private BufferedImage bufferedImage;	
+	private JPanel surface;
+	private BufferedImage bufferedImage;
+	private BufferedImage renderedImage;	
 	
 	private JScrollPane scrollPane;
 	private boolean isMain;	
+	
+	private Graphics myGraphics;
 	
 	public GraphicsData(CyNetworkView networkView, VisualLexicon visualLexicon, EventBus eventBus,
 			JComponent container, JComponent inputComponent, JScrollPane scrollPane) {
@@ -87,14 +95,15 @@ public class GraphicsData {
 		selectionData = new GraphicsSelectionData();
 		pickingData = new PickingData();
 		edgeAnalyser = new EdgeAnalyser();
-		bufferedImage = null;				
+		bufferedImage = null;	
+		renderedImage = null;
 	}
 	
 	public void setATransform(AffineTransform aTransform) {
 		this.aTransform = aTransform;
 	}
 
-	public AffineTransform getATranform() {
+	public AffineTransform getATransform() {
 		return aTransform;
 	}
 	
@@ -225,6 +234,16 @@ public class GraphicsData {
 			this.bufferedImage = bi;
 		}
 	}
+	
+	public BufferedImage getRenderedImage() {
+		return renderedImage;
+	}
+	
+	public void setRenderedImage(BufferedImage bi) {
+		if(bi != null){
+			this.renderedImage = bi;
+		}
+	}
 
 	public JScrollPane getScrollPane() {
 		return scrollPane;
@@ -242,6 +261,30 @@ public class GraphicsData {
 	
 	public void setIsMain(boolean isMain) {
 		this.isMain = isMain;
+	}
+	
+	public JPanel getSurface() {
+		return surface;
+	}
+	
+	public void setSurface(JPanel surface) {
+		this.surface = surface;
+	}
+	
+	public Graphics getMyGraphics() {
+		return myGraphics;
+	}
+	
+	public void setMyGraphics(Graphics graphics) {
+		this.myGraphics = graphics;
+	}
+	
+	public Shape getMyShape() {
+		return shape;
+	}
+	
+	public void setMyShape(Shape shape) {
+		this.shape = shape;
 	}
 }
 
