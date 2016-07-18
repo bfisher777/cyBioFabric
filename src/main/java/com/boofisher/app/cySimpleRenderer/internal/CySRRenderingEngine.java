@@ -84,7 +84,8 @@ public class CySRRenderingEngine implements RenderingEngine<CyNetwork> {
 			container.add(panel, BorderLayout.CENTER);
 			logger.warn("Added birds eye view");
 		}
-									
+		
+		//adds tool bar to frame
 		configuration.initializeFrame(container, inputComponent);
 		//set up event listeners / handlers / fit graph in view
 		configuration.initialize(panel.getGraphicsData());

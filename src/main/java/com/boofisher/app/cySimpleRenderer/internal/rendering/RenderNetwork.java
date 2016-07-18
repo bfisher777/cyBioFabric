@@ -27,6 +27,10 @@ import com.boofisher.app.cySimpleRenderer.internal.data.GraphicsData;
 import com.boofisher.app.cySimpleRenderer.internal.tools.NetworkToolkit;
 import com.boofisher.app.cySimpleRenderer.internal.tools.PairIdentifier;
 
+/********************************************************************************
+ * Class will be responsible for rendering the network's nodes and edges
+ * */
+
 public class RenderNetwork implements GraphicsProcedure {
 	final Logger logger = Logger.getLogger(CyUserLog.NAME);
 	GraphicsData graphicsData;
@@ -58,9 +62,7 @@ public class RenderNetwork implements GraphicsProcedure {
 			//logger.warn("Rendering main ? " + graphicsData.isMain());
 			//logger.warn("width = " + width + " height = " + height + " zoomFact = " + graphicsData.getZoomFactor());
 			int zoomFactor = graphicsData.getZoomFactor();
-			
-									
-			
+															
 			//paint background
 			imageGraphics.setColor((Color) networkView.getVisualProperty(BasicVisualLexicon.NETWORK_BACKGROUND_PAINT));
 			imageGraphics.fillRect(0,0, width, height);	
@@ -93,21 +95,19 @@ public class RenderNetwork implements GraphicsProcedure {
 			source = edgeView.getModel().getSource();
 			target = edgeView.getModel().getTarget();
 			
+			//set color and stroke
+			float edgeWidth = edgeView.getVisualProperty(BasicVisualLexicon.EDGE_WIDTH).intValue();
+			edgeWidth = (zoomFactor > 0) ? (edgeWidth /(int)(zoomFactor)) : edgeWidth;
+			g2.setColor(chooseColor(null, edgeView, graphicsData));
+			g2.setStroke( new BasicStroke( edgeWidth ));
+			
 			if(!rectMade){
 				shape = getShape(networkView, edgeView.getModel().getTarget(), midWidth, midHeight, zoomFactor);
 				rectMade = true;
 				
-				float edgeWidth = edgeView.getVisualProperty(BasicVisualLexicon.EDGE_WIDTH).intValue();
-				edgeWidth = (zoomFactor > 0) ? (edgeWidth /(int)(zoomFactor)) : edgeWidth;
-				//set stroke and color
-				if(edgeView.getVisualProperty(BasicVisualLexicon.EDGE_SELECTED)){
-					g2.setColor((Color) edgeView.getVisualProperty(BasicVisualLexicon.EDGE_SELECTED_PAINT));
-				}else{
-					g2.setColor((Color) edgeView.getVisualProperty(BasicVisualLexicon.EDGE_PAINT));
-				}
-				g2.setStroke( new BasicStroke( edgeWidth ));
+				//set stroke and color													
 				graphicsData.setMyShape(shape);
-			}
+			}					
 			
 			PairIdentifier pairIdentifier = NetworkToolkit.obtainPairIdentifier(source, target, networkView.getModel().getNodeList().size());
 			
@@ -115,6 +115,7 @@ public class RenderNetwork implements GraphicsProcedure {
 			//TODO mulit edges 
 			if (!drawnPairs.contains(pairIdentifier)) {
 			
+				//TODO fix this
 				if(edgeView.getVisualProperty(BasicVisualLexicon.EDGE_LINE_TYPE).toString().equals("SOLID") || true){
 					
 					View<CyNode> sourceView = networkView.getNodeView(source);
@@ -153,7 +154,7 @@ public class RenderNetwork implements GraphicsProcedure {
 			}					
 			
 			//set color						
-			g2.setColor(chooseColor(nodeView, graphicsData));
+			g2.setColor(chooseColor(nodeView, null, graphicsData));
 										
 			// Draw it only if the visual property says it is visible
 			if (nodeView.getVisualProperty(BasicVisualLexicon.NODE_VISIBLE)) {
@@ -163,20 +164,38 @@ public class RenderNetwork implements GraphicsProcedure {
 			}
 		}
 	}
-	private Color chooseColor(View<CyNode> nodeView, GraphicsData graphicsData) {
+	private Color chooseColor(View<CyNode> nodeView, View<CyEdge> edgeView, GraphicsData graphicsData) {
+		
 		Color visualPropertyColor = null;
-		visualPropertyColor = (Color) nodeView.getVisualProperty(BasicVisualLexicon.NODE_FILL_COLOR);		
 		
-		Color color = null;	
+		Color color = null;
 		
-		Long suid = nodeView.getModel().getSUID();
-		
-		if (nodeView.getVisualProperty(BasicVisualLexicon.NODE_SELECTED)) {
-			color = Color.BLUE;
-		} 
-		else if (suid.equals(graphicsData.getSelectionData().getHoverNodeIndex()) || graphicsData.getPickingData().getPickedNodeIndices().contains(suid)) {
-			color = Color.GREEN;
-		}		
+		if(nodeView != null){
+			
+			visualPropertyColor = (Color) nodeView.getVisualProperty(BasicVisualLexicon.NODE_FILL_COLOR);		
+	
+			
+			Long suid = nodeView.getModel().getSUID();
+			
+			if (nodeView.getVisualProperty(BasicVisualLexicon.NODE_SELECTED)) {
+				color = Color.BLUE;
+			} 
+			else if (suid.equals(graphicsData.getSelectionData().getHoverNodeIndex()) || graphicsData.getPickingData().getPickedNodeIndices().contains(suid)) {
+				color = Color.GREEN;
+			}								
+		}else if(edgeView != null){
+			
+			visualPropertyColor = (Color) edgeView.getVisualProperty(BasicVisualLexicon.NODE_FILL_COLOR);								
+			
+			Long suid = edgeView.getModel().getSUID();
+			
+			if (edgeView.getVisualProperty(BasicVisualLexicon.NODE_SELECTED)) {
+				color = Color.BLUE;
+			} 
+			else if (suid.equals(graphicsData.getSelectionData().getHoverEdgeIndex()) || graphicsData.getPickingData().getPickedEdgeIndices().contains(suid)) {
+				color = Color.GREEN;
+			}						
+		}
 		return (color == null) ? visualPropertyColor : color;
 	}
 	

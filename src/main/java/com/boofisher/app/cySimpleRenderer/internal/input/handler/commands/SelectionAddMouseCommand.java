@@ -40,8 +40,7 @@ public class SelectionAddMouseCommand extends MouseCommandAdapter {
 	
 	@Override
 	public void clicked(int x, int y) {
-		CyNetworkView networkView = graphicsData.getNetworkView();
-		logger.warn("click detected");
+		CyNetworkView networkView = graphicsData.getNetworkView();		
 		//TODO: Default shape picking processor sets closest picked node in Cy3D, need to rework for simple render
 		//Normalize x, y to account for zoom, screen position, create real world point
 		//Iterate through shapes to see if shape contains point.
@@ -50,9 +49,6 @@ public class SelectionAddMouseCommand extends MouseCommandAdapter {
 		
 		long newHoverNodeIndex = graphicsData.getPickingData().getClosestPickedNodeIndex();
 		long newHoverEdgeIndex = graphicsData.getPickingData().getClosestPickedEdgeIndex();
-
-		logger.warn("newHoverNodeIndex = " + newHoverNodeIndex);
-		logger.warn("(!selectionData.isDragSelectMode())? " + (!selectionData.isDragSelectMode()));
 		
 		selectionData.setHoverNodeIndex(newHoverNodeIndex);
 		selectionData.setHoverEdgeIndex(newHoverEdgeIndex);
@@ -71,7 +67,7 @@ public class SelectionAddMouseCommand extends MouseCommandAdapter {
 				if (NetworkToolkit.checkEdgeSelected(newHoverEdgeIndex, networkView)) {
 					// Deselect the edge if it was already selected
 					NetworkToolkit.setEdgeSelected(newHoverEdgeIndex, networkView, false);
-				} else {
+				} else {				
 					// Select the edge if it was not selected
 					NetworkToolkit.setEdgeSelected(newHoverEdgeIndex, networkView, true);
 				}

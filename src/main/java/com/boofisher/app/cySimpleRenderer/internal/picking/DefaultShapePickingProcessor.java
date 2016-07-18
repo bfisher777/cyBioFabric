@@ -27,6 +27,9 @@ import com.boofisher.app.cySimpleRenderer.internal.tools.PairIdentifier;
 public class DefaultShapePickingProcessor implements ShapePickingProcessor {
 
 	final Logger logger = Logger.getLogger(CyUserLog.NAME);
+	// Width and height of rectangular region around mouse
+	// pointer to use for hit detection on lines
+	private static final int HIT_BOX_SIZE = 4;
 	
 	/** A constant that stands for "no type is here" */
 	public static final int NO_TYPE = -1;
@@ -107,16 +110,16 @@ public class DefaultShapePickingProcessor implements ShapePickingProcessor {
 		
 		CyNetworkView networkView = graphicsData.getNetworkView();
 		
-		getEdges(edgeHits, screenCoords, networkView, midWidth, midHeight, graphicsData.getZoomFactor(), graphicsData);
+		getEdges(edgeHits, nodeHits, screenCoords, networkView, midWidth, midHeight, graphicsData.getZoomFactor(), graphicsData);
 		getNodes(nodeHits, screenCoords, networkView, midWidth, midHeight, graphicsData.getZoomFactor(), graphicsData);
 		
 		//logger.warn("world coords are " + screenCoords.toString() + "hits size is " + edgeHits.size() + nodeHits.size());	
-		
-		if (selectAll) {
+		parseSelectionBufferSelection(edgeHits, nodeHits, graphicsData.getPickingData());
+		/*if (selectAll) {
 			parseSelectionBufferMultipleSelection(edgeHits, nodeHits,graphicsData.getPickingData());			
 		} else {
-			parseSelectionBufferSingleEdgeSelection(edgeHits, nodeHits, graphicsData.getPickingData());			
-		}
+			parseSelectionBufferSingleSelection(edgeHits, nodeHits, graphicsData.getPickingData());			
+		}*/
 	}
 	
 	//TODO learn difference between view and model
@@ -141,20 +144,25 @@ public class DefaultShapePickingProcessor implements ShapePickingProcessor {
 				// draw Rectangle2D.Double
 				if(shape.contains(screenCoords)){
 					hits.add(nodeView.getModel().getSUID());
-					break;
+					break;//found hit so stop looking
 				}													
 			}
 		}
 	}
 	
-	public void getEdges(ArrayList<Long> hits, Point screenCoords, CyNetworkView networkView, int midWidth, 
+	//http://stackoverflow.com/questions/1797209/how-to-select-a-line
+	public void getEdges(ArrayList<Long> edgeHits, ArrayList<Long> nodeHits, Point screenCoords, CyNetworkView networkView, int midWidth, 
 			int midHeight, int zoomFactor, GraphicsData graphicsData){
 		// A set containing all pairs of nodes that have had an edge drawn between them
 		Set<PairIdentifier> drawnPairs = new HashSet<PairIdentifier>();
 		CyNode source, target;		
 		
 		Shape shape = graphicsData.getMyShape();
+		int boxX = (int) (screenCoords.getX() - HIT_BOX_SIZE / 2);
+		int boxY = (int) (screenCoords.getY() - HIT_BOX_SIZE / 2);
 
+		int boxWidth = HIT_BOX_SIZE;
+		int boxHeight = HIT_BOX_SIZE;
 		
 		double x1=0, x2=0, y1=0, y2=0;
 		for (View<CyEdge> edgeView : networkView.getEdgeViews()) {
@@ -176,6 +184,7 @@ public class DefaultShapePickingProcessor implements ShapePickingProcessor {
 			//TODO mulit edges 
 			if (!drawnPairs.contains(pairIdentifier)) {
 			
+				//TODO fix this
 				if(edgeView.getVisualProperty(BasicVisualLexicon.EDGE_LINE_TYPE).toString().equals("SOLID") || true){
 					
 					View<CyNode> sourceView = networkView.getNodeView(source);
@@ -192,9 +201,12 @@ public class DefaultShapePickingProcessor implements ShapePickingProcessor {
 					}
 					
 					Shape line = new Line2D.Double((x1+midWidth), (y1+midHeight), (x2+midWidth), (y2+midHeight));
-					if(line.contains(screenCoords)){
-						hits.add(edgeView.getModel().getSUID());
-						break;
+					
+					if(line.intersects(boxX, boxY, boxWidth, boxHeight)){						
+						nodeHits.add(edgeView.getModel().getSource().getSUID());
+						nodeHits.add(edgeView.getModel().getTarget().getSUID());
+						edgeHits.add(edgeView.getModel().getSUID());
+						break; //found hit so stop looking
 					}
 				}
 				
@@ -203,16 +215,16 @@ public class DefaultShapePickingProcessor implements ShapePickingProcessor {
 		}	
 	}
 	
-	private void parseSelectionBufferSingleEdgeSelection(ArrayList<Long> edgeHits, ArrayList<Long> nodeHits, PickingData pickingData) {
+	private void parseSelectionBufferSelection(ArrayList<Long> edgeHits, ArrayList<Long> nodeHits, PickingData pickingData) {
 		pickingData.setClosestPickedNodeIndex(NO_INDEX);
 		pickingData.setClosestPickedEdgeIndex(NO_INDEX);
-				
+		
 
-		for (long v : nodeHits) {			
-			pickingData.setClosestPickedNodeIndex(v);
+		for (long v : nodeHits) {	
+			pickingData.getPickedNodeIndices().add(v);			
 		}
 		
-		for (long v : edgeHits) {			
+		for (long v : edgeHits) {				
 			pickingData.setClosestPickedEdgeIndex(v);
 		}
 	}
