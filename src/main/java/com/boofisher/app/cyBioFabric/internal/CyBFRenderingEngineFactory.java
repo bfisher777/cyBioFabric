@@ -4,8 +4,8 @@ import java.awt.Container;
 
 import javax.swing.JComponent;
 
-import com.boofisher.app.cyBioFabric.internal.CySRRenderingEngine;
-import com.boofisher.app.cyBioFabric.internal.cytoscape.view.CySRNetworkView;
+import com.boofisher.app.cyBioFabric.internal.CyBFRenderingEngine;
+import com.boofisher.app.cyBioFabric.internal.cytoscape.view.CyBFNetworkView;
 import com.boofisher.app.cyBioFabric.internal.eventbus.EventBusProvider;
 import com.boofisher.app.cyBioFabric.internal.graphics.GraphicsConfiguration;
 import com.boofisher.app.cyBioFabric.internal.graphics.GraphicsConfigurationFactory;
@@ -33,7 +33,7 @@ main view or the birds-eye view.
 
  * @author paperwing (Yue Dong)
  */
-public class CySRRenderingEngineFactory implements RenderingEngineFactory<CyNetwork> {
+public class CyBFRenderingEngineFactory implements RenderingEngineFactory<CyNetwork> {
 	
 	private final RenderingEngineManager renderingEngineManager;
 	private final VisualLexicon visualLexicon;
@@ -44,7 +44,7 @@ public class CySRRenderingEngineFactory implements RenderingEngineFactory<CyNetw
 	private final GraphicsConfigurationFactory graphicsConfigFactory;
 	
 	
-	public CySRRenderingEngineFactory(
+	public CyBFRenderingEngineFactory(
 			RenderingEngineManager renderingEngineManager, 
 			VisualLexicon lexicon,
 			TaskFactoryListener taskFactoryListener,
@@ -70,7 +70,7 @@ public class CySRRenderingEngineFactory implements RenderingEngineFactory<CyNetw
 	@Override
 	public RenderingEngine<CyNetwork> createRenderingEngine(Object container, View<CyNetwork> viewModel) {
 		// Verify the type of the view up front.
-		CySRNetworkView cySRViewModel = (CySRNetworkView) viewModel;
+		CyBFNetworkView cySRViewModel = (CyBFNetworkView) viewModel;
 		JComponent component = (JComponent) container;
 		
 		GraphicsConfiguration configuration = graphicsConfigFactory.createGraphicsConfiguration();
@@ -81,7 +81,7 @@ public class CySRRenderingEngineFactory implements RenderingEngineFactory<CyNetw
 		if(inputComponent == null)
 			inputComponent = component; // happens for birds-eye-view
 		
-		CySRRenderingEngine engine = new CySRRenderingEngine(component, inputComponent, cySRViewModel, visualLexicon, eventBusProvider,
+		CyBFRenderingEngine engine = new CyBFRenderingEngine(component, inputComponent, cySRViewModel, visualLexicon, eventBusProvider,
 				                                             configuration, taskFactoryListener, taskManager);
 		
 		renderingEngineManager.addRenderingEngine(engine);

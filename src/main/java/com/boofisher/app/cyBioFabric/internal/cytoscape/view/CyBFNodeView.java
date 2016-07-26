@@ -5,11 +5,11 @@ import org.cytoscape.model.CyNode;
 import org.cytoscape.view.model.VisualProperty;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 
-public class CySRNodeView extends CySRView<CyNode> {
+public class CyBFNodeView extends CyBFView<CyNode> {
 
 	private final CyNode node;
 	
-	public CySRNodeView(DefaultValueVault defaultValueVault, CyNode node) {
+	public CyBFNodeView(DefaultValueVault defaultValueVault, CyNode node) {
 		super(defaultValueVault);
 		this.node = node;
 	}

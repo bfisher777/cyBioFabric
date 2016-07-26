@@ -16,13 +16,13 @@ import org.cytoscape.view.model.VisualProperty;
  *
  * Think of it as a row in the view-model table.
  */
-public abstract class CySRView<S> implements View<S> {
+public abstract class CyBFView<S> implements View<S> {
 	
 	private final Map<String, VisualPropertyValue<?>> valueHolders;
 	private final Long suid;
 	protected final DefaultValueVault defaultValues;
 		
-	public CySRView(DefaultValueVault defaultValues) {
+	public CyBFView(DefaultValueVault defaultValues) {
 		this.suid = SUIDFactory.getNextSUID();
 		this.valueHolders = new HashMap<String, VisualPropertyValue<?>>();
 		this.defaultValues = defaultValues;

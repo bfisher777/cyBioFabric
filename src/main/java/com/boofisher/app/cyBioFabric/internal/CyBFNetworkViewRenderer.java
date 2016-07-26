@@ -5,7 +5,7 @@ import org.cytoscape.model.CyNetwork;
 import org.cytoscape.view.model.CyNetworkViewFactory;
 import org.cytoscape.view.presentation.RenderingEngineFactory;
 
-public class CySRNetworkViewRenderer implements NetworkViewRenderer {
+public class CyBFNetworkViewRenderer implements NetworkViewRenderer {
 
 	public static final String ID = "com.boofisher.app";
 	public static final String DISPLAY_NAME = "CySR";
@@ -14,7 +14,7 @@ public class CySRNetworkViewRenderer implements NetworkViewRenderer {
 	private final RenderingEngineFactory<CyNetwork> mainFactory;
 	private final RenderingEngineFactory<CyNetwork> birdsEyeFactory;
 	
-	public CySRNetworkViewRenderer(CyNetworkViewFactory networkViewFactory, 
+	public CyBFNetworkViewRenderer(CyNetworkViewFactory networkViewFactory, 
 			                       RenderingEngineFactory<CyNetwork> mainFactory, 
 			                       RenderingEngineFactory<CyNetwork> birdsEyeFactory) {
 		

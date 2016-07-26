@@ -29,15 +29,11 @@ import org.cytoscape.work.swing.DialogTaskManager;
 import org.cytoscape.work.undo.UndoSupport;
 import org.osgi.framework.BundleContext;
 
-import com.boofisher.app.cyBioFabric.internal.cytoscape.view.CySRVisualLexicon;
+import com.boofisher.app.cyBioFabric.internal.cytoscape.view.BioFabricVisualLexicon;
 import com.boofisher.app.cyBioFabric.internal.eventbus.EventBusProvider;
 import com.boofisher.app.cyBioFabric.internal.graphics.GraphicsConfigurationFactory;
-import com.boofisher.app.cyBioFabric.internal.layouts.FlattenLayoutAlgorithm;
+import com.boofisher.app.cyBioFabric.internal.layouts.BioFabricLayoutAlgorithm;
 import com.boofisher.app.cyBioFabric.internal.task.TaskFactoryListener;
-import com.boofisher.app.cyBioFabric.internal.layouts.BoxLayoutAlgorithm;
-import com.boofisher.app.cyBioFabric.internal.layouts.CenterLayoutAlgorithm;
-import com.boofisher.app.cyBioFabric.internal.layouts.GridLayoutAlgorithm;
-import com.boofisher.app.cyBioFabric.internal.layouts.SphericalLayoutAlgorithm;
 
 /*Main entry point into cytoscape
  * The application Simple Renderer will perform simple rendering of the input file to generate the image.
@@ -86,29 +82,29 @@ public class CyActivator extends AbstractCyActivator {
 		
 		/*A RenderingEngine should provide one, immutable lexicon implementing this interface. 
 		 * This is a pre-defined tree of VisualProperties designed by the RenderingEngine developer.*/
-		VisualLexicon cySRVisualLexicon = new CySRVisualLexicon();		
+		VisualLexicon cyBFVisualLexicon = new BioFabricVisualLexicon();		
 		/*The Properties class represents a persistent set of properties. The Properties can be saved to a stream or loaded from a stream. 
 		 *Each key and its corresponding value in the property list is a string.*/
-		Properties cySRVisualLexiconProps = new Properties();
-		cySRVisualLexiconProps.setProperty("serviceType", "visualLexicon");
-		cySRVisualLexiconProps.setProperty("id", "CyBioFabric");
-		registerService(context, cySRVisualLexicon, VisualLexicon.class, cySRVisualLexiconProps);
+		Properties cyBFVisualLexiconProps = new Properties();
+		cyBFVisualLexiconProps.setProperty("serviceType", "visualLexicon");
+		cyBFVisualLexiconProps.setProperty("id", "CyBioFabric");
+		registerService(context, cyBFVisualLexicon, VisualLexicon.class, cyBFVisualLexiconProps);
 
 		/*EventBus allows publish-subscribe-style communication between components without 
 		requiring the components to explicitly register with one another (and thus be aware 
 				of each other). It is designed exclusively to replace traditional Java in-process 
 		event distribution using explicit registration. It is not a general-purpose 
 		publish-subscribe system, nor is it intended for interprocess communication.*/
-		/*Acts as a single point for accessing the event bus for a CySRNetworkView.*/
+		/*Acts as a single point for accessing the event bus for a CyBFNetworkView.*/
 		EventBusProvider eventBusProvider = new EventBusProvider();
 		
-		// CySR NetworkView factory
+		// CyBF NetworkView factory
 		/*Factory for CyNetworkView objects. Modules which need to create view models should import this as a service.
-		 * Create a CySRNetworkView*/
-		CySRNetworkViewFactory cySRNetworkViewFactory = new CySRNetworkViewFactory(cySRVisualLexicon, visualMappingManagerService, eventBusProvider);
-		Properties cySRNetworkViewFactoryProps = new Properties();
-		cySRNetworkViewFactoryProps.setProperty("serviceType", "factory");
-		registerService(context, cySRNetworkViewFactory, CyNetworkViewFactory.class, cySRNetworkViewFactoryProps);
+		 * Create a CyBFNetworkView*/
+		CyBFNetworkViewFactory cyBFNetworkViewFactory = new CyBFNetworkViewFactory(cyBFVisualLexicon, visualMappingManagerService, eventBusProvider);
+		Properties cyBFNetworkViewFactoryProps = new Properties();
+		cyBFNetworkViewFactoryProps.setProperty("serviceType", "factory");
+		registerService(context, cyBFNetworkViewFactory, CyNetworkViewFactory.class, cyBFNetworkViewFactoryProps);
 
 		
 		// Main RenderingEngine factory
@@ -121,38 +117,30 @@ public class CyActivator extends AbstractCyActivator {
 		A container object is passed to the factory whenever a RenderingEngine is created. 
 		This is typically an instance of JComponent, and will be the parent for the RenderingEngine's drawing canvas.
 		Your RenderingEngineFactory must also register the newly created RenderingEngine with the Cytoscape RenderingEngineManager.
-		In CySR there is one class CySRRenderingEngineFactory that implements RenderingEngineFactory. Two instances are created,
+		In CyBF there is one class CyBFRenderingEngineFactory that implements RenderingEngineFactory. Two instances are created,
 		each is parameterized with a GraphicsConfigurationFactory which provides functionality that is specific to the 
 		main view or the birds-eye view.*/
-		CySRRenderingEngineFactory cySRMainRenderingEngineFactory = new CySRRenderingEngineFactory(
-				renderingEngineManager, cySRVisualLexicon, taskFactoryListener, dialogTaskManager, eventBusProvider, mainFactory);		
+		CyBFRenderingEngineFactory cyBFMainRenderingEngineFactory = new CyBFRenderingEngineFactory(
+				renderingEngineManager, cyBFVisualLexicon, taskFactoryListener, dialogTaskManager, eventBusProvider, mainFactory);		
 		// Bird's Eye RenderingEngine factory
 		GraphicsConfigurationFactory birdsEyeFactory = GraphicsConfigurationFactory.BIRDS_EYE_FACTORY;
-		CySRRenderingEngineFactory cySRBirdsEyeRenderingEngineFactory = new CySRRenderingEngineFactory(
-				renderingEngineManager, cySRVisualLexicon, taskFactoryListener, dialogTaskManager, eventBusProvider, birdsEyeFactory);
+		CyBFRenderingEngineFactory cyBFBirdsEyeRenderingEngineFactory = new CyBFRenderingEngineFactory(
+				renderingEngineManager, cyBFVisualLexicon, taskFactoryListener, dialogTaskManager, eventBusProvider, birdsEyeFactory);
 
 		
 		// NetworkViewRenderer, this is the main entry point that Cytoscape will call into
-		CySRNetworkViewRenderer networkViewRenderer = new CySRNetworkViewRenderer(
-				cySRNetworkViewFactory, cySRMainRenderingEngineFactory, cySRBirdsEyeRenderingEngineFactory);
+		CyBFNetworkViewRenderer networkViewRenderer = new CyBFNetworkViewRenderer(
+				cyBFNetworkViewFactory, cyBFMainRenderingEngineFactory, cyBFBirdsEyeRenderingEngineFactory);
 		registerService(context, networkViewRenderer, NetworkViewRenderer.class, new Properties());
 		
 		// Still need to register the rendering engine factory directly		
 		Properties renderingEngineProps = new Properties();
-		renderingEngineProps.setProperty(ID, CySRNetworkViewRenderer.ID);
-		registerAllServices(context, cySRMainRenderingEngineFactory, renderingEngineProps);
-		
-		/*// Layout algorithms, A task factory specifically for layout algorithms.
-		CyLayoutAlgorithm frAlgorithm = layoutAlgorithmManager.getLayout("fruchterman-rheingold");	
-		
-		registerLayoutAlgorithms(context,
-				frAlgorithm,
-				new SphericalLayoutAlgorithm(undoSupport),
-				new GridLayoutAlgorithm(undoSupport),
-				new BoxLayoutAlgorithm(undoSupport),
-				new FlattenLayoutAlgorithm(undoSupport),
-				new CenterLayoutAlgorithm(undoSupport)
-		);*/
+		renderingEngineProps.setProperty(ID, CyBFNetworkViewRenderer.ID);
+		registerAllServices(context, cyBFMainRenderingEngineFactory, renderingEngineProps);
+						
+		registerLayoutAlgorithms(context,				
+				new BioFabricLayoutAlgorithm(undoSupport)				
+		);
 		
 		// About dialog
 		AboutDialogAction aboutDialogAction = new AboutDialogAction(application, openBrowser);

@@ -9,13 +9,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.boofisher.app.cyBioFabric.internal.CySRNetworkViewRenderer;
-import com.boofisher.app.cyBioFabric.internal.cytoscape.view.CySREdgeView;
-import com.boofisher.app.cyBioFabric.internal.cytoscape.view.CySRNodeView;
-import com.boofisher.app.cyBioFabric.internal.cytoscape.view.CySRView;
+import com.boofisher.app.cyBioFabric.internal.CyBFNetworkViewRenderer;
+import com.boofisher.app.cyBioFabric.internal.cytoscape.view.CyBFEdgeView;
+import com.boofisher.app.cyBioFabric.internal.cytoscape.view.CyBFNodeView;
+import com.boofisher.app.cyBioFabric.internal.cytoscape.view.CyBFView;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.DefaultValueVault;
 import com.boofisher.app.cyBioFabric.internal.eventbus.EventBusProvider;
 import com.boofisher.app.cyBioFabric.internal.eventbus.FitInViewEvent;
+import com.boofisher.app.cyBioFabric.source.BioFabricNetwork;
+
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyIdentifiable;
 import org.cytoscape.model.CyNetwork;
@@ -30,14 +32,14 @@ import org.cytoscape.view.vizmap.VisualStyle;
 
 import com.google.common.eventbus.EventBus;
 
-public class CySRNetworkView extends CySRView<CyNetwork> implements CyNetworkView {
+public class CyBFNetworkView extends CyBFView<CyNetwork> implements CyNetworkView {
 
 	private final CyNetwork network;
 	
 	private final VisualLexicon visualLexicon;
 	private final VisualMappingManager visualMappingManager;
 	private final EventBus eventBus;
-	
+	//private final BioFabricNetwork bioFabricNetwork;
 	/**
 	 * The camera associated with the main network viewing window used to
 	 * perform operations such as fitting all nodes onto the screen
@@ -49,7 +51,7 @@ public class CySRNetworkView extends CySRView<CyNetwork> implements CyNetworkVie
 	private Map<Long, View<CyEdge>> edgeViews;
 	
 	
-	public CySRNetworkView(CyNetwork network, VisualLexicon visualLexicon, VisualMappingManager visualMappingManager, EventBusProvider eventBusProvider) {
+	public CyBFNetworkView(CyNetwork network, VisualLexicon visualLexicon, VisualMappingManager visualMappingManager, EventBusProvider eventBusProvider) {
 		super(new DefaultValueVault(visualLexicon));
 		
 		this.network = network;
@@ -62,12 +64,12 @@ public class CySRNetworkView extends CySRView<CyNetwork> implements CyNetworkVie
 		edgeViews = new HashMap<>();
 		
 		for (CyNode node : network.getNodeList()) {
-			CySRNodeView nodeView = new CySRNodeView(defaultValues, node);
+			CyBFNodeView nodeView = new CyBFNodeView(defaultValues, node);
 			nodeViews.put(node.getSUID(), nodeView);
 		}
 		
 		for (CyEdge edge : network.getEdgeList()) {
-			CySREdgeView edgeView = new CySREdgeView(defaultValues, edge);
+			CyBFEdgeView edgeView = new CyBFEdgeView(defaultValues, edge);
 			edgeViews.put(edge.getSUID(), edgeView);
 		}
 	}
@@ -163,7 +165,7 @@ public class CySRNetworkView extends CySRView<CyNetwork> implements CyNetworkVie
 				// Found a node without a view?
 				if (nodeViews.get(node.getSUID()) == null) {
 					
-					CySRNodeView nodeView = new CySRNodeView(defaultValues, node);
+					CyBFNodeView nodeView = new CyBFNodeView(defaultValues, node);
 					
 					nodeViews.put(node.getSUID(), nodeView);
 					
@@ -208,7 +210,7 @@ public class CySRNetworkView extends CySRView<CyNetwork> implements CyNetworkVie
 				// Found a edge without a view?
 				if (edgeViews.get(edge.getSUID()) == null) {
 					
-					CySREdgeView edgeView = new CySREdgeView(defaultValues, edge);
+					CyBFEdgeView edgeView = new CyBFEdgeView(defaultValues, edge);
 					
 					edgeViews.put(edge.getSUID(), edgeView);
 					
@@ -316,7 +318,7 @@ public class CySRNetworkView extends CySRView<CyNetwork> implements CyNetworkVie
 
 	@Override
 	public String getRendererId() {
-		return CySRNetworkViewRenderer.ID;
+		return CyBFNetworkViewRenderer.ID;
 	}
 
 }

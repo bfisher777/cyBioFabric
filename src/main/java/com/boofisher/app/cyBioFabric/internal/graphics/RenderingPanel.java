@@ -11,7 +11,7 @@ import javax.swing.RootPaneContainer;
 import org.apache.log4j.Logger;
 import org.cytoscape.application.CyUserLog;
 import org.cytoscape.view.model.VisualLexicon;
-import com.boofisher.app.cyBioFabric.internal.cytoscape.view.CySRNetworkView;
+import com.boofisher.app.cyBioFabric.internal.cytoscape.view.CyBFNetworkView;
 import com.boofisher.app.cyBioFabric.internal.data.GraphicsData;
 import com.boofisher.app.cyBioFabric.internal.eventbus.EventBusProvider;
 import com.google.common.eventbus.EventBus;
@@ -29,7 +29,7 @@ public class RenderingPanel extends JPanel{
 	protected JScrollPane jsp;
 	    
 	public RenderingPanel(
-			CySRNetworkView networkView, 
+			CyBFNetworkView networkView, 
 			VisualLexicon visualLexicon, 
 			EventBusProvider eventBusProvider, 
 			GraphicsConfiguration configuration,									

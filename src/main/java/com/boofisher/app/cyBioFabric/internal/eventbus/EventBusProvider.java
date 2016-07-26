@@ -5,7 +5,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import com.boofisher.app.cyBioFabric.internal.cytoscape.view.CySRNetworkView;
+import com.boofisher.app.cyBioFabric.internal.cytoscape.view.CyBFNetworkView;
 
 import com.google.common.eventbus.EventBus;
 
@@ -26,7 +26,7 @@ public class EventBusProvider {
 	 * Note: The parameter type is rather restrictive to ensure its not accidentally
 	 * called on any CyIdentifiable.
 	 */
-	public synchronized EventBus getEventBus(CySRNetworkView identifiable) {
+	public synchronized EventBus getEventBus(CyBFNetworkView identifiable) {
 		Long suid = checkNotNull(identifiable).getSUID();
 		
 		/*EventBus allows publish-subscribe-style communication between components without 

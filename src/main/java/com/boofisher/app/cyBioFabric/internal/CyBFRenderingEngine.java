@@ -12,7 +12,7 @@ import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.RootPaneContainer;
 
-import com.boofisher.app.cyBioFabric.internal.cytoscape.view.CySRNetworkView;
+import com.boofisher.app.cyBioFabric.internal.cytoscape.view.CyBFNetworkView;
 import com.boofisher.app.cyBioFabric.internal.eventbus.EventBusProvider;
 import com.boofisher.app.cyBioFabric.internal.graphics.GraphicsConfiguration;
 import com.boofisher.app.cyBioFabric.internal.graphics.RenderingPanel;
@@ -27,20 +27,20 @@ import org.cytoscape.view.model.VisualProperty;
 import org.cytoscape.view.presentation.RenderingEngine;
 import org.cytoscape.work.swing.DialogTaskManager;
 
-public class CySRRenderingEngine implements RenderingEngine<CyNetwork> {
+public class CyBFRenderingEngine implements RenderingEngine<CyNetwork> {
 	
 	final Logger logger = Logger.getLogger(CyUserLog.NAME);
 	
-	private final CySRNetworkView networkView;
+	private final CyBFNetworkView networkView;
 	private final VisualLexicon visualLexicon;
 	
 	private RenderingPanel panel;	
 	
 	
-	public CySRRenderingEngine(
+	public CyBFRenderingEngine(
 			JComponent component,
 			JComponent inputComponent,
-			CySRNetworkView viewModel, 
+			CyBFNetworkView viewModel, 
 			VisualLexicon visualLexicon, 
 			EventBusProvider eventBusProvider, 
 			GraphicsConfiguration configuration,
@@ -136,7 +136,7 @@ public class CySRRenderingEngine implements RenderingEngine<CyNetwork> {
 	
 	@Override
 	public String getRendererId() {
-		return CySRNetworkViewRenderer.ID;
+		return CyBFNetworkViewRenderer.ID;
 	}
 	
 	@Override
