@@ -52,7 +52,7 @@ public class AboutDialog extends JDialog {
 						+ "<table border='0'><tr>"
 						+ "<td width='125'></td>"
 						+ "<td width='200'>"
-						+ "<p align=center><b>CySR</b><BR>A Cytoscape App<BR><BR></p>"
+						+ "<p align=center><b>CyBioFabric</b><BR>A Cytoscape App<BR><BR></p>"
 						+ "<p align=center>Version: " + version + "<br>Build: " + timestamp + "</p>"
 						+ "</td>"
 						+ "<td width='125'><div align='right'></td>"

@@ -110,7 +110,7 @@ public class DefaultShapePickingProcessor implements ShapePickingProcessor {
 		
 		CyNetworkView networkView = graphicsData.getNetworkView();
 		
-		getEdges(edgeHits, nodeHits, screenCoords, networkView, midWidth, midHeight, graphicsData.getZoomFactor(), graphicsData);
+		getEdges(edgeHits, screenCoords, networkView, midWidth, midHeight, graphicsData.getZoomFactor(), graphicsData);
 		getNodes(nodeHits, screenCoords, networkView, midWidth, midHeight, graphicsData.getZoomFactor(), graphicsData);
 		
 		//logger.warn("world coords are " + screenCoords.toString() + "hits size is " + edgeHits.size() + nodeHits.size());	
@@ -151,7 +151,7 @@ public class DefaultShapePickingProcessor implements ShapePickingProcessor {
 	}
 	
 	//http://stackoverflow.com/questions/1797209/how-to-select-a-line
-	public void getEdges(ArrayList<Long> edgeHits, ArrayList<Long> nodeHits, Point screenCoords, CyNetworkView networkView, int midWidth, 
+	public void getEdges(ArrayList<Long> edgeHits, Point screenCoords, CyNetworkView networkView, int midWidth, 
 			int midHeight, int zoomFactor, GraphicsData graphicsData){
 		// A set containing all pairs of nodes that have had an edge drawn between them
 		Set<PairIdentifier> drawnPairs = new HashSet<PairIdentifier>();
@@ -203,8 +203,6 @@ public class DefaultShapePickingProcessor implements ShapePickingProcessor {
 					Shape line = new Line2D.Double((x1+midWidth), (y1+midHeight), (x2+midWidth), (y2+midHeight));
 					
 					if(line.intersects(boxX, boxY, boxWidth, boxHeight)){						
-						nodeHits.add(edgeView.getModel().getSource().getSUID());
-						nodeHits.add(edgeView.getModel().getTarget().getSUID());
 						edgeHits.add(edgeView.getModel().getSUID());
 						break; //found hit so stop looking
 					}
@@ -221,7 +219,7 @@ public class DefaultShapePickingProcessor implements ShapePickingProcessor {
 		
 
 		for (long v : nodeHits) {	
-			pickingData.getPickedNodeIndices().add(v);			
+			pickingData.setClosestPickedNodeIndex(v);			
 		}
 		
 		for (long v : edgeHits) {				

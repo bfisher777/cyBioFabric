@@ -6,12 +6,13 @@ import static org.cytoscape.work.ServiceProperties.INSERT_SEPARATOR_BEFORE;
 import static org.cytoscape.work.ServiceProperties.MENU_GRAVITY;
 import static org.cytoscape.work.ServiceProperties.TITLE;
 
-import java.io.IOException;
 import java.util.Properties;
 
-
+import org.apache.log4j.Logger;
+import org.cytoscape.application.CyUserLog;
 import org.cytoscape.application.NetworkViewRenderer;
 import org.cytoscape.application.swing.CySwingApplication;
+import org.cytoscape.event.CyEventHelper;
 import org.cytoscape.service.util.AbstractCyActivator;
 import org.cytoscape.task.EdgeViewTaskFactory;
 import org.cytoscape.task.NetworkViewLocationTaskFactory;
@@ -29,6 +30,7 @@ import org.cytoscape.work.swing.DialogTaskManager;
 import org.cytoscape.work.undo.UndoSupport;
 import org.osgi.framework.BundleContext;
 
+import com.boofisher.app.cyBioFabric.BioFabricNetwork;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.BioFabricVisualLexicon;
 import com.boofisher.app.cyBioFabric.internal.eventbus.EventBusProvider;
 import com.boofisher.app.cyBioFabric.internal.graphics.GraphicsConfigurationFactory;
@@ -40,10 +42,16 @@ import com.boofisher.app.cyBioFabric.internal.task.TaskFactoryListener;
  * The app provides no user input handling and is meant to be a demonstration of writing a simple renderer
  * using Java 2-D with Cytoscape. */
 public class CyActivator extends AbstractCyActivator {
-
+	
+	final Logger logger = Logger.getLogger(CyUserLog.NAME);
+	public static BioFabricNetwork bfn;
+	
+	
 	@Override
 	public void start(BundleContext context) throws Exception {				
 
+		bfn = null;
+		
 		/*This interface provides basic access to the Swing objects that constitute this application.*/
 		CySwingApplication application = getService(context, CySwingApplication.class);
 		
@@ -137,10 +145,11 @@ public class CyActivator extends AbstractCyActivator {
 		Properties renderingEngineProps = new Properties();
 		renderingEngineProps.setProperty(ID, CyBFNetworkViewRenderer.ID);
 		registerAllServices(context, cyBFMainRenderingEngineFactory, renderingEngineProps);
-						
+					
 		registerLayoutAlgorithms(context,				
 				new BioFabricLayoutAlgorithm(undoSupport)				
 		);
+		logger.warn("BioFabricLayoutAlgorithm registered");
 		
 		// About dialog
 		AboutDialogAction aboutDialogAction = new AboutDialogAction(application, openBrowser);
@@ -165,5 +174,9 @@ public class CyActivator extends AbstractCyActivator {
 		}
 	}
 	
+	//TODO:find a better way to pass this object to graphics data
+	public synchronized static void setBioFabricNetwork (BioFabricNetwork bfn){
+		CyActivator.bfn = bfn;
+	}			
 }
 

@@ -16,12 +16,14 @@ import org.cytoscape.application.CyUserLog;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.view.model.View;
 
+import com.boofisher.app.cyBioFabric.internal.CyActivator;
 import com.boofisher.app.cyBioFabric.internal.data.GraphicsData;//open-gl
 import com.boofisher.app.cyBioFabric.internal.graphics.AbstractGraphicsConfiguration;//open-gl
 import com.boofisher.app.cyBioFabric.internal.input.handler.ToolPanel;
 import com.boofisher.app.cyBioFabric.internal.picking.DefaultShapePickingProcessor;
 import com.boofisher.app.cyBioFabric.internal.picking.ShapePickingProcessor;
 import com.boofisher.app.cyBioFabric.internal.rendering.RenderNetwork;
+import com.boofisher.app.cyBioFabric.internal.rendering.RenderNodesAsLinesProcedure;
 import com.google.common.eventbus.EventBus;
 
 public class MainGraphicsConfiguration extends AbstractGraphicsConfiguration {
@@ -38,7 +40,9 @@ public class MainGraphicsConfiguration extends AbstractGraphicsConfiguration {
 		//TODO fix this
 		shapePickingProcessor = new DefaultShapePickingProcessor(null, null);
 		
-		add(new RenderNetwork());
+		add(new RenderNodesAsLinesProcedure());
+		
+		//add(new RenderNetwork());		
 		//add(new UpdateEdges());//draw updated edges over bImage
 		//add(new UpdateNodes());//draw updated nodes over bImage
 		//add(new UpdateView()); //perform transformations on view

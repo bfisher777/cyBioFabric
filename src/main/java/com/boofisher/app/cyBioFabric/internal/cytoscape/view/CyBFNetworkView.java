@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.boofisher.app.cyBioFabric.BioFabricNetwork;
 import com.boofisher.app.cyBioFabric.internal.CyBFNetworkViewRenderer;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.CyBFEdgeView;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.CyBFNodeView;
@@ -16,7 +17,6 @@ import com.boofisher.app.cyBioFabric.internal.cytoscape.view.CyBFView;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.DefaultValueVault;
 import com.boofisher.app.cyBioFabric.internal.eventbus.EventBusProvider;
 import com.boofisher.app.cyBioFabric.internal.eventbus.FitInViewEvent;
-import com.boofisher.app.cyBioFabric.source.BioFabricNetwork;
 
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyIdentifiable;
