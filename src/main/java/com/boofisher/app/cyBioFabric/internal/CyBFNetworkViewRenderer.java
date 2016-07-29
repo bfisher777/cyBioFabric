@@ -7,7 +7,7 @@ import org.cytoscape.view.presentation.RenderingEngineFactory;
 
 public class CyBFNetworkViewRenderer implements NetworkViewRenderer {
 
-	public static final String ID = "com.boofisher.app";
+	public static final String ID = "com.boofisher.app.biofabric";
 	public static final String DISPLAY_NAME = "CyBioFabric";
 	
 	private final CyNetworkViewFactory networkViewFactory;
