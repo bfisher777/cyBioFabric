@@ -37,6 +37,8 @@ import com.boofisher.app.cyBioFabric.BioFabricNetwork;
 import com.boofisher.app.cyBioFabric.BufferBuilder;
 import com.boofisher.app.cyBioFabric.PaintCache;
 import com.boofisher.app.cyBioFabric.internal.CyActivator;
+import com.boofisher.app.cyBioFabric.internal.cytoscape.view.BNVisualPropertyValue;
+import com.boofisher.app.cyBioFabric.internal.cytoscape.view.BioFabricVisualLexicon;
 import com.boofisher.app.cyBioFabric.internal.data.GraphicsData;
 import com.boofisher.app.cyBioFabric.internal.tools.NetworkToolkit;
 import com.boofisher.app.cyBioFabric.internal.tools.PairIdentifier;
@@ -67,11 +69,12 @@ public class RenderNodesAsLinesProcedure implements GraphicsProcedure {
 	
 	@Override
 	public void execute(GraphicsData graphicsData) {
-				
-		BioFabricNetwork bfn = CyActivator.bfn;
+			
+		BNVisualPropertyValue bnvp = graphicsData.getNetworkView().getVisualProperty(BioFabricVisualLexicon.BIOFABRIC_NETWORK);
+		BioFabricNetwork bfn = bnvp.getBioFabricNetwork();
 					
 		//Houston we have a problem
-		if(CyActivator.bfn == null){
+		if(bfn == null){
 			System.out.println(getClass().getName() + ": BFN is null");
 			return;
 		}

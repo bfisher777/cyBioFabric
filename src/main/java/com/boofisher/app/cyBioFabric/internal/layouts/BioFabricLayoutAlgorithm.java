@@ -16,7 +16,6 @@ public class BioFabricLayoutAlgorithm extends AbstractLayoutAlgorithm {
 		super("biofabric", "BioFabric Layout", undo);	
 	}
 
-
 	@Override
 	public TaskIterator createTaskIterator(CyNetworkView networkView, Object context, Set<View<CyNode>> nodesToLayOut, String layoutAttribute) {
 		return new TaskIterator(new BioFabricLayoutAlgorithmTask(getName(), networkView, nodesToLayOut, layoutAttribute, undoSupport));

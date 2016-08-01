@@ -10,6 +10,7 @@ import com.boofisher.app.cyBioFabric.internal.input.handler.BirdsEyeEventBusList
 import com.boofisher.app.cyBioFabric.internal.data.GraphicsData;
 import com.boofisher.app.cyBioFabric.internal.graphics.AbstractGraphicsConfiguration;
 import com.boofisher.app.cyBioFabric.internal.rendering.RenderNetwork;
+import com.boofisher.app.cyBioFabric.internal.rendering.RenderNodesAsLinesProcedure;
 import com.google.common.eventbus.EventBus;
 
 public class BirdsEyeGraphicsConfiguration extends AbstractGraphicsConfiguration {
@@ -17,7 +18,7 @@ public class BirdsEyeGraphicsConfiguration extends AbstractGraphicsConfiguration
 	private JComponent frame;	
 	
 	public BirdsEyeGraphicsConfiguration() {			
-		add(new RenderNetwork());
+		add(new RenderNodesAsLinesProcedure());
 	}
 	
 	@Override

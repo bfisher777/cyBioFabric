@@ -44,13 +44,9 @@ import com.boofisher.app.cyBioFabric.internal.task.TaskFactoryListener;
 public class CyActivator extends AbstractCyActivator {
 	
 	final Logger logger = Logger.getLogger(CyUserLog.NAME);
-	public static BioFabricNetwork bfn;
-	
-	
+
 	@Override
 	public void start(BundleContext context) throws Exception {				
-
-		bfn = null;
 		
 		/*This interface provides basic access to the Swing objects that constitute this application.*/
 		CySwingApplication application = getService(context, CySwingApplication.class);
@@ -76,6 +72,8 @@ public class CyActivator extends AbstractCyActivator {
 		/*A task factory specifically for layout algorithms.*/
 		CyLayoutAlgorithmManager layoutAlgorithmManager =  getService(context, CyLayoutAlgorithmManager.class);
 		TunableSetter tunableSetter = getService(context, TunableSetter.class);
+		
+		BioFabricLayoutAlgorithm bfLayoutAlg = new BioFabricLayoutAlgorithm(undoSupport);
 		
 		// A specialization of TaskManager that creates a JDialog configuration object and expects the dialog parent to be a Window.
 		DialogTaskManager dialogTaskManager = getService(context, DialogTaskManager.class);
@@ -128,11 +126,11 @@ public class CyActivator extends AbstractCyActivator {
 		In CyBF there is one class CyBFRenderingEngineFactory that implements RenderingEngineFactory. Two instances are created,
 		each is parameterized with a GraphicsConfigurationFactory which provides functionality that is specific to the 
 		main view or the birds-eye view.*/
-		CyBFRenderingEngineFactory cyBFMainRenderingEngineFactory = new CyBFRenderingEngineFactory(
+		CyBFRenderingEngineFactory cyBFMainRenderingEngineFactory = new CyBFRenderingEngineFactory(bfLayoutAlg, layoutAlgorithmManager,
 				renderingEngineManager, cyBFVisualLexicon, taskFactoryListener, dialogTaskManager, eventBusProvider, mainFactory);		
 		// Bird's Eye RenderingEngine factory
 		GraphicsConfigurationFactory birdsEyeFactory = GraphicsConfigurationFactory.BIRDS_EYE_FACTORY;
-		CyBFRenderingEngineFactory cyBFBirdsEyeRenderingEngineFactory = new CyBFRenderingEngineFactory(
+		CyBFRenderingEngineFactory cyBFBirdsEyeRenderingEngineFactory = new CyBFRenderingEngineFactory(bfLayoutAlg, layoutAlgorithmManager,
 				renderingEngineManager, cyBFVisualLexicon, taskFactoryListener, dialogTaskManager, eventBusProvider, birdsEyeFactory);
 
 		
@@ -145,11 +143,10 @@ public class CyActivator extends AbstractCyActivator {
 		Properties renderingEngineProps = new Properties();
 		renderingEngineProps.setProperty(ID, CyBFNetworkViewRenderer.ID);
 		registerAllServices(context, cyBFMainRenderingEngineFactory, renderingEngineProps);
-					
+								
 		registerLayoutAlgorithms(context,				
-				new BioFabricLayoutAlgorithm(undoSupport)				
-		);
-		logger.warn("BioFabricLayoutAlgorithm registered");
+				bfLayoutAlg				
+		);		
 		
 		// About dialog
 		AboutDialogAction aboutDialogAction = new AboutDialogAction(application, openBrowser);
@@ -172,11 +169,6 @@ public class CyActivator extends AbstractCyActivator {
 			
 			registerService(context, algorithms[i], CyLayoutAlgorithm.class, props);
 		}
-	}
-	
-	//TODO:find a better way to pass this object to graphics data
-	public synchronized static void setBioFabricNetwork (BioFabricNetwork bfn){
-		CyActivator.bfn = bfn;
 	}			
 }
 
