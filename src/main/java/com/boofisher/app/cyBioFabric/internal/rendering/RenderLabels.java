@@ -44,49 +44,42 @@ public class RenderLabels implements GraphicsProcedure {
 		BufferedImage bImage = graphicsData.getBufferedImage();
 		Graphics2D imageGraphics = bImage.createGraphics();	
 		
-		if(graphicsData.getShowLabels()){
-			JScrollPane pictureScrollPane = graphicsData.getScrollPane();
+		if(graphicsData.getShowLabels()){			
 			// networkView.updateView();
 			for (View<CyNode> nodeView : networkView.getNodeViews()) {
 				x = nodeView.getVisualProperty(BasicVisualLexicon.NODE_X_LOCATION).floatValue();
 				y = nodeView.getVisualProperty(BasicVisualLexicon.NODE_Y_LOCATION).floatValue();
 				//abstract method implementing class will write 
-				drawNodeLabels(nodeView, imageGraphics, midWidth, midHeight, x, y, pictureScrollPane);
+				drawNodeLabels(nodeView, imageGraphics, midWidth, midHeight, x, y);
 			}
 		}
 		imageGraphics.dispose();
 	}
 	
 	public void drawNodeLabels(View<CyNode> nodeView, Graphics2D g2, int midWidth, int midHeight, 
-			float x, float y, JScrollPane pictureScrollPane) {
+			float x, float y) {
 		//handle text labels drawing
 		String text = nodeView.getVisualProperty(BasicVisualLexicon.NODE_LABEL);		
 		Color textColor = null;
+
+				
+		// TODO: Check if there is a way around this cast
+		textColor = (Color) nodeView.getVisualProperty(BasicVisualLexicon.NODE_LABEL_COLOR);
+		if (textColor == null) {
+			
+			// Use black as default if no node label color was found
+			textColor = TEXT_DEFAULT_COLOR;
+		}
+		int textFontSize = DEFAULT_TEXT_FONT_SIZE;
 		
-		if (text != null) {
+		textFontSize = (textFontSize > 14 ) ? 14 : textFontSize;
+		textFontSize = (textFontSize < 2 ) ? 2 : textFontSize;
+		Font font = new Font(DEFAULT_FONT_NAME, Font.PLAIN, textFontSize);
+		
+		g2.setColor(textColor);
+		g2.setFont(font);
+		g2.drawString(text, x+midWidth, y+midHeight);		
 				
-			//TODO this if statement doesn't work
-			if (pictureScrollPane.getViewport().getSize().getWidth() > x &&
-					pictureScrollPane.getViewport().getSize().getHeight() > y && x > 0 && y > 0 || true) {
-				
-				// TODO: Check if there is a way around this cast
-				textColor = (Color) nodeView.getVisualProperty(BasicVisualLexicon.NODE_LABEL_COLOR);
-				if (textColor == null) {
-					
-					// Use black as default if no node label color was found
-					textColor = TEXT_DEFAULT_COLOR;
-				}
-				int textFontSize = DEFAULT_TEXT_FONT_SIZE;
-				
-				textFontSize = (textFontSize > 14 ) ? 14 : textFontSize;
-				textFontSize = (textFontSize < 2 ) ? 2 : textFontSize;
-				Font font = new Font(DEFAULT_FONT_NAME, Font.PLAIN, textFontSize);
-				
-				g2.setColor(textColor);
-				g2.setFont(font);
-				g2.drawString(text, x+midWidth, y+midHeight);		
-			}
-		}		
 	}	
 
 }

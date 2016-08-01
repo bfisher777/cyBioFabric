@@ -85,7 +85,10 @@ public class BioFabricNetwork {
   // For mapping of selections:
   //
   
+  //stores the row of the node and the CyNode SUID(long) as a string
   private HashMap<Integer, String> rowToTarg_;
+  
+  //the number of nodes in the network
   private int rowCount_;
   
   //
@@ -94,7 +97,9 @@ public class BioFabricNetwork {
   
   private TreeMap<Integer, LinkInfo> fullLinkDefs_;
   private TreeMap<Integer, Integer> nonShadowedLinkMap_;
-  private HashMap<String, NodeInfo> nodeDefs_;
+  
+  //stores the CyNode SUID(long) as a string and the NodeInfo object
+  private HashMap<String, NodeInfo> nodeDefs_; 
   
   //
   // Grouping for links:
@@ -1903,7 +1908,7 @@ public class BioFabricNetwork {
     public Set<FabricLink> allLinks;
     public Set<String> loneNodes;
     public FabricColorGenerator colGen;
-    public Map<String, String> nodeOrder;
+    public Map<String, String> nodeOrder; //holds the cyId(long.toString) and the row number(int.toString)
     public List<String> existingOrder;
     public SortedMap<Integer, FabricLink> linkOrder;
     public List<String> existingLinkGroups;

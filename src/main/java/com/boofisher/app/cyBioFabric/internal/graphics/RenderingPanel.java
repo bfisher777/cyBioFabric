@@ -26,7 +26,6 @@ public class RenderingPanel extends JPanel{
 	
 	
 	protected JPanel picture;
-	protected JScrollPane jsp;
 	    
 	public RenderingPanel(
 			CyBFNetworkView networkView, 
@@ -41,11 +40,10 @@ public class RenderingPanel extends JPanel{
 		
 		//set up scroll pane on main view
 		if( this instanceof RootPaneContainer) {
-			jsp = new JScrollPane(this);
-			this.graphicsData = new GraphicsData(networkView, visualLexicon, eventBus, this, inputComponent, jsp);
+			this.graphicsData = new GraphicsData(networkView, visualLexicon, eventBus, this, inputComponent);
 			graphicsData.setIsMain(true);						
 		}else{			 
-			this.graphicsData = new GraphicsData(networkView, visualLexicon, eventBus, this, inputComponent, null);
+			this.graphicsData = new GraphicsData(networkView, visualLexicon, eventBus, this, inputComponent);
 		}				
 	}
 	

@@ -107,7 +107,7 @@ public class CommandSet {
 	      // We never create shadow feedback links
 		  //TODO do new shadow links need to be added to the network
 		  if (!source.equals(target)) {
-			  //TODO create hidden edge and then add it to network			   
+			  //TODO create hidden edge and then add to network			   
 			  //CyEdge newEdge = network.addEdge(nodeSource, nodeTarget, edgeView.getModel().isDirected());
 			  //network.getRow(newEdge).set(CyNetwork.NAME, rel);
 			  //fabricEdges.add(newEdge);

@@ -34,6 +34,12 @@ public class BioFabricVisualLexicon extends BasicVisualLexicon{
 	/** The root visual property */
 	public static final VisualProperty<NullDataType> ROOT = new NullVisualProperty( "CY_BIOFABRIC_ROOT", "cyBioFabric Rendering Engine Root Visual Property");
 	
+
+	/***************************************************************************************************************************
+	 * BioFabric Network
+	 * * ***********************************************************************************************************************/
+	public static final VisualProperty<BNVisualPropertyValue> BIOFABRIC_NETWORK = new BNVisualProperty("BIOFABRIC_NETWORK", "BioFabric Network", CyNetwork.class);
+	
 	/***************************************************************************************************************************
 	 * These data are found in PaintCache
 	 * * ***********************************************************************************************************************/
@@ -126,6 +132,8 @@ public class BioFabricVisualLexicon extends BasicVisualLexicon{
 	public BioFabricVisualLexicon() {
 		super(ROOT);
 		
+		addVisualProperty(BIOFABRIC_NETWORK, BasicVisualLexicon.NETWORK);
+		
 		addVisualProperty(NODE_NAME, BasicVisualLexicon.NODE);
 		addVisualProperty(NODE_ROW, BasicVisualLexicon.NODE);
 		addVisualProperty(NODE_COLOR_KEY, BasicVisualLexicon.NODE);
@@ -166,22 +174,23 @@ public class BioFabricVisualLexicon extends BasicVisualLexicon{
 		supportedProps.add(BasicVisualLexicon.NETWORK_CENTER_Y_LOCATION);
 
 		supportedProps.add(BasicVisualLexicon.NODE_SELECTED);
-		supportedProps.add(BasicVisualLexicon.NODE_FILL_COLOR);
-		supportedProps.add(BasicVisualLexicon.NODE_SELECTED_PAINT);
+		//supportedProps.add(BasicVisualLexicon.NODE_FILL_COLOR);
+		//supportedProps.add(BasicVisualLexicon.NODE_SELECTED_PAINT);
 		supportedProps.add(BasicVisualLexicon.NODE_LABEL);
 		supportedProps.add(BasicVisualLexicon.NODE_VISIBLE);				
-		supportedProps.add(BasicVisualLexicon.NODE_SIZE);		
-		supportedProps.add(BasicVisualLexicon.NODE_WIDTH);
-		supportedProps.add(BasicVisualLexicon.NODE_HEIGHT);
+		//supportedProps.add(BasicVisualLexicon.NODE_SIZE);		
+		//supportedProps.add(BasicVisualLexicon.NODE_WIDTH);
+		//supportedProps.add(BasicVisualLexicon.NODE_HEIGHT);
 		
 		supportedProps.add(BasicVisualLexicon.EDGE_VISIBLE);
-		supportedProps.add(BasicVisualLexicon.EDGE_LINE_TYPE);
+		//supportedProps.add(BasicVisualLexicon.EDGE_LINE_TYPE);
 		supportedProps.add(BasicVisualLexicon.EDGE_SELECTED);
 		supportedProps.add(BasicVisualLexicon.EDGE_SELECTED_PAINT);
 		supportedProps.add(BasicVisualLexicon.EDGE_PAINT);
 		supportedProps.add(BasicVisualLexicon.EDGE_LABEL);		
 		
 		//See constant fields for definitions
+		supportedProps.add(BIOFABRIC_NETWORK);
 		supportedProps.add(NODE_NAME);
 		supportedProps.add(NODE_ROW);
 		supportedProps.add(NODE_COLOR_KEY);

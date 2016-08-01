@@ -98,6 +98,7 @@ public class DefaultLayout {
   /***************************************************************************
   **
   ** Install node orders
+  ** Create a map between node and row
   */
   
   public void installNodeOrder(List<String> targets, BioFabricNetwork.RelayoutBuildData rbd) {
@@ -136,6 +137,9 @@ public class DefaultLayout {
          
     HashSet<String> targsToGo = new HashSet<String>();
     Iterator<FabricLink> alit = allLinks.iterator();
+    
+    //loop finds calculates the edge count for each source and target node in allLinks
+    //looks to be adding links as bi-directional
     while (alit.hasNext()) {
       FabricLink nextLink = alit.next();
       String source = nextLink.getSrc();

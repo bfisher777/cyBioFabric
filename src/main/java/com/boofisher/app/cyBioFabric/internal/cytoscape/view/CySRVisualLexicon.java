@@ -30,7 +30,7 @@ public class CySRVisualLexicon extends BasicVisualLexicon {
 	/** The root visual property */
 	public static final VisualProperty<NullDataType> ROOT = new NullVisualProperty( "CYSR_ROOT", "cySR Rendering Engine Root Visual Property");
 	
-	public static final VisualProperty<DetailLevel> DETAIL_LEVEL = new DetailLevelVisualProperty("DETAIL_LEVEL", "Detail Level", CyNetwork.class);
+	public static final VisualProperty<BNVisualPropertyValue> DETAIL_LEVEL = new BNVisualProperty("DETAIL_LEVEL", "Detail Level", CyNetwork.class);
 	
 	private final Set<VisualProperty<?>> supportedProps = new HashSet<>();
 	private final Map<VisualProperty<?>, Collection<?>> supportedValuesMap = new HashMap<>();

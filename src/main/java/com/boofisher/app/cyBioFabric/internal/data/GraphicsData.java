@@ -6,8 +6,6 @@ import java.awt.image.BufferedImage;
 
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-
 import com.boofisher.app.cyBioFabric.internal.cytoscape.edges.EdgeAnalyser;
 import com.boofisher.app.cyBioFabric.internal.task.TaskFactoryListener;
 
@@ -17,7 +15,6 @@ import com.boofisher.app.cyBioFabric.internal.data.PickingData;
 import org.cytoscape.application.CyUserLog;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.VisualLexicon;
-import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 import org.cytoscape.work.swing.DialogTaskManager;
 
 import com.google.common.eventbus.EventBus;
@@ -75,19 +72,17 @@ public class GraphicsData {
 	private BufferedImage bufferedImage;
 	private BufferedImage renderedImage;	
 	
-	private JScrollPane scrollPane;
 	private boolean isMain;	
 	
 	private Graphics myGraphics;
 	
 	public GraphicsData(CyNetworkView networkView, VisualLexicon visualLexicon, EventBus eventBus,
-			JComponent container, JComponent inputComponent, JScrollPane scrollPane) {
+			JComponent container, JComponent inputComponent) {
 		this.networkView = networkView;
 		this.eventBus = eventBus;
 		this.visualLexicon = visualLexicon;
 		this.container = container;
-		this.inputComponent = inputComponent;
-		this.scrollPane = scrollPane;
+		this.inputComponent = inputComponent;		
 		this.aTransform = new AffineTransform();
 		this.isMain = false;
 				
@@ -242,16 +237,6 @@ public class GraphicsData {
 	public void setRenderedImage(BufferedImage bi) {
 		if(bi != null){
 			this.renderedImage = bi;
-		}
-	}
-
-	public JScrollPane getScrollPane() {
-		return scrollPane;
-	}
-	
-	public void setScrollPane(JScrollPane scrollPane) {
-		if(scrollPane != null){
-			this.scrollPane = scrollPane;
 		}
 	}
 	

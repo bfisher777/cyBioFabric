@@ -5,6 +5,10 @@ import java.util.Set;
 
 import com.boofisher.app.cyBioFabric.CommandSet;
 import com.boofisher.app.cyBioFabric.internal.CyActivator;
+import com.boofisher.app.cyBioFabric.internal.cytoscape.view.BNVisualProperty;
+import com.boofisher.app.cyBioFabric.internal.cytoscape.view.BNVisualPropertyValue;
+import com.boofisher.app.cyBioFabric.internal.cytoscape.view.BioFabricVisualLexicon;
+
 import org.apache.log4j.Logger;
 import org.cytoscape.application.CyUserLog;
 import org.cytoscape.event.CyEventHelper;
@@ -30,12 +34,14 @@ public class BioFabricLayoutAlgorithmTask extends AbstractLayoutTask {
 		
 		 /* Partition the graph -- this builds the LayoutEdge and LayoutNode
 		  * arrays as a byproduct. TODO: find out if this is needed*/
-		List<LayoutPartition> layoutPartitions = PartitionUtil.partition(networkView, false, null);
+		//List<LayoutPartition> layoutPartitions = PartitionUtil.partition(networkView, false, null);
+		
+		BNVisualPropertyValue bnvp = networkView.getVisualProperty(BioFabricVisualLexicon.BIOFABRIC_NETWORK);
 		
 		CommandSet onCommand = new CommandSet();				
 		
-		//TODO: revisit this
-		CyActivator.setBioFabricNetwork(onCommand.loadDataFromCytoscape(networkView));				
+		//TODO: revisit this		
+		bnvp.setBioFabricNetwork(onCommand.loadDataFromCytoscape(networkView));				
 	}		
 }
 

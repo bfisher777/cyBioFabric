@@ -123,8 +123,10 @@ public class CyBFRenderingEngineFactory implements RenderingEngineFactory<CyNetw
 	private void setLayoutAlgorithm(CyBFNetworkView cyBFViewModel){
 		// Get the layout
 		CyLayoutAlgorithm layout = layoutAlgorithmManager.getLayout(bfLayoutAlg.getName());
-		if(layout == null)
+		if(layout == null){
+			System.out.println("layout is null");
 			layout = layoutAlgorithmManager.getDefaultLayout();
+		}
 
 		// apply the layout
 		TaskIterator taskIterator = layout.createTaskIterator(cyBFViewModel, layout.getDefaultLayoutContext(), CyLayoutAlgorithm.ALL_NODE_VIEWS, null);

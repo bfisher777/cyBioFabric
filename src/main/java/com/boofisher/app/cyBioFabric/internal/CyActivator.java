@@ -44,15 +44,9 @@ import com.boofisher.app.cyBioFabric.internal.task.TaskFactoryListener;
 public class CyActivator extends AbstractCyActivator {
 	
 	final Logger logger = Logger.getLogger(CyUserLog.NAME);
-	
-	//TODO move this into a visual property
-	public static BioFabricNetwork bfn;
-	
-	
+
 	@Override
 	public void start(BundleContext context) throws Exception {				
-
-		bfn = null;
 		
 		/*This interface provides basic access to the Swing objects that constitute this application.*/
 		CySwingApplication application = getService(context, CySwingApplication.class);
@@ -175,11 +169,6 @@ public class CyActivator extends AbstractCyActivator {
 			
 			registerService(context, algorithms[i], CyLayoutAlgorithm.class, props);
 		}
-	}
-	
-	//TODO:find a better way to pass this object to graphics data
-	public synchronized static void setBioFabricNetwork (BioFabricNetwork bfn){
-		CyActivator.bfn = bfn;
 	}			
 }
 
