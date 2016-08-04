@@ -47,6 +47,8 @@ public class CyBFRenderingEngineFactory implements RenderingEngineFactory<CyNetw
 	private final BioFabricLayoutAlgorithm bfLayoutAlg;
 	private final CyLayoutAlgorithmManager layoutAlgorithmManager;
 	
+	private boolean firstLoad; //used to signal that this is the first time factory is called
+	
 	private final GraphicsConfigurationFactory graphicsConfigFactory;
 	
 	
@@ -67,6 +69,8 @@ public class CyBFRenderingEngineFactory implements RenderingEngineFactory<CyNetw
 		this.taskManager = taskManager;
 		this.eventBusProvider = eventBusFactory;
 		this.graphicsConfigFactory = graphicsConfigFactory;
+		
+		this.firstLoad = true;
 	}
 	
 	
@@ -84,7 +88,11 @@ public class CyBFRenderingEngineFactory implements RenderingEngineFactory<CyNetw
 		
 		GraphicsConfiguration configuration = graphicsConfigFactory.createGraphicsConfiguration();
 		
-		setLayoutAlgorithm(cyBFViewModel);
+		//algorithmically set layout for first call
+		if(firstLoad){
+			setLayoutAlgorithm(cyBFViewModel);
+			firstLoad = false;
+		}
 		
 		// TODO the birds eye view should not be attaching input listeners to the outer component
 		// Is the Birds eye view above the top glass pane?

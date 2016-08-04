@@ -30,7 +30,7 @@ import org.cytoscape.work.swing.DialogTaskManager;
 import org.cytoscape.work.undo.UndoSupport;
 import org.osgi.framework.BundleContext;
 
-import com.boofisher.app.cyBioFabric.BioFabricNetwork;
+import com.boofisher.app.cyBioFabric.internal.biofabric.BioFabricNetwork;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.BioFabricVisualLexicon;
 import com.boofisher.app.cyBioFabric.internal.eventbus.EventBusProvider;
 import com.boofisher.app.cyBioFabric.internal.graphics.GraphicsConfigurationFactory;

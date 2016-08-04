@@ -3,6 +3,8 @@ package com.boofisher.app.cyBioFabric.internal.graphics;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.awt.Graphics;
+import java.awt.Graphics2D;
+
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -38,6 +40,9 @@ public class RenderingPanel extends JPanel{
 		this.configuration = checkNotNull(configuration);
 		EventBus eventBus = eventBusProvider.getEventBus(networkView);				
 		
+		JScrollPane jsp = new JScrollPane(this);
+	    
+		
 		//set up scroll pane on main view
 		if( this instanceof RootPaneContainer) {
 			this.graphicsData = new GraphicsData(networkView, visualLexicon, eventBus, this, inputComponent);
@@ -50,13 +55,15 @@ public class RenderingPanel extends JPanel{
 	@Override
     public void paintComponent(Graphics g) {										
 		super.paintComponent(g);
-		graphicsData.setMyGraphics(g);
+		Graphics2D g2d = (Graphics2D)g;
+		graphicsData.setMyGraphics(g2d);
 		graphicsData.setScreenHeight(this.getHeight());
 		graphicsData.setScreenWidth(this.getWidth());
+		graphicsData.setATransform(g2d.getTransform());
 		
 		//now call the graphics configuration rendering procedures
-		// Doesn't really need to be split into two methods, but it allows GrapicsConfigurations to 
-		// only override update() and leave the drawing to AbstractGraphicsConfiguration.
+		//Doesn't really need to be split into two methods, but it allows GrapicsConfigurations to 
+		//only override update() and leave the drawing to AbstractGraphicsConfiguration.
 		//update() handles picking and picked node rendering 
 		configuration.update();
 		//draw scene calls the rendering procedures

@@ -2,46 +2,20 @@ package com.boofisher.app.cyBioFabric.internal.rendering;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.Shape;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Line2D;
-import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
-import javax.swing.JComponent;
-
 import org.apache.log4j.Logger;
 import org.cytoscape.application.CyUserLog;
-import org.cytoscape.model.CyEdge;
-import org.cytoscape.model.CyNode;
-import org.cytoscape.view.model.CyNetworkView;
-import org.cytoscape.view.model.View;
-import org.cytoscape.view.presentation.property.BasicVisualLexicon;
-import org.cytoscape.view.presentation.property.NodeShapeVisualProperty;
-
-import com.boofisher.app.cyBioFabric.BioFabricNetwork;
-import com.boofisher.app.cyBioFabric.BufferBuilder;
-import com.boofisher.app.cyBioFabric.PaintCache;
-import com.boofisher.app.cyBioFabric.internal.CyActivator;
+import com.boofisher.app.cyBioFabric.internal.biofabric.model.BioFabricNetwork;
+import com.boofisher.app.cyBioFabric.internal.biofabric.ui.render.PaintCache;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.BNVisualPropertyValue;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.BioFabricVisualLexicon;
 import com.boofisher.app.cyBioFabric.internal.data.GraphicsData;
-import com.boofisher.app.cyBioFabric.internal.tools.NetworkToolkit;
-import com.boofisher.app.cyBioFabric.internal.tools.PairIdentifier;
 
 
 /********************************************************************************
@@ -70,8 +44,8 @@ public class RenderNodesAsLinesProcedure implements GraphicsProcedure {
 	@Override
 	public void execute(GraphicsData graphicsData) {
 			
-		BNVisualPropertyValue bnvp = graphicsData.getNetworkView().getVisualProperty(BioFabricVisualLexicon.BIOFABRIC_NETWORK);
-		BioFabricNetwork bfn = bnvp.getBioFabricNetwork();
+		BNVisualPropertyValue bnvpv = graphicsData.getNetworkView().getVisualProperty(BioFabricVisualLexicon.BIOFABRIC_NETWORK);
+		BioFabricNetwork bfn = bnvpv.getBioFabricNetwork();
 					
 		//Houston we have a problem
 		if(bfn == null){
@@ -84,6 +58,11 @@ public class RenderNodesAsLinesProcedure implements GraphicsProcedure {
 		Graphics2D g2 = (Graphics2D)graphicsData.getMyGraphics();   
 	    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 	    g2.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);	    
+	    double zoom = ((graphicsData.getZoomFactor()/(double)graphicsData.MAX_ZOOM)- 1)*(-1);
+	    
+	    AffineTransform atScale = new AffineTransform(); 
+	    atScale.scale(zoom, zoom);
+	    g2.transform(atScale);
 	    
 	    //TODO need to add a button for this
 	    boolean shadeNodes = true;
@@ -91,6 +70,9 @@ public class RenderNodesAsLinesProcedure implements GraphicsProcedure {
 	    painter.buildObjCache(bfn.getNodeDefList(), bfn.getLinkDefList(showShadows), shadeNodes, 
 	                           showShadows, new HashMap<String, Rectangle2D>(), new HashMap<String, Rectangle2D>());
 	    paintIt(g2, bfn, painter, graphicsData);
+	    
+	    
+	    g2.setTransform(graphicsData.getATransform());
 	    
 	}
 	
@@ -124,7 +106,7 @@ public class RenderNodesAsLinesProcedure implements GraphicsProcedure {
 	    Graphics2D g2 = (Graphics2D)g;   
 	    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 	    g2.setRenderingHint(RenderingHints.KEY_FRACTIONALMETRICS, RenderingHints.VALUE_FRACTIONALMETRICS_ON);
-	    g2.getTransform();   
+	      
 	    Rectangle clip = new Rectangle((int)viewRect.getX(), (int)viewRect.getY(), (int)viewRect.getWidth(), (int)viewRect.getHeight());
 	    //g2.transform(graphicsData.getATransform());
 	    BasicStroke selectedStroke = new BasicStroke(PaintCache.STROKE_SIZE, BasicStroke.CAP_SQUARE, BasicStroke.JOIN_MITER);    
@@ -141,14 +123,5 @@ public class RenderNodesAsLinesProcedure implements GraphicsProcedure {
 	    
 	    return;
 	  }
-	  
-	  /***************************************************************************
-	   **
-	   ** Draw Object
-	   */  
 	   
-	   private static class ImageToUse {
-	     ImageToUse(BufferedImage image, int stX, int stY) {
-	     }
-	   } 
 }

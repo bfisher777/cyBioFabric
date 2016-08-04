@@ -2,7 +2,7 @@ package com.boofisher.app.cyBioFabric.internal.cytoscape.view;
 
 import org.cytoscape.view.presentation.property.values.AbstractVisualPropertyValue;
 
-import com.boofisher.app.cyBioFabric.BioFabricNetwork;
+import com.boofisher.app.cyBioFabric.internal.biofabric.model.BioFabricNetwork;
 
 
 /*
@@ -17,8 +17,8 @@ public class BNVisualPropertyValue extends AbstractVisualPropertyValue {
 		bfn = null;
 	}
 	
-	public void setBioFabricNetwork(BioFabricNetwork bfn){
-		this.bfn = bfn;
+	public void setBioFabricNetwork(BioFabricNetwork bioFabricNetwork){
+		this.bfn = bioFabricNetwork;
 	}
 	
 	public BioFabricNetwork getBioFabricNetwork(){

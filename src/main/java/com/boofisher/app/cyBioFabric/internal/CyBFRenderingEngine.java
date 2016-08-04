@@ -6,12 +6,19 @@ import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.print.Printable;
+import java.util.HashMap;
 import java.util.Properties;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.RootPaneContainer;
 
+import com.boofisher.app.cyBioFabric.internal.biofabric.app.BioFabricApplication;
+import com.boofisher.app.cyBioFabric.internal.biofabric.app.BioFabricWindow;
+import com.boofisher.app.cyBioFabric.internal.biofabric.model.BioFabricNetwork;
+import com.boofisher.app.cyBioFabric.internal.cytoscape.view.BNVisualPropertyValue;
+import com.boofisher.app.cyBioFabric.internal.cytoscape.view.BioFabricVisualLexicon;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.CyBFNetworkView;
 import com.boofisher.app.cyBioFabric.internal.eventbus.EventBusProvider;
 import com.boofisher.app.cyBioFabric.internal.graphics.GraphicsConfiguration;
@@ -34,7 +41,9 @@ public class CyBFRenderingEngine implements RenderingEngine<CyNetwork> {
 	private final CyBFNetworkView networkView;
 	private final VisualLexicon visualLexicon;
 	
-	private RenderingPanel panel;	
+	//private RenderingPanel panel;	
+	private BioFabricWindow bioFabricWindow;
+	private final BioFabricApplication bioFabricApplication;
 	
 	
 	public CyBFRenderingEngine(
@@ -50,6 +59,8 @@ public class CyBFRenderingEngine implements RenderingEngine<CyNetwork> {
 		this.networkView = viewModel;
 		this.visualLexicon = visualLexicon;
 		
+		this.bioFabricApplication = new BioFabricApplication(false);
+		
 		setUpCanvas(component, inputComponent, configuration, eventBusProvider, taskFactoryListener, taskManager);
 	}
 	
@@ -63,32 +74,35 @@ public class CyBFRenderingEngine implements RenderingEngine<CyNetwork> {
 	private void setUpCanvas(JComponent container, JComponent inputComponent, 
 			                 GraphicsConfiguration configuration, EventBusProvider eventBusProvider, 
 			                 TaskFactoryListener taskFactoryListener, DialogTaskManager taskManager) {				
-		
-		
-		panel = new RenderingPanel(networkView, visualLexicon, eventBusProvider, 
+				
+		/*panel = new RenderingPanel(networkView, visualLexicon, eventBusProvider, 
 				configuration, inputComponent);
 		panel.setIgnoreRepaint(false); 
 		panel.setDoubleBuffered(true);
 		
 		// When networkView.updateView() is called it will repaint all containers it owns
-		networkView.addContainer(panel); 
+		networkView.addContainer(panel);*/ 		
+		final HashMap<String, Object> args = new HashMap<String, Object>();
+				
+		bioFabricApplication.launch(args);
+		bioFabricWindow = bioFabricApplication.getBioFabricWindow();
 		
 		if (container instanceof RootPaneContainer) {			
 			RootPaneContainer rootPaneContainer = (RootPaneContainer) container;
 			Container pane = rootPaneContainer.getContentPane();
 			pane.setLayout(new BorderLayout());
-			pane.add(panel, BorderLayout.CENTER);
+			pane.add(bioFabricWindow, BorderLayout.CENTER);
 			logger.warn("Added main view");
 		} else {			
-			container.setLayout(new BorderLayout());
+			/*container.setLayout(new BorderLayout());
 			container.add(panel, BorderLayout.CENTER);
-			logger.warn("Added birds eye view");
+			logger.warn("Added birds eye view")*/;
 		}
 		
-		//adds tool bar to frame
+		/*//adds tool bar to frame
 		configuration.initializeFrame(container, inputComponent);
 		//set up event listeners / handlers / fit graph in view
-		configuration.initialize(panel.getGraphicsData());
+		configuration.initialize(panel.getGraphicsData());*/
 	}
 	
 	
@@ -116,11 +130,11 @@ public class CyBFRenderingEngine implements RenderingEngine<CyNetwork> {
 	public Image createImage(int width, int height) {
 		Image image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB_PRE);		
 
-		Dimension panelSize = panel.getSize();
+		/*Dimension panelSize = panel.getSize();
 		
 		panel.setSize(width, height);
 		panel.paint(image.getGraphics());
-		panel.setSize(panelSize);
+		panel.setSize(panelSize);*/
 		
 		return image;
 	}
