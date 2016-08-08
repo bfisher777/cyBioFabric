@@ -358,6 +358,10 @@ public class CommandSet implements ZoomChangeTracker, SelectionChangeListener, F
   */   
   
   public void optionsHaveChanged(boolean needRebuild, boolean needRecolor) {
+	  
+	  //TODO remove this
+	  System.out.println("Options have changed is called");
+	  
     if (!needRebuild && !needRecolor) {
       bfp_.repaint();
       return;
@@ -4208,6 +4212,9 @@ public class CommandSet implements ZoomChangeTracker, SelectionChangeListener, F
     private BioFabricNetwork.PreBuiltBuildData restore_;
     
     public void doNetworkBuild(BioFabricNetwork.BuildData bfn, boolean isMain) {
+    	
+    	//TODO: remove this
+    	System.out.println("Trying to do network build");
       try {
         if (bfn.canRestore()) {
           BioFabricNetwork net = bfp_.getNetwork();

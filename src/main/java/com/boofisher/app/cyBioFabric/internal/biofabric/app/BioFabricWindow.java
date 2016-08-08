@@ -212,8 +212,9 @@ public class BioFabricWindow extends JInternalFrame implements BackgroundWorkerC
     JMenu gaggleGooseChooseMenu = (doGaggle_) ? new JMenu(ResourceManager.getManager().getString("command.gooseChoose")) : null;    
     gaggleGooseCombo_ = (doGaggle_) ? new FixedJComboBox(250) : null;    
     fc.setGaggleElements(gaggleGooseChooseMenu, gaggleGooseCombo_);
-        
-    menuInstall(fc, isMain_, gaggleGooseChooseMenu);
+      
+    //TODO move menu to Cytoscape frame
+    //menuInstall(fc, isMain_, gaggleGooseChooseMenu);
     toolBar = new JToolBar();
     stockActionMap(fc, isMain_);
     stockToolBar(toolBar, isMain_, fc);
@@ -236,7 +237,8 @@ public class BioFabricWindow extends JInternalFrame implements BackgroundWorkerC
     cpane.setLayout(new BorderLayout());
     
     if (toolBar != null) {
-      cpane.add(toolBar, BorderLayout.NORTH);
+      //TODO move tool bar into Cytoscape frame
+      //cpane.add(toolBar, BorderLayout.NORTH);
     }
         
     hidingPanel_ = new JPanel();

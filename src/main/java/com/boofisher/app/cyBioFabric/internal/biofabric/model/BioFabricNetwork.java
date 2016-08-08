@@ -130,6 +130,8 @@ public class BioFabricNetwork {
   
   private FabricColorGenerator colGen_;
   
+  private BuildData bd_; //added to pass to cytoscape renderer
+  
   ////////////////////////////////////////////////////////////////////////////
   //
   // PUBLIC CONSTRUCTORS
@@ -143,7 +145,7 @@ public class BioFabricNetwork {
 
   public BioFabricNetwork(BuildData bd) {
     BuildMode mode = bd.getMode();
-    
+    bd_ = bd;
     switch (mode) {
       case DEFAULT_LAYOUT:  
       case REORDER_LAYOUT:
@@ -1949,7 +1951,7 @@ public class BioFabricNetwork {
       	  this.nodeName = network.getModel().getRow(node).get(CyNetwork.NAME, String.class);
         
       	  View<CyNode> view = network.getNodeView(node);
-      	  view.setVisualProperty(BioFabricVisualLexicon.NODE_NAME, nodeName);
+      	  view.setVisualProperty(BioFabricVisualLexicon.NODE_NAME, this.nodeName);
       	  view.setVisualProperty(BioFabricVisualLexicon.NODE_COLOR_KEY, colorKey);
       	  view.setVisualProperty(BioFabricVisualLexicon.NODE_ROW, nodeRow);
       	  view.setVisualProperty(BioFabricVisualLexicon.COL_RANGE_HIGH, colRangePln_.max);
@@ -2568,5 +2570,13 @@ public class BioFabricNetwork {
    */    
    public FabricColorGenerator getColorGenerator() {
      return (colGen_);
+   }
+   
+   /***************************************************************************
+    **
+    ** Get BuildData
+    */ 
+   public BuildData getBuildData(){
+	   return bd_;
    }
 }

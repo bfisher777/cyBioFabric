@@ -30,7 +30,6 @@ import org.cytoscape.work.swing.DialogTaskManager;
 import org.cytoscape.work.undo.UndoSupport;
 import org.osgi.framework.BundleContext;
 
-import com.boofisher.app.cyBioFabric.internal.biofabric.BioFabricNetwork;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.BioFabricVisualLexicon;
 import com.boofisher.app.cyBioFabric.internal.eventbus.EventBusProvider;
 import com.boofisher.app.cyBioFabric.internal.graphics.GraphicsConfigurationFactory;
@@ -46,7 +45,7 @@ public class CyActivator extends AbstractCyActivator {
 	final Logger logger = Logger.getLogger(CyUserLog.NAME);
 
 	@Override
-	public void start(BundleContext context) throws Exception {				
+	public void start(BundleContext context) throws Exception {								
 		
 		/*This interface provides basic access to the Swing objects that constitute this application.*/
 		CySwingApplication application = getService(context, CySwingApplication.class);
@@ -66,14 +65,19 @@ public class CyActivator extends AbstractCyActivator {
 		and VisualStyleAboutToBeRemovedEvent.*/
 		VisualMappingManager visualMappingManagerService = getService(context, VisualMappingManager.class);
 		
-		/*A simple interface that posts edits to the Cytoscape undo stack.*/
+		//A simple interface that posts edits to the Cytoscape undo stack.
 		UndoSupport undoSupport = getService(context, UndoSupport.class);
 		
-		/*A task factory specifically for layout algorithms.*/
+		//A task factory specifically for layout algorithms.
 		CyLayoutAlgorithmManager layoutAlgorithmManager =  getService(context, CyLayoutAlgorithmManager.class);
+		
 		TunableSetter tunableSetter = getService(context, TunableSetter.class);
 		
 		BioFabricLayoutAlgorithm bfLayoutAlg = new BioFabricLayoutAlgorithm(undoSupport);
+		registerLayoutAlgorithms(context,				
+				bfLayoutAlg				
+		);
+		layoutAlgorithmManager.setDefaultLayout(bfLayoutAlg);
 		
 		// A specialization of TaskManager that creates a JDialog configuration object and expects the dialog parent to be a Window.
 		DialogTaskManager dialogTaskManager = getService(context, DialogTaskManager.class);
@@ -142,11 +146,7 @@ public class CyActivator extends AbstractCyActivator {
 		// Still need to register the rendering engine factory directly		
 		Properties renderingEngineProps = new Properties();
 		renderingEngineProps.setProperty(ID, CyBFNetworkViewRenderer.ID);
-		registerAllServices(context, cyBFMainRenderingEngineFactory, renderingEngineProps);
-								
-		registerLayoutAlgorithms(context,				
-				bfLayoutAlg				
-		);		
+		registerAllServices(context, cyBFMainRenderingEngineFactory, renderingEngineProps);												
 		
 		// About dialog
 		AboutDialogAction aboutDialogAction = new AboutDialogAction(application, openBrowser);

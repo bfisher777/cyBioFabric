@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Set;
 
 import com.boofisher.app.cyBioFabric.internal.CyBFNetworkViewRenderer;
-import com.boofisher.app.cyBioFabric.internal.biofabric.BioFabricNetwork;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.CyBFEdgeView;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.CyBFNodeView;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.CyBFView;

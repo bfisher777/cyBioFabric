@@ -1,21 +1,15 @@
 package com.boofisher.app.cyBioFabric.internal.layouts;
 
-import java.util.List;
 import java.util.Set;
 
-import com.boofisher.app.cyBioFabric.internal.CyActivator;
 import com.boofisher.app.cyBioFabric.internal.biofabric.DefaultLayoutBuildTool;
-import com.boofisher.app.cyBioFabric.internal.cytoscape.view.BNVisualProperty;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.BNVisualPropertyValue;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.BioFabricVisualLexicon;
 
 import org.apache.log4j.Logger;
 import org.cytoscape.application.CyUserLog;
-import org.cytoscape.event.CyEventHelper;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.view.layout.AbstractLayoutTask;
-import org.cytoscape.view.layout.LayoutPartition;
-import org.cytoscape.view.layout.PartitionUtil;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
 import org.cytoscape.work.TaskMonitor;

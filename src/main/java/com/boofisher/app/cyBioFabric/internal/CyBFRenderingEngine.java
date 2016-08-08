@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.print.Printable;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Properties;
 
@@ -13,10 +14,12 @@ import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.RootPaneContainer;
+import javax.swing.plaf.basic.BasicInternalFrameUI;
 
 import com.boofisher.app.cyBioFabric.internal.biofabric.app.BioFabricApplication;
 import com.boofisher.app.cyBioFabric.internal.biofabric.app.BioFabricWindow;
 import com.boofisher.app.cyBioFabric.internal.biofabric.model.BioFabricNetwork;
+import com.boofisher.app.cyBioFabric.internal.biofabric.cmd.CommandSet;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.BNVisualPropertyValue;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.BioFabricVisualLexicon;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.CyBFNetworkView;
@@ -34,6 +37,7 @@ import org.cytoscape.view.model.VisualProperty;
 import org.cytoscape.view.presentation.RenderingEngine;
 import org.cytoscape.work.swing.DialogTaskManager;
 
+
 public class CyBFRenderingEngine implements RenderingEngine<CyNetwork> {
 	
 	final Logger logger = Logger.getLogger(CyUserLog.NAME);
@@ -41,8 +45,9 @@ public class CyBFRenderingEngine implements RenderingEngine<CyNetwork> {
 	private final CyBFNetworkView networkView;
 	private final VisualLexicon visualLexicon;
 	
-	//private RenderingPanel panel;	
+	private RenderingPanel panel;	
 	private BioFabricWindow bioFabricWindow;
+	private BioFabricWindow selectionWindow;
 	private final BioFabricApplication bioFabricApplication;
 	
 	
@@ -74,37 +79,108 @@ public class CyBFRenderingEngine implements RenderingEngine<CyNetwork> {
 	private void setUpCanvas(JComponent container, JComponent inputComponent, 
 			                 GraphicsConfiguration configuration, EventBusProvider eventBusProvider, 
 			                 TaskFactoryListener taskFactoryListener, DialogTaskManager taskManager) {				
-				
-		/*panel = new RenderingPanel(networkView, visualLexicon, eventBusProvider, 
-				configuration, inputComponent);
-		panel.setIgnoreRepaint(false); 
-		panel.setDoubleBuffered(true);
-		
-		// When networkView.updateView() is called it will repaint all containers it owns
-		networkView.addContainer(panel);*/ 		
-		final HashMap<String, Object> args = new HashMap<String, Object>();
-				
-		bioFabricApplication.launch(args);
-		bioFabricWindow = bioFabricApplication.getBioFabricWindow();
-		
-		if (container instanceof RootPaneContainer) {			
+										
+		if (container instanceof RootPaneContainer) {		
+			
+			final HashMap<String, Object> args = new HashMap<String, Object>();
+					
+			bioFabricApplication.launch(args);
+			bioFabricWindow = bioFabricApplication.getBioFabricWindow();
+			selectionWindow = bioFabricApplication.getSelectionWindow();
+			
+			clearBorder();
+			
 			RootPaneContainer rootPaneContainer = (RootPaneContainer) container;
 			Container pane = rootPaneContainer.getContentPane();
 			pane.setLayout(new BorderLayout());
 			pane.add(bioFabricWindow, BorderLayout.CENTER);
+			
+			BNVisualPropertyValue bnvpv = networkView.getVisualProperty(BioFabricVisualLexicon.BIOFABRIC_NETWORK);
+			BioFabricNetwork bfn = bnvpv.getBioFabricNetwork();
+			
+			while(bfn == null){
+				try {
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				bfn = bnvpv.getBioFabricNetwork();
+			}
+			
+			installBioFabricNetwork(bfn, bioFabricWindow, selectionWindow);						
+			System.out.println("Attempting to install BioFabric Network");
 			logger.warn("Added main view");
-		} else {			
-			/*container.setLayout(new BorderLayout());
+			/*logger.warn("Biofabric network data: " );
+			logger.warn("rowCount: " + bfn.getRowCount());
+			logger.warn("columnCount: " + bfn.getColumnCount(false));
+			logger.warn("");*/
+		} else {
+			/*// When networkView.updateView() is called it will repaint all containers it owns
+			networkView.addContainer(panel); 
+			panel = new RenderingPanel(networkView, visualLexicon, eventBusProvider, 
+					configuration, inputComponent);
+			panel.setIgnoreRepaint(false); 
+			panel.setDoubleBuffered(true);
+			
+			container.setLayout(new BorderLayout());
 			container.add(panel, BorderLayout.CENTER);
-			logger.warn("Added birds eye view")*/;
-		}
-		
-		/*//adds tool bar to frame
-		configuration.initializeFrame(container, inputComponent);
-		//set up event listeners / handlers / fit graph in view
-		configuration.initialize(panel.getGraphicsData());*/
+			
+			//adds tool bar to frame
+			configuration.initializeFrame(container, inputComponent);
+			//set up event listeners / handlers / fit graph in view
+			configuration.initialize(panel.getGraphicsData());
+			*/
+			logger.warn("Added birds eye view");
+		}							
 	}
 	
+	
+	/*http://stackoverflow.com/questions/7218608/hiding-title-bar-of-jinternalframe-java
+	 * http://stackoverflow.com/questions/3620970/how-to-remove-the-borders-in-jinternalframe
+	 * */
+	private void clearBorder(){
+		
+		((BasicInternalFrameUI)bioFabricWindow.getUI()).setNorthPane(null);	
+		((BasicInternalFrameUI)selectionWindow.getUI()).setNorthPane(null);
+		
+		((BasicInternalFrameUI)bioFabricWindow.getUI()).setWestPane(null);	
+		((BasicInternalFrameUI)selectionWindow.getUI()).setWestPane(null);
+		
+		((BasicInternalFrameUI)bioFabricWindow.getUI()).setEastPane(null);	
+		((BasicInternalFrameUI)selectionWindow.getUI()).setEastPane(null);
+		
+		((BasicInternalFrameUI)bioFabricWindow.getUI()).setSouthPane(null);	
+		((BasicInternalFrameUI)selectionWindow.getUI()).setSouthPane(null);
+		
+		bioFabricWindow.setBorder(null);
+		selectionWindow.setBorder(null);
+		
+	}
+	
+	
+	//TODO not sure if I need to call this on the selectionWindow
+	//Disable menu toolbar in biofabric network manually if desired
+	public void installBioFabricNetwork(BioFabricNetwork bfn, BioFabricWindow bfw, BioFabricWindow selectionWindow){
+		  if(bfn != null){
+		    bfw.getFabricPanel().installModel(bfn);
+		    selectionWindow.getFabricPanel().installModel(bfn);
+		    
+		    CommandSet fc = CommandSet.getCmds((true) ? "mainWindow" : "selectionWindow");
+		    
+		    //build the nav window image?
+		    try {
+				fc.newModelOperations(bfn.getBuildData(), true);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		  }else{
+			  System.out.println("Attempting to install a null BioFabricNetwork");
+		  }
+		  
+		  bfw.showNavAndControl(false);
+	  }
 	
 	@Override
 	public View<CyNetwork> getViewModel() {

@@ -75,6 +75,7 @@ public class BioFabricApplication {
   */
   
   public BioFabricApplication(boolean forCyto){
+	  
     forCyto_ = forCyto;
   }
   
@@ -167,7 +168,7 @@ public class BioFabricApplication {
     bfw_.setVisible(true);
     initSelection();
     Boolean doGag = (Boolean)args.get("doGaggle");
-    gooseLaunch(bfw_, (doGag != null) && doGag.booleanValue()); 
+    gooseLaunch(bfw_, (doGag != null) && doGag.booleanValue());    
         
     return (bfw_);
   }
@@ -249,4 +250,9 @@ public class BioFabricApplication {
   public BioFabricWindow getBioFabricWindow(){
 	  return bfw_;
   }
+  
+  public BioFabricWindow getSelectionWindow(){
+	  return selectionWindow_;
+  }
+    
 }

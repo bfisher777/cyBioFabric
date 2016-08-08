@@ -70,7 +70,7 @@ public class DefaultLayoutBuildTool {
     HashSet<String> loneNodes = new HashSet<String>();       
 	  try { 
 	    bioFabricDataLoader(networkView, links, loneNodes); 
-	    return (finishLoadFromSIFSource(networkView, links, loneNodes));
+	    return finishLoad(networkView, links, loneNodes);
 	  } catch (OutOfMemoryError oom) {
 	    //ExceptionHandler.getHandler().displayOutOfMemory(oom);
 	    return null;  
@@ -88,7 +88,7 @@ public class DefaultLayoutBuildTool {
 	  CyNetwork network = networkView.getModel();		  		 
 	  Collection<View<CyNode>> nodeViews = networkView.getNodeViews();
 	  Collection<View<CyEdge>> edgeViews = networkView.getEdgeViews();
-	  ArrayList<CyEdge> fabricEdges = new ArrayList<CyEdge>(edgeViews.size());
+	  
 	  //get all edges and make a fabric link
 	  for(View<CyEdge> edgeView : edgeViews){
 		  
@@ -138,11 +138,11 @@ public class DefaultLayoutBuildTool {
   ** Method may return null.
   */ 
     
-  private BioFabricNetwork finishLoadFromSIFSource(CyNetworkView networkView, List<FabricLink> links, Set<String> loneNodes) {
+  private BioFabricNetwork finishLoad(CyNetworkView networkView, List<FabricLink> links, Set<String> loneNodes) {
 	  BioFabricNetwork bfn = null;
 	  
 	  try {	      
-	      SortedMap relaMap = BioFabricNetwork.extractRelations(links);               	 
+	      SortedMap<FabricLink.AugRelation, Boolean> relaMap = BioFabricNetwork.extractRelations(links);               	 
 	                  
 	      assignDirections(links, relaMap);
 	      HashSet<FabricLink> reducedLinks = new HashSet<FabricLink>();
@@ -156,10 +156,10 @@ public class DefaultLayoutBuildTool {
 	      bfn = new BioFabricNetwork(bfnbd);	      
 	      
     } catch (OutOfMemoryError oom) {
-      //ExceptionHandler.getHandler().displayOutOfMemory(oom);
+      System.err.println("Out Of Memomry: " + oom.toString());
       return null;  
     }
-    
+    System.out.println("Finished building BioFabricNetwork");
     return bfn;
   } 
   
@@ -168,8 +168,8 @@ public class DefaultLayoutBuildTool {
    ** Process a link set that has not had directionality established
    */
 
-   public static void assignDirections(List allLinks, Map relMap) {    
-     Iterator alit = allLinks.iterator();
+   public static void assignDirections(List<FabricLink> allLinks, Map<FabricLink.AugRelation, Boolean> relMap) {    
+     Iterator<FabricLink> alit = allLinks.iterator();
      while (alit.hasNext()) {
        FabricLink nextLink = (FabricLink)alit.next();
        FabricLink.AugRelation rel = nextLink.getAugRelation();

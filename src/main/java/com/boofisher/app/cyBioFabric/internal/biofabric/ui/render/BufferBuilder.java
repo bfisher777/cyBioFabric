@@ -558,9 +558,9 @@ public class BufferBuilder {
   ** cross-over is set to 10,000 links:
   */ 
 
-  public static int[] calcImageZooms(BioFabricNetwork bfn) { 
-
+  public static int[] calcImageZooms(BioFabricNetwork bfn) {  
     boolean showShadows = FabricDisplayOptionsManager.getMgr().getDisplayOptions().getDisplayShadows();
+
     int lco = (bfn == null) ? 0 : bfn.getLinkCount(showShadows);
     int[] preZooms;
     if (lco != 0) {

@@ -31,7 +31,7 @@ import com.boofisher.app.cyBioFabric.internal.tools.PairIdentifier;
  * Class will be responsible for rendering the network's nodes and edges
  * */
 
-public class RenderNetwork implements GraphicsProcedure {
+public class RenderNetworkProcedure implements GraphicsProcedure {
 	final Logger logger = Logger.getLogger(CyUserLog.NAME);
 	GraphicsData graphicsData;
 	boolean isMain;

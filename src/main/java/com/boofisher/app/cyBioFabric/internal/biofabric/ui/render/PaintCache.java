@@ -120,7 +120,7 @@ public class PaintCache {
   */
   
   public boolean needToPaint() {
-  	System.out.println("paint paths = " + paintPaths_.size());
+  	//System.out.println("paint paths = " + paintPaths_.size());
     return (!paintPaths_.isEmpty());
   }
   

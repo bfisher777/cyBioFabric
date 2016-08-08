@@ -59,8 +59,8 @@ public class FabricDisplayOptions implements Cloneable {
   private static final double DEFAULT_SELECTION_OPAQUE_LEVEL_ = 0.90; 
   private static final double DEFAULT_NODE_LIGHTER_LEVEL_ = 0.43; 
   private static final double DEFAULT_LINK_DARKER_LEVEL_ = 0.43;
-  private static final boolean DEFAULT_DISPLAY_SHADOWS_ = false;
-  private static final boolean DEFAULT_SHADE_NODES_ = false;
+  private static final boolean DEFAULT_DISPLAY_SHADOWS_ = true; //TODO set back to false
+  private static final boolean DEFAULT_SHADE_NODES_ = true; //TODO set back to false
   private static final boolean DEFAULT_OFFER_NODE_BROWSER_ = false;
   private static final boolean DEFAULT_OFFER_LINK_BROWSER_ = false;
   private static final boolean DEFAULT_OFFER_MOUSEOVER_VIEW_ = false;

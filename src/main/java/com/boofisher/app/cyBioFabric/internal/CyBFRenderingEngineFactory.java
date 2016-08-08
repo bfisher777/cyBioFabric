@@ -104,6 +104,9 @@ public class CyBFRenderingEngineFactory implements RenderingEngineFactory<CyNetw
 				                                             configuration, taskFactoryListener, taskManager);
 		
 		renderingEngineManager.addRenderingEngine(engine);
+		
+		/*CyLayoutAlgorithm frAlgorithm = layoutAlgorithmManager.getLayout("force-driected");
+		layoutAlgorithmManager.setDefaultLayout(frAlgorithm);*/
 		return engine;
 	}
 	
@@ -129,7 +132,7 @@ public class CyBFRenderingEngineFactory implements RenderingEngineFactory<CyNetw
 	}
 	
 	private void setLayoutAlgorithm(CyBFNetworkView cyBFViewModel){
-		// Get the layout
+		// Get the layout	
 		CyLayoutAlgorithm layout = layoutAlgorithmManager.getLayout(bfLayoutAlg.getName());
 		if(layout == null){
 			System.out.println("layout is null");
