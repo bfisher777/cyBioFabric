@@ -84,6 +84,7 @@ public class BioFabricWindow extends JInternalFrame implements BackgroundWorkerC
   private JSplitPane sp_;
   private double savedSplitFrac_;
   private static final long serialVersionUID = 1L;
+  public final String COMMAND_NAME;
    
   ////////////////////////////////////////////////////////////////////////////
   //
@@ -96,13 +97,14 @@ public class BioFabricWindow extends JInternalFrame implements BackgroundWorkerC
   ** Constructor
   */
 
-  public BioFabricWindow(Map<String, Object> args, BioFabricApplication bfa, boolean isMain) {
+  public BioFabricWindow(Map<String, Object> args, BioFabricApplication bfa, boolean isMain, String commandName) {
     super((isMain) ? "BioFabric" : "BioFabric: Selected Submodel View");
     Boolean doGag = (Boolean)args.get("doGaggle");
     doGaggle_ = (doGag != null) && doGag.booleanValue();
     bfa_ = bfa;
     isMain_ = isMain;
     actionMap_ = new HashMap<Integer, Action>();
+    COMMAND_NAME = commandName;
   }
     
   ////////////////////////////////////////////////////////////////////////////
@@ -127,7 +129,7 @@ public class BioFabricWindow extends JInternalFrame implements BackgroundWorkerC
   */ 
   
   public void disableControls(int pushFlags, boolean displayToo) {
-    CommandSet fc = CommandSet.getCmds((isMain_) ? "mainWindow" : "selectionWindow");
+    CommandSet fc = CommandSet.getCmds(COMMAND_NAME);
     if (displayToo) {
       myCard_.show(hidingPanel_, "Hiding");
       fmt_.enableControls(false);
@@ -148,7 +150,7 @@ public class BioFabricWindow extends JInternalFrame implements BackgroundWorkerC
   */  
   
   public void reenableControls() {
-    CommandSet fc = CommandSet.getCmds((isMain_) ? "mainWindow" : "selectionWindow");
+    CommandSet fc = CommandSet.getCmds(COMMAND_NAME);
     fc.popDisabled();
     myCard_.show(hidingPanel_, "SUPanel");
     fmt_.enableControls(true);
@@ -207,7 +209,7 @@ public class BioFabricWindow extends JInternalFrame implements BackgroundWorkerC
         }
       }
     });        
-    CommandSet fc = CommandSet.getCmds((isMain_) ? "mainWindow" : "selectionWindow");
+    CommandSet fc = CommandSet.getCmds(COMMAND_NAME);
     JToolBar toolBar = null;
     JMenu gaggleGooseChooseMenu = (doGaggle_) ? new JMenu(ResourceManager.getManager().getString("command.gooseChoose")) : null;    
     gaggleGooseCombo_ = (doGaggle_) ? new FixedJComboBox(250) : null;    
@@ -220,7 +222,7 @@ public class BioFabricWindow extends JInternalFrame implements BackgroundWorkerC
     stockToolBar(toolBar, isMain_, fc);
        
     
-    nac_ = new BioFabricNavAndControl(isMain_, this);
+    nac_ = new BioFabricNavAndControl(isMain_, this, COMMAND_NAME);
     fmt_ = nac_.getFMT();
     cp_ = new BioFabricPanel(fc.getColorGenerator(), bfa_, fmt_, nac_.getOverview(), nac_.getNavTool(), isMain_, this);
     fc.setFabricPanel(cp_);
@@ -270,7 +272,7 @@ public class BioFabricWindow extends JInternalFrame implements BackgroundWorkerC
   */    
   
   public void haveInboundGaggleCommands() {
-    CommandSet fc = CommandSet.getCmds((isMain_) ? "mainWindow" : "selectionWindow");
+    CommandSet fc = CommandSet.getCmds(COMMAND_NAME);
     fc.triggerGaggleState(CommandSet.GAGGLE_PROCESS_INBOUND, true);
     return;
   }
@@ -281,7 +283,7 @@ public class BioFabricWindow extends JInternalFrame implements BackgroundWorkerC
   */    
   
   public void haveGaggleGooseChange() {
-    CommandSet fc = CommandSet.getCmds((isMain_) ? "mainWindow" : "selectionWindow");
+    CommandSet fc = CommandSet.getCmds(COMMAND_NAME);
     fc.triggerGaggleState(CommandSet.GAGGLE_GOOSE_UPDATE, true);
     return;
   }  
@@ -292,7 +294,7 @@ public class BioFabricWindow extends JInternalFrame implements BackgroundWorkerC
   */    
   
   public void connectedToGaggle(boolean connected) {
-    CommandSet fc = CommandSet.getCmds((isMain_) ? "mainWindow" : "selectionWindow");
+    CommandSet fc = CommandSet.getCmds(COMMAND_NAME);
     fc.getAction(CommandSet.GAGGLE_CONNECT, true, null).setEnabled(!connected);
     fc.getAction(CommandSet.GAGGLE_DISCONNECT, true, null).setEnabled(connected);
     fc.getAction(CommandSet.GAGGLE_CONNECT, false, null).setEnabled(!connected);

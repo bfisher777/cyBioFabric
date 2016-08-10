@@ -1,7 +1,6 @@
 package com.boofisher.app.cyBioFabric.internal;
 
 import java.awt.Insets;
-import java.awt.Dialog.ModalityType;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;

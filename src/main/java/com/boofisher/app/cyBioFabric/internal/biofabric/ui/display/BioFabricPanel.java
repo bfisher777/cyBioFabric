@@ -213,7 +213,8 @@ public class BioFabricPanel extends JPanel implements ZoomTarget, ZoomPresentati
     bfw_ = bfw;
     zoomSrc_ = new ZoomerSource();
     zoomer_ = new BasicZoomTargetSupport(this, this, zoomSrc_);
-    CommandSet fc = CommandSet.getCmds((isForMain) ? "mainWindow" : "selectionWindow");
+    //CommandSet fc = CommandSet.getCmds((isForMain) ? "mainWindow" : "selectionWindow");
+    CommandSet fc = CommandSet.getCmds(bfw_.COMMAND_NAME);
     zcs_ = new ZoomCommandSupport(fc);
     isAMac_ = fc.isAMac();
     painter_ = new PaintCache(colGen);
@@ -639,7 +640,7 @@ public class BioFabricPanel extends JPanel implements ZoomTarget, ZoomPresentati
     } else {
       bfa_.raiseSelection();
     }
-    CommandSet fc = CommandSet.getCmds("selectionWindow");
+    CommandSet fc = CommandSet.getCmds(bfw_.COMMAND_NAME);
     try {
       BioFabricNetwork.SelectBuildData bfnsbd = new BioFabricNetwork.SelectBuildData(bfn_, targetList, linkList);
       fc.newModelOperations(bfnsbd, false);

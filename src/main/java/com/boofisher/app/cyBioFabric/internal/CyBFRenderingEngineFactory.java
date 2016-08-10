@@ -1,15 +1,22 @@
 package com.boofisher.app.cyBioFabric.internal;
 
 import java.awt.Container;
+import java.util.HashMap;
 
 import javax.swing.JComponent;
 
 import com.boofisher.app.cyBioFabric.internal.CyBFRenderingEngine;
+import com.boofisher.app.cyBioFabric.internal.biofabric.BioFabricNetworkViewAddedListener;
+import com.boofisher.app.cyBioFabric.internal.biofabric.BioFabricNetworkViewToBeDestroyedListener;
+import com.boofisher.app.cyBioFabric.internal.biofabric.NetworkViewAddedHandler;
+import com.boofisher.app.cyBioFabric.internal.biofabric.NetworkViewDestroyedHandler;
+import com.boofisher.app.cyBioFabric.internal.biofabric.app.BioFabricApplication;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.CyBFNetworkView;
 import com.boofisher.app.cyBioFabric.internal.eventbus.EventBusProvider;
 import com.boofisher.app.cyBioFabric.internal.graphics.GraphicsConfiguration;
 import com.boofisher.app.cyBioFabric.internal.graphics.GraphicsConfigurationFactory;
-import com.boofisher.app.cyBioFabric.internal.layouts.BioFabricLayoutAlgorithm;
+import com.boofisher.app.cyBioFabric.internal.layouts.BioFabricLayoutInterface;
+import com.boofisher.app.cyBioFabric.internal.layouts.DefaultBioFabricLayoutAlgorithm;
 import com.boofisher.app.cyBioFabric.internal.task.TaskFactoryListener;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.view.layout.CyLayoutAlgorithm;
@@ -44,23 +51,28 @@ public class CyBFRenderingEngineFactory implements RenderingEngineFactory<CyNetw
 	private final TaskFactoryListener taskFactoryListener;
 	private final DialogTaskManager taskManager;
 	private final EventBusProvider eventBusProvider;
-	private final BioFabricLayoutAlgorithm bfLayoutAlg;
-	private final CyLayoutAlgorithmManager layoutAlgorithmManager;
-	
-	private boolean firstLoad; //used to signal that this is the first time factory is called
+	private final BioFabricLayoutInterface bfLayoutAlg;
+	private final CyLayoutAlgorithmManager layoutAlgorithmManager;		
+	private final CyLayoutAlgorithm defaultLayout;
 	
 	private final GraphicsConfigurationFactory graphicsConfigFactory;
+	private NetworkViewAddedHandler addNetworkHandler; 
+	private NetworkViewDestroyedHandler destroyNetworkHandler;
+    private int count;//used to keep track of the number of Biofabric applications created
 	
 	
 	public CyBFRenderingEngineFactory(
-			BioFabricLayoutAlgorithm bfLayoutAlg, 
+			BioFabricLayoutInterface bfLayoutAlg, 
 			CyLayoutAlgorithmManager layoutAlgorithmManager,
 			RenderingEngineManager renderingEngineManager, 
 			VisualLexicon lexicon,
 			TaskFactoryListener taskFactoryListener,
 			DialogTaskManager taskManager,
 			EventBusProvider eventBusFactory,
-			GraphicsConfigurationFactory graphicsConfigFactory) {	
+			GraphicsConfigurationFactory graphicsConfigFactory,
+			NetworkViewAddedHandler addNetworkHandler, 
+			NetworkViewDestroyedHandler destroyNetworkHandler,            
+            CyLayoutAlgorithm defaultLayout) {	
 		this.bfLayoutAlg = bfLayoutAlg;
 		this.layoutAlgorithmManager = layoutAlgorithmManager;
 		this.renderingEngineManager = renderingEngineManager;
@@ -69,8 +81,10 @@ public class CyBFRenderingEngineFactory implements RenderingEngineFactory<CyNetw
 		this.taskManager = taskManager;
 		this.eventBusProvider = eventBusFactory;
 		this.graphicsConfigFactory = graphicsConfigFactory;
-		
-		this.firstLoad = true;
+		this.addNetworkHandler = addNetworkHandler;
+		this.destroyNetworkHandler = destroyNetworkHandler;		
+		this.defaultLayout = defaultLayout;
+			
 	}
 	
 	
@@ -86,22 +100,23 @@ public class CyBFRenderingEngineFactory implements RenderingEngineFactory<CyNetw
 		CyBFNetworkView cyBFViewModel = (CyBFNetworkView) viewModel;
 		JComponent component = (JComponent) container;
 		
-		GraphicsConfiguration configuration = graphicsConfigFactory.createGraphicsConfiguration();
-		
-		//algorithmically set layout for first call
-		if(firstLoad){
-			setLayoutAlgorithm(cyBFViewModel);
-			firstLoad = false;
-		}
+		GraphicsConfiguration configuration = graphicsConfigFactory.createGraphicsConfiguration();				
 		
 		// TODO the birds eye view should not be attaching input listeners to the outer component
 		// Is the Birds eye view above the top glass pane?
 		JComponent inputComponent = getKeyboardComponent(component, cyBFViewModel.getSUID());
 		if(inputComponent == null)
-			inputComponent = component; // happens for birds-eye-view				
+			inputComponent = component; // happens for birds-eye-view
+		
+		//sometimes default layout doesn't get changed so need to change it manually
+		if(!(layoutAlgorithmManager.getDefaultLayout() instanceof BioFabricLayoutInterface)){
+			setLayoutAlgorithm(cyBFViewModel);
+		}
+				
 		
 		CyBFRenderingEngine engine = new CyBFRenderingEngine(component, inputComponent, cyBFViewModel, visualLexicon, eventBusProvider,
-				                                             configuration, taskFactoryListener, taskManager);
+				                                             configuration, taskFactoryListener, taskManager, addNetworkHandler,  
+				                                             destroyNetworkHandler, layoutAlgorithmManager, defaultLayout, count++);
 		
 		renderingEngineManager.addRenderingEngine(engine);
 		
@@ -131,6 +146,7 @@ public class CyBFRenderingEngineFactory implements RenderingEngineFactory<CyNetw
 		return visualLexicon;
 	}
 	
+	//Programatically set the layout algorithm
 	private void setLayoutAlgorithm(CyBFNetworkView cyBFViewModel){
 		// Get the layout	
 		CyLayoutAlgorithm layout = layoutAlgorithmManager.getLayout(bfLayoutAlg.getName());

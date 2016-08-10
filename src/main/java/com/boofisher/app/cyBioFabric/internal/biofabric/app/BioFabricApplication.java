@@ -29,7 +29,6 @@ import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
-import com.boofisher.app.cyBioFabric.internal.biofabric.DefaultLayoutBuildTool;
 import com.boofisher.app.cyBioFabric.internal.biofabric.cmd.CommandSet;
 import com.boofisher.app.cyBioFabric.internal.biofabric.gaggle.DeadFabricGoose;
 import com.boofisher.app.cyBioFabric.internal.biofabric.gaggle.FabricGooseInterface;
@@ -39,6 +38,7 @@ import com.boofisher.app.cyBioFabric.internal.biofabric.ui.dialogs.UpdateJavaDia
 import com.boofisher.app.cyBioFabric.internal.biofabric.util.ExceptionHandler;
 import com.boofisher.app.cyBioFabric.internal.biofabric.util.ResourceManager;
 import com.boofisher.app.cyBioFabric.internal.biofabric.util.UiUtil;
+import com.boofisher.app.cyBioFabric.internal.layouts.DefaultBioFabricLayoutBuildTool;
 
 /****************************************************************************
 **
@@ -62,6 +62,7 @@ public class BioFabricApplication {
   private boolean forCyto_;
   private BioFabricWindow bfw_;
   private BioFabricWindow selectionWindow_;
+  private int count; //used to increment class name in init CommandSet  
   
   ////////////////////////////////////////////////////////////////////////////
   //
@@ -74,9 +75,10 @@ public class BioFabricApplication {
   ** Now supporting Cytoscape App usage
   */
   
-  public BioFabricApplication(boolean forCyto){
+  public BioFabricApplication(boolean forCyto, int count){
 	  
     forCyto_ = forCyto;
+    this.count = count;
   }
   
   ////////////////////////////////////////////////////////////////////////////
@@ -91,18 +93,20 @@ public class BioFabricApplication {
   */
   
   public void shutdownFabric() {
-    FabricGooseInterface goose = FabricGooseManager.getManager().getGoose();
+	  
+	System.out.println("Shutting down biofabric application");
+	
+	//TODO: revisit this
+    /*FabricGooseInterface goose = FabricGooseManager.getManager().getGoose();
     if ((goose != null) && goose.isActivated()) {
       goose.closeDown();
-    }
+    }*/
+	
     bfw_.stopBufferBuilding();
     bfw_.dispose();
     if (selectionWindow_ != null) {
       selectionWindow_.dispose();
-    }
-    if (!forCyto_) {
-      System.exit(0);
-    }
+    }   
   }
    
   /***************************************************************************
@@ -143,9 +147,11 @@ public class BioFabricApplication {
     /***************************************************************************
   **
   ** Launch operations. Now public to support Cytoscape App usage
+  *  Added a number "count" to the end of the string para to allow multiple CommandSets
   */
    
-  public BioFabricWindow launch(Map<String, Object> args) { 
+  public BioFabricWindow launch(Map<String, Object> args) { 		  
+	
     boolean isAMac = System.getProperty("os.name").toLowerCase().startsWith("mac os x");
     if (isAMac) {
       String verNum = System.getProperty("java.version").toLowerCase();
@@ -157,18 +163,24 @@ public class BioFabricApplication {
        } 
        }
     }
-    ResourceManager.initManager("com.boofisher.app.cyBioFabric.internal.biofabric.props.BioFabric");
-    bfw_ = new BioFabricWindow(args, this, true);
+    //Moved this call into CyActivator
+    //ResourceManager.initManager("com.boofisher.app.cyBioFabric.internal.biofabric.props.BioFabric");
+    
+    String commandName = "mainWindow_" + count;
+    bfw_ = new BioFabricWindow(args, this, true, commandName);
     ExceptionHandler.getHandler().initialize(bfw_);
     Dimension cbf = UiUtil.centerBigFrame(bfw_, 1600, 1200, 1.0, 0);
     bfw_.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);   
     
-    CommandSet.initCmds("mainWindow", this, bfw_, true);
+    System.out.println("Initializing commands for main name: " + commandName);
+    CommandSet.initCmds(commandName, this, bfw_, true);
     bfw_.initWindow(cbf);
     bfw_.setVisible(true);
     initSelection();
     Boolean doGag = (Boolean)args.get("doGaggle");
-    gooseLaunch(bfw_, (doGag != null) && doGag.booleanValue());    
+    
+    //TODO is the goose code required?
+    //gooseLaunch(bfw_, (doGag != null) && doGag.booleanValue());    
         
     return (bfw_);
   }
@@ -206,16 +218,19 @@ public class BioFabricApplication {
   /***************************************************************************
   **
   ** init selection window 
+  *  Added a number to the end of the string para to allow multi CommandSets
   */
      
-  private void initSelection() {  
-    selectionWindow_ = new BioFabricWindow(new HashMap<String, Object>(), this, false);
+  private void initSelection() { 
+	String commandName = "selectionWindow_" + count;  
+	System.out.println("Initializing commands for selection name: " + commandName);
+    selectionWindow_ = new BioFabricWindow(new HashMap<String, Object>(), this, false, commandName);
     Dimension swDim = new Dimension((int)(bfw_.getWidth() * .80), (int)(bfw_.getHeight() * .80));
     selectionWindow_.setSize(swDim.width, swDim.height);
     selectionWindow_.setLocation(bfw_.getLocation().x, bfw_.getLocation().y);
     selectionWindow_.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);   
     
-    CommandSet.initCmds("selectionWindow", this, selectionWindow_, false);
+    CommandSet.initCmds(commandName, this, selectionWindow_, false);
     selectionWindow_.initWindow(swDim);
     return;
   }
