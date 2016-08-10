@@ -230,6 +230,11 @@
 			<version>1.5.2</version>
 			<scope>provided</scope>
 		</dependency>
+		
+		<!-- BioFabric dependency-->
+		<!-- http://stackoverflow.com/questions/4955635/how-to-add-local-jar-files-in-maven-project/22300875#22300875-->
+		
+		
 	</dependencies>
 
 </project>

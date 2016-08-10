@@ -20,7 +20,7 @@ import com.boofisher.app.cyBioFabric.internal.data.GraphicsSelectionData;
 import com.boofisher.app.cyBioFabric.internal.data.PickingData;
 import com.boofisher.app.cyBioFabric.internal.picking.ShapePickingProcessor;
 import com.boofisher.app.cyBioFabric.internal.rendering.GraphicsProcedure;
-import com.boofisher.app.cyBioFabric.internal.rendering.RenderNetwork;
+import com.boofisher.app.cyBioFabric.internal.rendering.RenderNetworkProcedure;
 import com.boofisher.app.cyBioFabric.internal.tools.NetworkToolkit;
 import com.boofisher.app.cyBioFabric.internal.tools.PairIdentifier;
 
@@ -140,7 +140,7 @@ public class DefaultShapePickingProcessor implements ShapePickingProcessor {
 						
 			// Draw it only if the visual property says it is visible
 			if (nodeView.getVisualProperty(BasicVisualLexicon.NODE_VISIBLE)) {
-				shape = RenderNetwork.getShape(networkView, nodeView.getModel(), midWidth, midHeight, zoomFactor);						
+				shape = RenderNetworkProcedure.getShape(networkView, nodeView.getModel(), midWidth, midHeight, zoomFactor);						
 				// draw Rectangle2D.Double
 				if(shape.contains(screenCoords)){
 					hits.add(nodeView.getModel().getSUID());
@@ -172,7 +172,7 @@ public class DefaultShapePickingProcessor implements ShapePickingProcessor {
 			PairIdentifier pairIdentifier = NetworkToolkit.obtainPairIdentifier(source, target, networkView.getModel().getNodeList().size());
 			
 			if(shape == null){
-				shape = RenderNetwork.getShape(networkView, edgeView.getModel().getTarget(), midWidth, midHeight, zoomFactor);			
+				shape = RenderNetworkProcedure.getShape(networkView, edgeView.getModel().getTarget(), midWidth, midHeight, zoomFactor);			
 				
 				float edgeWidth = edgeView.getVisualProperty(BasicVisualLexicon.EDGE_WIDTH).intValue();
 				edgeWidth = (zoomFactor > 0) ? (edgeWidth /(int)(zoomFactor)) : edgeWidth;
