@@ -39,12 +39,11 @@ public class GraphicsData {
 	 */
 	public static final float DISTANCE_SCALE = 180.0f; 
 	public static final float VERTICAL_VOF = 45.0f;
-	
+	public static final int MAX_ZOOM = 100;
 	
 	private final CyNetworkView networkView;
 	private final EventBus eventBus;
-	private final VisualLexicon visualLexicon;	
-	private final int MAX_ZOOM = 100;
+	private final VisualLexicon visualLexicon;		
 	
 	private int mouseCurrentX;
 	private int mouseCurrentY;

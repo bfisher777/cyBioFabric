@@ -22,7 +22,7 @@ import com.boofisher.app.cyBioFabric.internal.graphics.AbstractGraphicsConfigura
 import com.boofisher.app.cyBioFabric.internal.input.handler.ToolPanel;
 import com.boofisher.app.cyBioFabric.internal.picking.DefaultShapePickingProcessor;
 import com.boofisher.app.cyBioFabric.internal.picking.ShapePickingProcessor;
-import com.boofisher.app.cyBioFabric.internal.rendering.RenderNetwork;
+import com.boofisher.app.cyBioFabric.internal.rendering.RenderNetworkProcedure;
 import com.boofisher.app.cyBioFabric.internal.rendering.RenderNodesAsLinesProcedure;
 import com.google.common.eventbus.EventBus;
 
