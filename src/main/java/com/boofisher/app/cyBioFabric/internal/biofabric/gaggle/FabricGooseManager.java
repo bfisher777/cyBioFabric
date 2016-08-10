@@ -68,7 +68,8 @@ public class FabricGooseManager {
 
   public void setGoose(FabricGooseInterface gai) {
     if (goose_ != null) {
-      throw new IllegalStateException();
+    	//TODO is a singleton required?
+      //throw new IllegalStateException();
     }
     goose_ = gai; 
     return;

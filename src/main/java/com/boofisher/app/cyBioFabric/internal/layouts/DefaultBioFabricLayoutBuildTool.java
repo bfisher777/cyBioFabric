@@ -17,7 +17,7 @@
 **    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package com.boofisher.app.cyBioFabric.internal.biofabric;
+package com.boofisher.app.cyBioFabric.internal.layouts;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,7 +43,7 @@ import com.boofisher.app.cyBioFabric.internal.biofabric.model.FabricLink;
 ** Build a biofabric network using default layout
 */
 
-public class DefaultLayoutBuildTool {
+public class DefaultBioFabricLayoutBuildTool {
   
   ////////////////////////////////////////////////////////////////////////////
   //
@@ -55,7 +55,7 @@ public class DefaultLayoutBuildTool {
   private FabricColorGenerator colorGenerator;  
 
   
-  public DefaultLayoutBuildTool(){
+  public DefaultBioFabricLayoutBuildTool(){
 	  this.colorGenerator = new FabricColorGenerator();
 	  this.colorGenerator.newColorModel();	  
   }
