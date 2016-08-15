@@ -136,6 +136,7 @@ import com.boofisher.app.cyBioFabric.internal.biofabric.util.ObjChoiceContent;
 import com.boofisher.app.cyBioFabric.internal.biofabric.util.ResourceManager;
 import com.boofisher.app.cyBioFabric.internal.biofabric.util.UiUtil;
 import com.boofisher.app.cyBioFabric.internal.biofabric.biotapestry.FabricCommands;
+import com.boofisher.app.cyBioFabric.internal.tools.NodeNameSUIDPair;
 
 /****************************************************************************
 **
@@ -840,7 +841,8 @@ public class CommandSet implements ZoomChangeTracker, SelectionChangeListener, F
         }
       }
       
-      BioFabricNetwork.RelayoutBuildData bfn = new BioFabricNetwork.RelayoutBuildData(reducedLinks, loneNodes, colGen_, 
+      //TODO this has been broken
+      BioFabricNetwork.RelayoutBuildData bfn = new BioFabricNetwork.RelayoutBuildData(reducedLinks, new ArrayList<NodeNameSUIDPair>(), colGen_, 
                                                                                       BioFabricNetwork.BuildMode.BUILD_FROM_SIF);
       NetworkBuilder nb = new NetworkBuilder(); 
       nb.doNetworkBuild(bfn, true);            
@@ -916,8 +918,9 @@ public class CommandSet implements ZoomChangeTracker, SelectionChangeListener, F
                                     rMan.getString("fabricRead.dupLinkTitle"),
                                     JOptionPane.WARNING_MESSAGE);
     }
-    BioFabricNetwork.RelayoutBuildData bfnbd = new BioFabricNetwork.RelayoutBuildData(reducedLinks, new HashSet<String>(singles), 
-                                                                                      colGen_, BioFabricNetwork.BuildMode.BUILD_FROM_GAGGLE);
+    //TODO this has been broken
+    BioFabricNetwork.RelayoutBuildData bfnbd = new BioFabricNetwork.RelayoutBuildData(reducedLinks, new ArrayList<NodeNameSUIDPair>(), colGen_, 
+                                                                                    BioFabricNetwork.BuildMode.BUILD_FROM_GAGGLE);
     NetworkBuilder nb = new NetworkBuilder(); 
     nb.doNetworkBuild(bfnbd, true);
     manageWindowTitle("Gaggle");
@@ -3670,8 +3673,9 @@ public class CommandSet implements ZoomChangeTracker, SelectionChangeListener, F
     public void actionPerformed(ActionEvent e) {
       try {
         manageWindowTitle(null);
+        //TODO Broke
         BioFabricNetwork.RelayoutBuildData obd = new BioFabricNetwork.RelayoutBuildData(new HashSet<FabricLink>(), 
-                                                                                        new HashSet<String>(), colGen_, 
+                                                                                        new ArrayList<NodeNameSUIDPair>(), colGen_, 
                                                                                         BioFabricNetwork.BuildMode.BUILD_FROM_SIF);
         newModelOperations(obd, true);
       } catch (Exception ex) {
@@ -4251,7 +4255,8 @@ public class CommandSet implements ZoomChangeTracker, SelectionChangeListener, F
       if (restore_ != null) {
         ubd = restore_;
       } else {
-        ubd = new BioFabricNetwork.RelayoutBuildData(new HashSet<FabricLink>(), new HashSet<String>(), colGen_, BioFabricNetwork.BuildMode.BUILD_FROM_SIF);
+    	  //TODO: Broke
+        ubd = new BioFabricNetwork.RelayoutBuildData(new HashSet<FabricLink>(), new ArrayList<NodeNameSUIDPair>(), colGen_, BioFabricNetwork.BuildMode.BUILD_FROM_SIF);
       }
       try {
         newModelOperations(ubd, true);
@@ -4331,7 +4336,8 @@ public class CommandSet implements ZoomChangeTracker, SelectionChangeListener, F
       if (restore_ != null) {
         ubd = restore_;
       } else {
-        ubd = new BioFabricNetwork.RelayoutBuildData(new HashSet<FabricLink>(), new HashSet<String>(), colGen_, 
+    	  //Broke
+        ubd = new BioFabricNetwork.RelayoutBuildData(new HashSet<FabricLink>(), new ArrayList<NodeNameSUIDPair>(), colGen_, 
                                                      BioFabricNetwork.BuildMode.BUILD_FROM_SIF);
       }
       try {

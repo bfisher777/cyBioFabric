@@ -2,6 +2,7 @@ package com.boofisher.app.cyBioFabric.internal.layouts;
 
 import java.util.Set;
 
+import com.boofisher.app.cyBioFabric.internal.biofabric.model.BioFabricNetwork;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.BNVisualPropertyValue;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.BioFabricVisualLexicon;
 
@@ -34,7 +35,8 @@ public class DefaultBioFabricLayoutAlgorithmTask extends AbstractLayoutTask {
 		DefaultBioFabricLayoutBuildTool onCommand = new DefaultBioFabricLayoutBuildTool();				
 		
 		//TODO: revisit this		
-		bnvp.setBioFabricNetwork(onCommand.loadDataFromCytoscape(networkView));				
+		BioFabricNetwork bfn = onCommand.loadDataFromCytoscape(networkView);
+		bnvp.setBioFabricNetwork(bfn);				
 	}		
 }
 

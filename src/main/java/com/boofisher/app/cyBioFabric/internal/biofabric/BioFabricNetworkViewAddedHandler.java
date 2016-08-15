@@ -5,11 +5,11 @@ import java.util.Map;
 
 import com.boofisher.app.cyBioFabric.internal.biofabric.app.BioFabricApplication;
 
-public class NetworkViewAddedHandler {
+public class BioFabricNetworkViewAddedHandler {
 	
 	Map<Long, BioFabricApplication> apps;
 	
-	public NetworkViewAddedHandler(){
+	public BioFabricNetworkViewAddedHandler(){
 		 apps = new HashMap<Long, BioFabricApplication>();
 		
 	}

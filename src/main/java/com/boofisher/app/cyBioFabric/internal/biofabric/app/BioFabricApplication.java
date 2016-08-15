@@ -25,6 +25,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
@@ -63,6 +65,7 @@ public class BioFabricApplication {
   private BioFabricWindow bfw_;
   private BioFabricWindow selectionWindow_;
   private int count; //used to increment class name in init CommandSet  
+  private final JComponent inputComponent;
   
   ////////////////////////////////////////////////////////////////////////////
   //
@@ -75,10 +78,11 @@ public class BioFabricApplication {
   ** Now supporting Cytoscape App usage
   */
   
-  public BioFabricApplication(boolean forCyto, int count){
+  public BioFabricApplication(boolean forCyto, int count, JComponent inputComponent){
 	  
     forCyto_ = forCyto;
     this.count = count;
+    this.inputComponent = inputComponent;
   }
   
   ////////////////////////////////////////////////////////////////////////////
@@ -171,10 +175,9 @@ public class BioFabricApplication {
     ExceptionHandler.getHandler().initialize(bfw_);
     Dimension cbf = UiUtil.centerBigFrame(bfw_, 1600, 1200, 1.0, 0);
     bfw_.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);   
-    
-    System.out.println("Initializing commands for main name: " + commandName);
+        
     CommandSet.initCmds(commandName, this, bfw_, true);
-    bfw_.initWindow(cbf);
+    bfw_.initWindow(cbf, inputComponent);
     bfw_.setVisible(true);
     initSelection();
     Boolean doGag = (Boolean)args.get("doGaggle");
@@ -222,8 +225,8 @@ public class BioFabricApplication {
   */
      
   private void initSelection() { 
-	String commandName = "selectionWindow_" + count;  
-	System.out.println("Initializing commands for selection name: " + commandName);
+	//create a unique command name
+	String commandName = "selectionWindow_" + count;  	
     selectionWindow_ = new BioFabricWindow(new HashMap<String, Object>(), this, false, commandName);
     Dimension swDim = new Dimension((int)(bfw_.getWidth() * .80), (int)(bfw_.getHeight() * .80));
     selectionWindow_.setSize(swDim.width, swDim.height);
@@ -231,7 +234,7 @@ public class BioFabricApplication {
     selectionWindow_.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);   
     
     CommandSet.initCmds(commandName, this, selectionWindow_, false);
-    selectionWindow_.initWindow(swDim);
+    selectionWindow_.initWindow(swDim, inputComponent);
     return;
   }
   

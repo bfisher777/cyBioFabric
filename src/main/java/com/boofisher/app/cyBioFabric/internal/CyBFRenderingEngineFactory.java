@@ -8,8 +8,8 @@ import javax.swing.JComponent;
 import com.boofisher.app.cyBioFabric.internal.CyBFRenderingEngine;
 import com.boofisher.app.cyBioFabric.internal.biofabric.BioFabricNetworkViewAddedListener;
 import com.boofisher.app.cyBioFabric.internal.biofabric.BioFabricNetworkViewToBeDestroyedListener;
-import com.boofisher.app.cyBioFabric.internal.biofabric.NetworkViewAddedHandler;
-import com.boofisher.app.cyBioFabric.internal.biofabric.NetworkViewDestroyedHandler;
+import com.boofisher.app.cyBioFabric.internal.biofabric.BioFabricNetworkViewAddedHandler;
+import com.boofisher.app.cyBioFabric.internal.biofabric.BioFabricNetworkViewToBeDestroyedHandler;
 import com.boofisher.app.cyBioFabric.internal.biofabric.app.BioFabricApplication;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.CyBFNetworkView;
 import com.boofisher.app.cyBioFabric.internal.eventbus.EventBusProvider;
@@ -51,30 +51,24 @@ public class CyBFRenderingEngineFactory implements RenderingEngineFactory<CyNetw
 	private final TaskFactoryListener taskFactoryListener;
 	private final DialogTaskManager taskManager;
 	private final EventBusProvider eventBusProvider;
-	private final BioFabricLayoutInterface bfLayoutAlg;
-	private final CyLayoutAlgorithmManager layoutAlgorithmManager;		
-	private final CyLayoutAlgorithm defaultLayout;
 	
 	private final GraphicsConfigurationFactory graphicsConfigFactory;
-	private NetworkViewAddedHandler addNetworkHandler; 
-	private NetworkViewDestroyedHandler destroyNetworkHandler;
+	private BioFabricNetworkViewAddedHandler addNetworkHandler; 
+	private BioFabricNetworkViewToBeDestroyedHandler destroyNetworkHandler;
     private int count;//used to keep track of the number of Biofabric applications created
 	
 	
-	public CyBFRenderingEngineFactory(
-			BioFabricLayoutInterface bfLayoutAlg, 
-			CyLayoutAlgorithmManager layoutAlgorithmManager,
+	public CyBFRenderingEngineFactory(			
 			RenderingEngineManager renderingEngineManager, 
 			VisualLexicon lexicon,
 			TaskFactoryListener taskFactoryListener,
 			DialogTaskManager taskManager,
 			EventBusProvider eventBusFactory,
 			GraphicsConfigurationFactory graphicsConfigFactory,
-			NetworkViewAddedHandler addNetworkHandler, 
-			NetworkViewDestroyedHandler destroyNetworkHandler,            
-            CyLayoutAlgorithm defaultLayout) {	
-		this.bfLayoutAlg = bfLayoutAlg;
-		this.layoutAlgorithmManager = layoutAlgorithmManager;
+			BioFabricNetworkViewAddedHandler addNetworkHandler, 
+			BioFabricNetworkViewToBeDestroyedHandler destroyNetworkHandler ) {	
+		
+		//this.layoutAlgorithmManager = layoutAlgorithmManager;
 		this.renderingEngineManager = renderingEngineManager;
 		this.visualLexicon = lexicon;
 		this.taskFactoryListener = taskFactoryListener;
@@ -83,8 +77,6 @@ public class CyBFRenderingEngineFactory implements RenderingEngineFactory<CyNetw
 		this.graphicsConfigFactory = graphicsConfigFactory;
 		this.addNetworkHandler = addNetworkHandler;
 		this.destroyNetworkHandler = destroyNetworkHandler;		
-		this.defaultLayout = defaultLayout;
-			
 	}
 	
 	
@@ -108,20 +100,18 @@ public class CyBFRenderingEngineFactory implements RenderingEngineFactory<CyNetw
 		if(inputComponent == null)
 			inputComponent = component; // happens for birds-eye-view
 		
-		//sometimes default layout doesn't get changed so need to change it manually
+		/*//sometimes default layout doesn't get changed so need to change it manually
 		if(!(layoutAlgorithmManager.getDefaultLayout() instanceof BioFabricLayoutInterface)){
 			setLayoutAlgorithm(cyBFViewModel);
-		}
+		}*/
 				
 		
 		CyBFRenderingEngine engine = new CyBFRenderingEngine(component, inputComponent, cyBFViewModel, visualLexicon, eventBusProvider,
 				                                             configuration, taskFactoryListener, taskManager, addNetworkHandler,  
-				                                             destroyNetworkHandler, layoutAlgorithmManager, defaultLayout, count++);
+				                                             destroyNetworkHandler, count++);
 		
 		renderingEngineManager.addRenderingEngine(engine);
-		
-		/*CyLayoutAlgorithm frAlgorithm = layoutAlgorithmManager.getLayout("force-driected");
-		layoutAlgorithmManager.setDefaultLayout(frAlgorithm);*/
+
 		return engine;
 	}
 	
@@ -145,7 +135,7 @@ public class CyBFRenderingEngineFactory implements RenderingEngineFactory<CyNetw
 	public VisualLexicon getVisualLexicon() {
 		return visualLexicon;
 	}
-	
+	/*
 	//Programatically set the layout algorithm
 	private void setLayoutAlgorithm(CyBFNetworkView cyBFViewModel){
 		// Get the layout	
@@ -158,6 +148,6 @@ public class CyBFRenderingEngineFactory implements RenderingEngineFactory<CyNetw
 		// apply the layout
 		TaskIterator taskIterator = layout.createTaskIterator(cyBFViewModel, layout.getDefaultLayoutContext(), CyLayoutAlgorithm.ALL_NODE_VIEWS, null);
 		taskManager.execute(taskIterator);
-	}
+	}*/
 }
 

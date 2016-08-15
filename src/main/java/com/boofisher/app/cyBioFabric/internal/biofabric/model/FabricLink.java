@@ -32,7 +32,9 @@ public class FabricLink implements Cloneable, Comparable<FabricLink>, AttributeL
   private String relation_;
   private Boolean directed_;
   private boolean isShadow_;
-  private long edgeSUID_;
+  private long edgeModelSUID_;
+  private long srcModelSUID_;
+  private long targetModelSUID_;
 
   public FabricLink(String src, String trg, String relation, boolean isShadow, Boolean directed) {
     if ((src == null) || (trg == null) || (relation == null)) {
@@ -55,7 +57,8 @@ public class FabricLink implements Cloneable, Comparable<FabricLink>, AttributeL
    * @param directed
    * @param edgeSUID
    */
-  public FabricLink(String src, String trg, String relation, boolean isShadow, Boolean directed, long edgeSUID) {
+  public FabricLink(String src, String trg, String relation, boolean isShadow, Boolean directed, long edgeSUID,
+		  long srcModelSUID, long targetModelSUID) {
 	    if ((src == null) || (trg == null) || (relation == null)) {
 	      throw new IllegalArgumentException();
 	    }
@@ -64,11 +67,14 @@ public class FabricLink implements Cloneable, Comparable<FabricLink>, AttributeL
 	    relation_ = relation;
 	    isShadow_ = isShadow;
 	    directed_ = directed;
-	    edgeSUID_ = edgeSUID;
+	    edgeModelSUID_ = edgeSUID;
+	    srcModelSUID_ = srcModelSUID;
+	    targetModelSUID_ = targetModelSUID;
   }
   
-  public FabricLink(String src, String trg, String relation, boolean isShadow, long edgeSUID) {
-	    this(src, trg, relation, isShadow, null, edgeSUID);
+  public FabricLink(String src, String trg, String relation, boolean isShadow, long edgeSUID,
+		  long srcModelSUID, long targetModelSUID) {
+	    this(src, trg, relation, isShadow, null, edgeSUID, srcModelSUID, targetModelSUID);
   }
   
   public FabricLink(String src, String trg, String relation, boolean isShadow) {
@@ -345,7 +351,15 @@ public class FabricLink implements Cloneable, Comparable<FabricLink>, AttributeL
     }    
   }
   
-  public long getEdgeSUID(){
-	  return edgeSUID_;
+  public long getEdgeModelSUID(){
+	  return edgeModelSUID_;
+  }
+  
+  public Long getSrcModelSUID(){
+	  return srcModelSUID_;
+  }
+  
+  public Long getTargetModelSUID(){
+	  return targetModelSUID_;
   }
 }

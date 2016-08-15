@@ -32,6 +32,8 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.apache.log4j.Logger;
+import org.cytoscape.application.CyUserLog;
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
@@ -57,6 +59,7 @@ import com.boofisher.app.cyBioFabric.internal.biofabric.util.Indenter;
 import com.boofisher.app.cyBioFabric.internal.biofabric.util.MinMax;
 import com.boofisher.app.cyBioFabric.internal.biofabric.util.UiUtil;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.BioFabricVisualLexicon;
+import com.boofisher.app.cyBioFabric.internal.tools.NodeNameSUIDPair;
 
 /****************************************************************************
 **
@@ -64,7 +67,7 @@ import com.boofisher.app.cyBioFabric.internal.cytoscape.view.BioFabricVisualLexi
 */
 
 public class BioFabricNetwork {
-  
+	
   ////////////////////////////////////////////////////////////////////////////
   //
   // PRIVATE CONSTANTS
@@ -411,13 +414,13 @@ public class BioFabricNetwork {
     // Note the allLinks Set has pruned out duplicates and synonymous non-directional links
     //
        
-    List<String> targets =  (new DefaultLayout()).doNodeLayout(rbd, null);
+    List<NodeNameSUIDPair> targets =  (new DefaultLayout()).doNodeLayout(rbd, null);
     
     //
     // Now have the ordered list of targets we are going to display.
     //
     
-    fillNodesFromOrder(targets, rbd.colGen, rbd.clustAssign);
+    fillNodesFromOrder(rbd.networkView, targets, rbd.colGen, rbd.clustAssign);
 
     //
     // This now assigns the link to its column.  Note that we order them
@@ -1532,13 +1535,46 @@ public class BioFabricNetwork {
     return;
   }
 
+  
+  /***************************************************************************
+   ** 
+   ** Fill out node info from order
+   ** Overloaded
+   */
+
+   private void fillNodesFromOrder(List<String> targets, FabricColorGenerator colGen, Map<String, String> clustAssign) {
+     //
+     // Now have the ordered list of targets we are going to display.
+     // Build target->row maps and the inverse:
+     //
+     
+     int numColors = colGen.getNumColors();
+
+     int currRow = 0;
+     Iterator<String> trit = targets.iterator();
+     while (trit.hasNext()) {
+       String target = trit.next();
+       Integer rowObj = Integer.valueOf(currRow);
+       rowToTarg_.put(rowObj, target);
+       String colorKey = colGen.getGeneColor(currRow % numColors);
+       NodeInfo nextNI = new NodeInfo(target, currRow++, colorKey);
+       if (clustAssign != null) {
+       	nextNI.setCluster(clustAssign.get(target.toUpperCase()));
+       }
+       nodeDefs_.put(target, nextNI);
+     }
+     rowCount_ = targets.size();
+     return;
+   }
 
   /***************************************************************************
   ** 
   ** Fill out node info from order
+  ** TODO: Check if broken
+  *
   */
 
-  private void fillNodesFromOrder(List<String> targets, FabricColorGenerator colGen, Map<String, String> clustAssign) {
+  private void fillNodesFromOrder(CyNetworkView networkView, List<NodeNameSUIDPair> targets, FabricColorGenerator colGen, Map<String, String> clustAssign) {
     //
     // Now have the ordered list of targets we are going to display.
     // Build target->row maps and the inverse:
@@ -1547,17 +1583,19 @@ public class BioFabricNetwork {
     int numColors = colGen.getNumColors();
 
     int currRow = 0;
-    Iterator<String> trit = targets.iterator();
+    Iterator<NodeNameSUIDPair> trit = targets.iterator();
     while (trit.hasNext()) {
-      String target = trit.next();
+      NodeNameSUIDPair pair = trit.next();
+      String target = pair.getSUID().toString();
+      String name = pair.getName();
       Integer rowObj = Integer.valueOf(currRow);
-      rowToTarg_.put(rowObj, target);
+      rowToTarg_.put(rowObj, name);//add name
       String colorKey = colGen.getGeneColor(currRow % numColors);
-      NodeInfo nextNI = new NodeInfo(target, currRow++, colorKey);
+      NodeInfo nextNI = new NodeInfo(networkView, target, currRow++, colorKey);
       if (clustAssign != null) {
-      	nextNI.setCluster(clustAssign.get(target.toUpperCase()));
+      	nextNI.setCluster(clustAssign.get(name.toUpperCase()));
       }
-      nodeDefs_.put(target, nextNI);
+      nodeDefs_.put(name, nextNI);
     }
     rowCount_ = targets.size();
     return;
@@ -1613,11 +1651,11 @@ public class BioFabricNetwork {
   ** For the lone nodes, they are assigned into the last column:
   */
 
-  private void loneNodesToLastColumn(Set<String> loneNodes) {
-    Iterator<String> lnit = loneNodes.iterator();
+  private void loneNodesToLastColumn(ArrayList<NodeNameSUIDPair> loneNodes) {
+    Iterator<NodeNameSUIDPair> lnit = loneNodes.iterator();
     while (lnit.hasNext()) {
-      String lone = lnit.next();
-      NodeInfo loneNI = nodeDefs_.get(lone);     
+      NodeNameSUIDPair lone = lnit.next();
+      NodeInfo loneNI = nodeDefs_.get(lone.getName());     
       loneNI.updateMinMaxCol(normalCols_.columnCount - 1, false);
       loneNI.updateMinMaxCol(shadowCols_.columnCount - 1, true);
     }    
@@ -1629,8 +1667,8 @@ public class BioFabricNetwork {
   ** Pretty icky hack:
   */
 
-  private Set<String> getLoneNodes() {
-    HashSet<String> retval = new HashSet<String>();
+  private ArrayList<NodeNameSUIDPair> getLoneNodes() {
+	ArrayList<NodeNameSUIDPair> retval = new ArrayList<NodeNameSUIDPair>();
     Iterator<String> lnit = nodeDefs_.keySet().iterator();
     boolean checkDone = false;
     while (lnit.hasNext()) {
@@ -1647,7 +1685,7 @@ public class BioFabricNetwork {
             checkDone = true;
           }
         }
-        retval.add(loneNI.nodeName);
+        retval.add(new NodeNameSUIDPair(loneNI.nodeSUID, loneNI.nodeName));
       }    
     }    
     return (retval);
@@ -1807,7 +1845,7 @@ public class BioFabricNetwork {
     private int shadowColumn_;
     private String colorKey_;
     private CyNetworkView networkView_;
-    private long edgeSUID_;
+    private long edgeModelSUID_;
     
     public LinkInfo(FabricLink flink, int startRow, int endRow, int noShadowColumn, int shadowColumn, String colorKey) {
       myLink_ = flink.clone();
@@ -1826,10 +1864,10 @@ public class BioFabricNetwork {
         noShadowColumn_ = noShadowColumn;
         shadowColumn_ = shadowColumn;
         colorKey_ = colorKey;
-        edgeSUID_ = flink.getEdgeSUID();
+        edgeModelSUID_ = flink.getEdgeModelSUID();
         
         if(this.networkView_ != null){    	  
-      	  CyEdge edge = networkView_.getModel().getEdge(edgeSUID_);     	  
+      	  CyEdge edge = networkView_.getModel().getEdge(edgeModelSUID_);     	  
         
       	  View<CyEdge> view = networkView.getEdgeView(edge);
       	  view.setVisualProperty(BioFabricVisualLexicon.LINK_INFO_START_ROW, startRow);
@@ -1907,6 +1945,8 @@ public class BioFabricNetwork {
   */  
   
   public static class NodeInfo {
+	  final Logger logger = Logger.getLogger(CyUserLog.NAME);
+	  
     public String nodeName;
     public int nodeRow;
     public String colorKey;
@@ -1948,8 +1988,10 @@ public class BioFabricNetwork {
         if(this.network != null){
       	  nodeSUID = Long.parseLong(nodeName);
       	  CyNode node = network.getModel().getNode(nodeSUID); 
+      	  
+      	  //TODO figure out why names not printing
       	  this.nodeName = network.getModel().getRow(node).get(CyNetwork.NAME, String.class);
-        
+      	  
       	  View<CyNode> view = network.getNodeView(node);
       	  view.setVisualProperty(BioFabricVisualLexicon.NODE_NAME, this.nodeName);
       	  view.setVisualProperty(BioFabricVisualLexicon.NODE_COLOR_KEY, colorKey);
@@ -1958,7 +2000,7 @@ public class BioFabricNetwork {
       	  view.setVisualProperty(BioFabricVisualLexicon.COL_RANGE_LOW, colRangePln_.min);
       	  view.setVisualProperty(BioFabricVisualLexicon.SHADOW_COL_RANGE_HIGH, colRangeSha_.max);
       	  view.setVisualProperty(BioFabricVisualLexicon.SHADOW_COL_RANGE_LOW, colRangeSha_.min);    	  
-        }else{
+        }else{        	
       	  this.nodeName = nodeName;
         }
       }
@@ -2119,7 +2161,7 @@ public class BioFabricNetwork {
 	public CyNetworkView networkView;
     public BioFabricNetwork bfn;
     public Set<FabricLink> allLinks;
-    public Set<String> loneNodes;
+    public ArrayList<NodeNameSUIDPair> loneNodes;
     public FabricColorGenerator colGen;
     public Map<String, String> nodeOrder;
     public List<String> existingOrder;
@@ -2143,7 +2185,7 @@ public class BioFabricNetwork {
       this.clustAssign = (fullNet.nodeClustersAssigned()) ? fullNet.nodeClusterAssigment() : null;
     }
     
-    public RelayoutBuildData(CyNetworkView networkView, Set<FabricLink> allLinks, Set<String> loneNodes, FabricColorGenerator colGen, BuildMode mode) {
+    public RelayoutBuildData(CyNetworkView networkView, Set<FabricLink> allLinks, ArrayList<NodeNameSUIDPair> loneNodes, FabricColorGenerator colGen, BuildMode mode) {
         super(mode);
         this.bfn = null;
         this.allLinks = allLinks;
@@ -2157,7 +2199,7 @@ public class BioFabricNetwork {
         this.networkView = networkView;
       } 
     
-    public RelayoutBuildData(Set<FabricLink> allLinks, Set<String> loneNodes, FabricColorGenerator colGen, BuildMode mode) {
+    public RelayoutBuildData(HashSet<FabricLink> allLinks, ArrayList<NodeNameSUIDPair> arrayList, FabricColorGenerator colGen, BuildMode mode) {
       super(mode);
       this.bfn = null;
       this.allLinks = allLinks;
@@ -2166,11 +2208,11 @@ public class BioFabricNetwork {
       this.existingOrder = null;
       this.linkOrder = null;
       this.existingLinkGroups = new ArrayList<String>();
-      this.loneNodes = loneNodes;
+      this.loneNodes = arrayList;
       this.allNodes = null;
     } 
 
-    public void setNodeOrderFromAttrib(Map<AttributeLoader.AttributeKey, String> nodeOrder) {
+	public void setNodeOrderFromAttrib(Map<AttributeLoader.AttributeKey, String> nodeOrder) {
       this.nodeOrder = new HashMap<String, String>();
       for (AttributeLoader.AttributeKey key : nodeOrder.keySet()) {
         this.nodeOrder.put(((AttributeLoader.StringKey)key).key, nodeOrder.get(key));

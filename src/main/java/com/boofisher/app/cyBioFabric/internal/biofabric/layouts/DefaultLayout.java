@@ -31,8 +31,13 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.cytoscape.model.CyNetwork;
+import org.cytoscape.model.CyNode;
+import org.cytoscape.view.model.CyNetworkView;
+
 import com.boofisher.app.cyBioFabric.internal.biofabric.model.BioFabricNetwork;
 import com.boofisher.app.cyBioFabric.internal.biofabric.model.FabricLink;
+import com.boofisher.app.cyBioFabric.internal.tools.NodeNameSUIDPair;
 
 /****************************************************************************
 **
@@ -84,9 +89,9 @@ public class DefaultLayout {
   ** Relayout the network!
   */
   
-  public List<String> doNodeLayout(BioFabricNetwork.RelayoutBuildData rbd, List<String> startNodes) {
+  public List<NodeNameSUIDPair> doNodeLayout(BioFabricNetwork.RelayoutBuildData rbd, List<String> startNodes) {
     
-    List<String> targets = defaultNodeOrder(rbd.allLinks, rbd.loneNodes, startNodes);       
+    List<NodeNameSUIDPair> targets = defaultNodeOrder(rbd.networkView, rbd.allLinks, rbd.loneNodes, startNodes);       
 
     //
     // Now have the ordered list of targets we are going to display.
@@ -102,13 +107,13 @@ public class DefaultLayout {
   ** Install node orders
   */
   
-  public void installNodeOrder(List<String> targets, BioFabricNetwork.RelayoutBuildData rbd) {
+  public void installNodeOrder(List<NodeNameSUIDPair> targets, BioFabricNetwork.RelayoutBuildData rbd) {
   
     int currRow = 0;
     HashMap<String, String> nodeOrder = new HashMap<String, String>();
-    Iterator<String> trit = targets.iterator();
+    Iterator<NodeNameSUIDPair> trit = targets.iterator();
     while (trit.hasNext()) {
-      String target = trit.next();
+      String target = trit.next().getName();
       String rowTag = Integer.toString(currRow++);
       nodeOrder.put(target.toUpperCase(), rowTag);
       //System.out.println("ino " + target + " " + rowTag);
@@ -122,7 +127,7 @@ public class DefaultLayout {
   ** Calculate default node order
   */
 
-  public List<String> defaultNodeOrder(Set<FabricLink> allLinks, Set<String> loneNodes, List<String> startNodes) {    
+  public List<NodeNameSUIDPair> defaultNodeOrder(CyNetworkView networkView, Set<FabricLink> allLinks, ArrayList<NodeNameSUIDPair> loneNodes, List<String> startNodes) {    
     //
     // Note the allLinks Set has pruned out duplicates and synonymous non-directional links
     //
@@ -140,8 +145,8 @@ public class DefaultLayout {
     Iterator<FabricLink> alit = allLinks.iterator();
     while (alit.hasNext()) {
       FabricLink nextLink = alit.next();
-      String source = nextLink.getSrc();
-      String target = nextLink.getTrg();
+      String source = nextLink.getSrcModelSUID().toString();
+      String target = nextLink.getTargetModelSUID().toString();
       Set<String> targs = targsPerSource.get(source);
       if (targs == null) {
         targs = new HashSet<String>();
@@ -181,6 +186,7 @@ public class DefaultLayout {
     
     //
     // Handle the specified starting nodes case:
+    // TODO: understand this
     //
     
     if ((startNodes != null) && !startNodes.isEmpty()) {
@@ -215,16 +221,29 @@ public class DefaultLayout {
       }
     }
     
+    //create a list of name suid pairs
+    ArrayList<NodeNameSUIDPair> targetPairs = new ArrayList<NodeNameSUIDPair>(); 
+    Iterator<String> edgeNodesItr = targets.iterator();
+    while(edgeNodesItr.hasNext()){
+    	long nodeSuid = Long.parseLong(edgeNodesItr.next());
+    	CyNode node = networkView.getModel().getNode(nodeSuid); 
+    	String name = networkView.getModel().getRow(node).get(CyNetwork.NAME, String.class);
+    	targetPairs.add(new NodeNameSUIDPair(nodeSuid, name));
+    }
+    
     //
     //
     // Tag on lone nodes.  If a node is by itself, but also shows up in the links,
     // we drop it:
     //
+    loneNodes.removeAll(targetPairs);
+    //HashSet<String> remains = new HashSet<String>(loneNodes);
+    //remains.removeAll(targets);
+    //targets.addAll(new TreeSet<String>(loneNodes));
     
-    HashSet<String> remains = new HashSet<String>(loneNodes);
-    remains.removeAll(targets);
-    targets.addAll(new TreeSet<String>(remains));
-    return (targets);
+    targetPairs.addAll(loneNodes);
+    
+    return (targetPairs);
   }
         
   /***************************************************************************
