@@ -5,10 +5,10 @@ import java.util.Map;
 
 import com.boofisher.app.cyBioFabric.internal.biofabric.app.BioFabricApplication;
 
-public class NetworkViewDestroyedHandler {
+public class BioFabricNetworkViewToBeDestroyedHandler {
 	Map<Long, BioFabricApplication> apps;
 	
-	public NetworkViewDestroyedHandler(){
+	public BioFabricNetworkViewToBeDestroyedHandler(){
 		 apps = new HashMap<Long, BioFabricApplication>();
 		
 	}
@@ -17,10 +17,14 @@ public class NetworkViewDestroyedHandler {
 		apps.put(id, bfa);
 	}
 	
+	/* Handle the shut down event, clear cache, free threads etc.
+	** Sets the bioFabricApplication to null
+	** @param id */
 	public void handleEvent(long id){
 		BioFabricApplication bfa = apps.get(id);
 		if(bfa != null){
 			bfa.shutdownFabric();
+			bfa = null;//allow for garbage collection
 		}
 		
 	}

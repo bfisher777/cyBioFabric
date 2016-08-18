@@ -40,7 +40,7 @@ import com.boofisher.app.cyBioFabric.internal.biofabric.model.FabricLink;
 ** This does the world bank layout
 */
 
-public class ProcessWorldBankCSV {
+public class ProcessWorldBankCSV {/*
   
   ////////////////////////////////////////////////////////////////////////////
   //
@@ -66,10 +66,10 @@ public class ProcessWorldBankCSV {
   //
   ////////////////////////////////////////////////////////////////////////////
 
-  /***************************************************************************
+  *//***************************************************************************
   **
   ** Constructor
-  */
+  *//*
 
   public ProcessWorldBankCSV() {
   }
@@ -80,10 +80,10 @@ public class ProcessWorldBankCSV {
   //
   ////////////////////////////////////////////////////////////////////////////
 
-  /***************************************************************************
+  *//***************************************************************************
   **
   ** Relayout the network!
-  */
+  *//*
   
   public void doLayout(BioFabricNetwork.RelayoutBuildData rbd) {   
     doNodeLayout(rbd);
@@ -91,10 +91,10 @@ public class ProcessWorldBankCSV {
     return;
   }
   
-  /***************************************************************************
+  *//***************************************************************************
   **
   ** Relayout the network!
-  */
+  *//*
   
   public List<String> doNodeLayout(BioFabricNetwork.RelayoutBuildData rbd) {
     
@@ -109,10 +109,10 @@ public class ProcessWorldBankCSV {
     return (targets);
   }
   
-  /***************************************************************************
+  *//***************************************************************************
   ** 
   ** Bump count
-  */
+  *//*
 
   public void bumpDaCount(Map<String, Integer> countMap, String dNode) {    
     Integer inc = countMap.get(dNode);
@@ -124,10 +124,10 @@ public class ProcessWorldBankCSV {
     return;
   }
   
-  /***************************************************************************
+  *//***************************************************************************
   ** 
   ** Track neighbors
-  */
+  *//*
 
   public void addANeighbor(Map<String, SortedSet<String>> neighMap, String daNode, String daNeigh) {    
     SortedSet<String> forNode = neighMap.get(daNode);
@@ -139,10 +139,10 @@ public class ProcessWorldBankCSV {
     return;
   }
 
-  /***************************************************************************
+  *//***************************************************************************
   ** 
   ** Invert a map
-  */
+  *//*
 
   public SortedMap<Integer, SortedSet<String>> invertDaCount(Map<String, Integer> countMap) { 
     TreeMap<Integer, SortedSet<String>> retval = new TreeMap<Integer, SortedSet<String>>(Collections.reverseOrder());
@@ -160,10 +160,10 @@ public class ProcessWorldBankCSV {
     return (retval);
   }
   
-  /***************************************************************************
+  *//***************************************************************************
   ** 
   ** Flatten a map
-  */
+  *//*
 
   public List<String> flattenDaCount(SortedMap<Integer, SortedSet<String>> invCountMap) { 
     ArrayList<String> retval = new ArrayList<String>();
@@ -174,10 +174,10 @@ public class ProcessWorldBankCSV {
     return (retval);
   }
 
-  /***************************************************************************
+  *//***************************************************************************
   ** 
   ** Calculate node order
-  */
+  *//*
 
   public List<String> calcNodeOrder(Set<FabricLink> allLinks, Set<String> loneNodes) {    
  
@@ -273,4 +273,4 @@ public class ProcessWorldBankCSV {
     targets.addAll(new TreeSet<String>(remains));
     return (targets);
   } 
-}
+*/}

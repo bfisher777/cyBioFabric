@@ -192,12 +192,14 @@ public class BioFabricWindow extends JInternalFrame implements BackgroundWorkerC
   /***************************************************************************
   **
   ** Get it up and running
+  ** @param inputComponent pass in from CyBFRenderingEngine to BioFabricApplication
+  ** represent the keyboard c
   */
 
-  public void initWindow(Dimension dim) {
+  public void initWindow(Dimension dim, JComponent inputComponent) {
     JPanel cpane = (JPanel)getContentPane();
-    ((JComponent)cpane).getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke("ESCAPE"), "BioTapCancel");
-    ((JComponent)cpane).getActionMap().put("BioTapCancel", new AbstractAction() {
+    inputComponent.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke("ESCAPE"), "BioTapCancel");
+    inputComponent.getActionMap().put("BioTapCancel", new AbstractAction() {
       private static final long serialVersionUID = 1L;
       public void actionPerformed(ActionEvent e) {
         try {
@@ -216,7 +218,7 @@ public class BioFabricWindow extends JInternalFrame implements BackgroundWorkerC
     fc.setGaggleElements(gaggleGooseChooseMenu, gaggleGooseCombo_);
       
     //TODO move menu to Cytoscape frame
-    //menuInstall(fc, isMain_, gaggleGooseChooseMenu);
+    menuInstall(fc, isMain_, gaggleGooseChooseMenu);
     toolBar = new JToolBar();
     stockActionMap(fc, isMain_);
     stockToolBar(toolBar, isMain_, fc);
@@ -240,7 +242,7 @@ public class BioFabricWindow extends JInternalFrame implements BackgroundWorkerC
     
     if (toolBar != null) {
       //TODO move tool bar into Cytoscape frame
-      //cpane.add(toolBar, BorderLayout.NORTH);
+      cpane.add(toolBar, BorderLayout.NORTH);
     }
         
     hidingPanel_ = new JPanel();

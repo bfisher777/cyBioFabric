@@ -14,6 +14,13 @@ import com.boofisher.app.cyBioFabric.internal.cytoscape.view.CyBFEdgeView;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.CyBFNodeView;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.CyBFView;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.DefaultValueVault;
+import com.boofisher.app.cyBioFabric.internal.cytoscape.view.listeners.ApplyPreferredLayoutListenerInterface;
+import com.boofisher.app.cyBioFabric.internal.cytoscape.view.listeners.BioFabricFitContentListenerInterface;
+import com.boofisher.app.cyBioFabric.internal.cytoscape.view.listeners.BioFabricViewListenerInterface;
+import com.boofisher.app.cyBioFabric.internal.cytoscape.view.listeners.BioFabricZoomAllNetworkListenerInterface;
+import com.boofisher.app.cyBioFabric.internal.cytoscape.view.listeners.BioFabricZoomInListenerInterface;
+import com.boofisher.app.cyBioFabric.internal.cytoscape.view.listeners.BioFabricZoomOutListenerInterface;
+import com.boofisher.app.cyBioFabric.internal.cytoscape.view.listeners.BioFabricZoomSelectedListenerInterface;
 import com.boofisher.app.cyBioFabric.internal.eventbus.EventBusProvider;
 import com.boofisher.app.cyBioFabric.internal.eventbus.FitInViewEvent;
 
@@ -30,18 +37,35 @@ import org.cytoscape.view.vizmap.VisualMappingManager;
 import org.cytoscape.view.vizmap.VisualStyle;
 
 import com.google.common.eventbus.EventBus;
-
+/*
+ * Used to create view model
+ * */
 public class CyBFNetworkView extends CyBFView<CyNetwork> implements CyNetworkView {
 
 	private final CyNetwork network;
 	
 	private final VisualLexicon visualLexicon;
+	
+	private ArrayList<BioFabricViewListenerInterface> bioFabricViewListeners;
+	private BioFabricZoomOutListenerInterface zoomOutListener;
+	private BioFabricZoomInListenerInterface zoomInListener;
+	private BioFabricFitContentListenerInterface fitContentListener;
+	private BioFabricZoomAllNetworkListenerInterface zoomAllNetworkListener;
+	private BioFabricZoomSelectedListenerInterface zoomSelectedListener;
+	private ApplyPreferredLayoutListenerInterface applyPrefferedLayoutListener;
+	
+	/*
+	 * This object (VisualMappingManager) manages mapping from view
+	 * model to VisualStyle. User objects can access all VisualStyles and
+	 * VisualMappingFunctions through this class.
+	 * */
 	private final VisualMappingManager visualMappingManager;
 	private final EventBus eventBus;
 	//private final BioFabricNetwork bioFabricNetwork;
 	/**
 	 * The camera associated with the main network viewing window used to
 	 * perform operations such as fitting all nodes onto the screen
+	 * 
 	 */
 	private List<Component> canvases = new ArrayList<>(2);
 	
@@ -49,6 +73,8 @@ public class CyBFNetworkView extends CyBFView<CyNetwork> implements CyNetworkVie
 	private Map<Long, View<CyNode>> nodeViews;
 	private Map<Long, View<CyEdge>> edgeViews;
 	
+	private boolean doFitContent;
+	private double  networkScaleFactor;
 	
 	public CyBFNetworkView(CyNetwork network, VisualLexicon visualLexicon, VisualMappingManager visualMappingManager, EventBusProvider eventBusProvider) {
 		super(new DefaultValueVault(visualLexicon));
@@ -71,6 +97,13 @@ public class CyBFNetworkView extends CyBFView<CyNetwork> implements CyNetworkVie
 			CyBFEdgeView edgeView = new CyBFEdgeView(defaultValues, edge);
 			edgeViews.put(edge.getSUID(), edgeView);
 		}
+		
+		this.bioFabricViewListeners = new ArrayList<BioFabricViewListenerInterface>();
+		this.networkScaleFactor = this.getVisualProperty(BasicVisualLexicon.NETWORK_SCALE_FACTOR);
+	}
+	
+	public void addBioFabricViewListener(BioFabricViewListenerInterface viewListener){
+		this.bioFabricViewListeners.add(viewListener);
 	}
 	
 	@Override
@@ -112,7 +145,7 @@ public class CyBFNetworkView extends CyBFView<CyNetwork> implements CyNetworkVie
 	 */
 	@Override
 	public void fitContent() {
-		fitNodesInView();
+		this.doFitContent = true;
 		updateView();
 	}
 
@@ -142,11 +175,16 @@ public class CyBFNetworkView extends CyBFView<CyNetwork> implements CyNetworkVie
 
 	@Override
 	public void updateView() {
+		System.out.println("updateView has been called in CyBFNetworkView");		
 		matchNodes();
-		matchEdges();
+		matchEdges();				
 		
 		for(int i = 0; i < canvases.size(); i++) {
 			canvases.get(i).repaint();
+		}
+		
+		for(BioFabricViewListenerInterface bFVL : this.bioFabricViewListeners){
+			fireAway(bFVL);
 		}
 	}
 	
@@ -295,12 +333,6 @@ public class CyBFNetworkView extends CyBFView<CyNetwork> implements CyNetworkVie
 		canvases.add(container);
 	}
 	
-	/**
-	 * Attempts to adjust the view to show all nodes by using the network camera.
-	 */
-	private void fitNodesInView() {
-		eventBus.post(new FitInViewEvent(nodeViews.values()));
-	}
 	
 //	/**
 //	 * Requests focus for this network view so that it is ready to accept mouse and keyboard input.
@@ -319,5 +351,74 @@ public class CyBFNetworkView extends CyBFView<CyNetwork> implements CyNetworkVie
 	public String getRendererId() {
 		return CyBFNetworkViewRenderer.ID;
 	}
+	
+	private void fireAway(BioFabricViewListenerInterface bFVL){
+		
+		if((bFVL instanceof BioFabricZoomInListenerInterface) && zoomInChanged()){			
+			
+			((BioFabricZoomInListenerInterface)bFVL).performZoomIn();
+			
+		}else if((bFVL instanceof BioFabricZoomOutListenerInterface) && zoomOutChanged()){			
+			
+			((BioFabricZoomOutListenerInterface)bFVL).performZoomOut();
+			
+		}else if((bFVL instanceof ApplyPreferredLayoutListenerInterface) && refreshChanged()){
+			
+			((ApplyPreferredLayoutListenerInterface)bFVL).performApplyLayout();
+			
+		}else if((bFVL instanceof BioFabricFitContentListenerInterface) && fitContentChanged()){
+			
+			((BioFabricFitContentListenerInterface)bFVL).performFitContent();
+			
+		}else if((bFVL instanceof BioFabricZoomAllNetworkListenerInterface) && zoomAllNetworkChanged()){
+			
+			((BioFabricZoomAllNetworkListenerInterface)bFVL).performZoomAllNetwork();
+			
+		}else if((bFVL instanceof BioFabricZoomSelectedListenerInterface) && zoomSelectedChanged()){
+			
+			((BioFabricZoomSelectedListenerInterface)bFVL).performZoomSelected();
+			
+		}
+	}
 
+	private boolean zoomInChanged(){
+		double zoom = this.getVisualProperty(BioFabricVisualLexicon.NETWORK_SCALE_FACTOR);			
+		if(zoom > networkScaleFactor){
+			networkScaleFactor = zoom;
+			return true;
+		}else{		
+			return false;
+		}
+	}
+	
+	private boolean zoomOutChanged(){
+		double zoom = this.getVisualProperty(BioFabricVisualLexicon.NETWORK_SCALE_FACTOR);
+		if(zoom < networkScaleFactor){
+			networkScaleFactor = zoom;
+			return true;
+		}else{		
+			return false;
+		}
+	}
+	
+	private boolean refreshChanged(){
+		return false;
+	}
+	
+	private boolean fitContentChanged(){
+		if(this.doFitContent){
+			this.doFitContent = false;
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	private boolean zoomAllNetworkChanged(){
+		return false;
+	}
+	
+	private boolean zoomSelectedChanged(){
+		return false;
+	}
 }

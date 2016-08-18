@@ -6,14 +6,14 @@ import static org.cytoscape.work.ServiceProperties.INSERT_SEPARATOR_BEFORE;
 import static org.cytoscape.work.ServiceProperties.MENU_GRAVITY;
 import static org.cytoscape.work.ServiceProperties.TITLE;
 
-import java.util.HashMap;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.cytoscape.application.CyUserLog;
 import org.cytoscape.application.NetworkViewRenderer;
+import org.cytoscape.application.events.CyShutdownListener;
+import org.cytoscape.application.events.SetCurrentRenderingEngineListener;
 import org.cytoscape.application.swing.CySwingApplication;
-import org.cytoscape.event.CyEventHelper;
 import org.cytoscape.service.util.AbstractCyActivator;
 import org.cytoscape.task.EdgeViewTaskFactory;
 import org.cytoscape.task.NetworkViewLocationTaskFactory;
@@ -27,17 +27,21 @@ import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.view.model.events.NetworkViewAboutToBeDestroyedListener;
 import org.cytoscape.view.model.events.NetworkViewAddedListener;
 import org.cytoscape.view.presentation.RenderingEngineManager;
+import org.cytoscape.view.presentation.events.RenderingEngineAddedEvent;
+import org.cytoscape.view.presentation.events.RenderingEngineAddedListener;
 import org.cytoscape.view.vizmap.VisualMappingManager;
-import org.cytoscape.work.TunableSetter;
 import org.cytoscape.work.swing.DialogTaskManager;
 import org.cytoscape.work.undo.UndoSupport;
 import org.osgi.framework.BundleContext;
 
 import com.boofisher.app.cyBioFabric.internal.biofabric.BioFabricNetworkViewAddedListener;
 import com.boofisher.app.cyBioFabric.internal.biofabric.BioFabricNetworkViewToBeDestroyedListener;
-import com.boofisher.app.cyBioFabric.internal.biofabric.NetworkViewAddedHandler;
-import com.boofisher.app.cyBioFabric.internal.biofabric.NetworkViewDestroyedHandler;
-import com.boofisher.app.cyBioFabric.internal.biofabric.app.BioFabricApplication;
+import com.boofisher.app.cyBioFabric.internal.biofabric.BioFabricShutdownHandler;
+import com.boofisher.app.cyBioFabric.internal.biofabric.BioFabricShutdownListener;
+import com.boofisher.app.cyBioFabric.internal.biofabric.BioFabricNetworkViewAddedHandler;
+import com.boofisher.app.cyBioFabric.internal.biofabric.BioFabricNetworkViewToBeDestroyedHandler;
+import com.boofisher.app.cyBioFabric.internal.biofabric.BioFabricSetCurrentRenderingEngineHandler;
+import com.boofisher.app.cyBioFabric.internal.biofabric.BioFabricSetCurrentRenderingEngineListener;
 import com.boofisher.app.cyBioFabric.internal.biofabric.util.ResourceManager;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.BioFabricVisualLexicon;
 import com.boofisher.app.cyBioFabric.internal.eventbus.EventBusProvider;
@@ -77,17 +81,11 @@ public class CyActivator extends AbstractCyActivator {
 		
 		//register layout and then set it as the default layout
 		BioFabricLayoutInterface bfLayoutAlg = new DefaultBioFabricLayoutAlgorithm(undoSupport);
-		CyLayoutAlgorithm defaultLayout = layoutAlgorithmManager.getDefaultLayout();
+		
 		registerLayoutAlgorithms(context,				
 				(DefaultBioFabricLayoutAlgorithm)bfLayoutAlg				
 		);				
-		
-		
-		//Handle case where user has set a BioFabric Layout as the default layout
-		if(defaultLayout instanceof BioFabricLayoutInterface){
-			bfLayoutAlg = (BioFabricLayoutInterface) defaultLayout;
-		}
-		
+
 		/*This interface provides basic access to the Swing objects that constitute this application.*/
 		CySwingApplication application = getService(context, CySwingApplication.class);				
 		
@@ -118,15 +116,22 @@ public class CyActivator extends AbstractCyActivator {
 		registerServiceListener(context, taskFactoryListener, "addNetworkViewLocationTaskFactory", "removeNetworkViewLocationTaskFactory", NetworkViewLocationTaskFactory.class);
 		
 		
-		//set network view created and network view to be destroyed listeners, these listeners handle setting up and destroying
-		//threads and caches
-		NetworkViewAddedHandler addNetworkHandler = new NetworkViewAddedHandler();
+		//create and register all the event listeners
+		BioFabricNetworkViewAddedHandler addNetworkHandler = new BioFabricNetworkViewAddedHandler();
 		BioFabricNetworkViewAddedListener bioFabricViewAddedListener = new BioFabricNetworkViewAddedListener(addNetworkHandler);
 		registerService(context, bioFabricViewAddedListener, NetworkViewAddedListener.class, new Properties());
 	
-		NetworkViewDestroyedHandler destroyNetworkHandler = new NetworkViewDestroyedHandler();
+		BioFabricNetworkViewToBeDestroyedHandler destroyNetworkHandler = new BioFabricNetworkViewToBeDestroyedHandler();
 		BioFabricNetworkViewToBeDestroyedListener bioFabricViewToBeDestroyedListener = new BioFabricNetworkViewToBeDestroyedListener(destroyNetworkHandler);
 		registerService(context, bioFabricViewToBeDestroyedListener, NetworkViewAboutToBeDestroyedListener.class, new Properties());
+		
+		BioFabricShutdownHandler biofabricShutdownHandler = new BioFabricShutdownHandler();
+		BioFabricShutdownListener bioFabricShutdownListener = new BioFabricShutdownListener(biofabricShutdownHandler);
+		registerService(context, bioFabricShutdownListener, CyShutdownListener.class, new Properties());
+		
+		BioFabricSetCurrentRenderingEngineHandler rendererSetCurrentHandler = new BioFabricSetCurrentRenderingEngineHandler(layoutAlgorithmManager);
+		BioFabricSetCurrentRenderingEngineListener rendererSetCurrentListener = new BioFabricSetCurrentRenderingEngineListener(rendererSetCurrentHandler);
+		registerService(context, rendererSetCurrentListener, SetCurrentRenderingEngineListener.class, new Properties());
 				
 		/*EventBus allows publish-subscribe-style communication between components without 
 		requiring the components to explicitly register with one another (and thus be aware 
@@ -158,14 +163,14 @@ public class CyActivator extends AbstractCyActivator {
 		In CyBF there is one class CyBFRenderingEngineFactory that implements RenderingEngineFactory. Two instances are created,
 		each is parameterized with a GraphicsConfigurationFactory which provides functionality that is specific to the 
 		main view or the birds-eye view.*/
-		CyBFRenderingEngineFactory cyBFMainRenderingEngineFactory = new CyBFRenderingEngineFactory(bfLayoutAlg, layoutAlgorithmManager,
+		CyBFRenderingEngineFactory cyBFMainRenderingEngineFactory = new CyBFRenderingEngineFactory(
 				renderingEngineManager, cyBFVisualLexicon, taskFactoryListener, dialogTaskManager, eventBusProvider, mainFactory, 
-				addNetworkHandler, destroyNetworkHandler, defaultLayout);		
+				addNetworkHandler, destroyNetworkHandler);		
 		// Bird's Eye RenderingEngine factory
 		GraphicsConfigurationFactory birdsEyeFactory = GraphicsConfigurationFactory.BIRDS_EYE_FACTORY;
-		CyBFRenderingEngineFactory cyBFBirdsEyeRenderingEngineFactory = new CyBFRenderingEngineFactory(bfLayoutAlg, layoutAlgorithmManager,
+		CyBFRenderingEngineFactory cyBFBirdsEyeRenderingEngineFactory = new CyBFRenderingEngineFactory(
 				renderingEngineManager, cyBFVisualLexicon, taskFactoryListener, dialogTaskManager, eventBusProvider, birdsEyeFactory, 
-				addNetworkHandler, destroyNetworkHandler, defaultLayout);
+				addNetworkHandler, destroyNetworkHandler);
 
 		
 		// NetworkViewRenderer, this is the main entry point that Cytoscape will call into
