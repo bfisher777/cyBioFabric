@@ -72,7 +72,7 @@ public class FabricLink implements Cloneable, Comparable<FabricLink>, AttributeL
 	    targetModelSUID_ = targetModelSUID;
   }
   
-  public FabricLink(String src, String trg, String relation, boolean isShadow, long edgeSUID,
+  public FabricLink(String src, String trg, String relation, Boolean isShadow, long edgeSUID,
 		  long srcModelSUID, long targetModelSUID) {
 	    this(src, trg, relation, isShadow, null, edgeSUID, srcModelSUID, targetModelSUID);
   }

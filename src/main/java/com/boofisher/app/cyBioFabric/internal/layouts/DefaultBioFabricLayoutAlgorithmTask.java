@@ -2,6 +2,7 @@ package com.boofisher.app.cyBioFabric.internal.layouts;
 
 import java.util.Set;
 
+import com.boofisher.app.cyBioFabric.internal.CyBFNetworkViewRenderer;
 import com.boofisher.app.cyBioFabric.internal.biofabric.model.BioFabricNetwork;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.BNVisualPropertyValue;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.BioFabricVisualLexicon;
@@ -25,10 +26,6 @@ public class DefaultBioFabricLayoutAlgorithmTask extends AbstractLayoutTask {
 
 	@Override
 	protected void doLayout(TaskMonitor taskMonitor) {
-		
-		 /* Partition the graph -- this builds the LayoutEdge and LayoutNode
-		  * arrays as a byproduct. TODO: find out if this is needed*/
-		//List<LayoutPartition> layoutPartitions = PartitionUtil.partition(networkView, false, null);
 		
 		BNVisualPropertyValue bnvp = networkView.getVisualProperty(BioFabricVisualLexicon.BIOFABRIC_NETWORK);
 		

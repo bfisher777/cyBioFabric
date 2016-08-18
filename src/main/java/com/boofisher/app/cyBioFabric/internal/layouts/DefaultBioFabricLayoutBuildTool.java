@@ -126,6 +126,7 @@ public class DefaultBioFabricLayoutBuildTool {
 	  
 	  //add nodes of degree 0 to list loneNodes
 	  for(View<CyNode> nodeView : nodeViews){		  
+		  //TODO: does this work with directed networks?
 		  if(networkView.getModel().getAdjacentEdgeList(nodeView.getModel(), CyEdge.Type.ANY).size() == 0){			  
 			  //String loner = network.getRow(nodeView.getModel()).get(CyNetwork.NAME, String.class);
 		  	  //loneNodes.add(nodeView.getModel().getSUID().toString());

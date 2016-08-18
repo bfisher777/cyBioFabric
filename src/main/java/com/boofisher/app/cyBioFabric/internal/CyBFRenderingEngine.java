@@ -2,7 +2,6 @@ package com.boofisher.app.cyBioFabric.internal;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.print.Printable;
@@ -12,12 +11,9 @@ import java.util.Properties;
 
 import javax.swing.Icon;
 import javax.swing.JComponent;
-import javax.swing.JFrame;
 import javax.swing.RootPaneContainer;
 import javax.swing.plaf.basic.BasicInternalFrameUI;
 
-import com.boofisher.app.cyBioFabric.internal.biofabric.BioFabricNetworkViewAddedListener;
-import com.boofisher.app.cyBioFabric.internal.biofabric.BioFabricNetworkViewToBeDestroyedListener;
 import com.boofisher.app.cyBioFabric.internal.biofabric.BioFabricNetworkViewAddedHandler;
 import com.boofisher.app.cyBioFabric.internal.biofabric.BioFabricNetworkViewToBeDestroyedHandler;
 import com.boofisher.app.cyBioFabric.internal.biofabric.app.BioFabricApplication;
@@ -27,6 +23,9 @@ import com.boofisher.app.cyBioFabric.internal.biofabric.cmd.CommandSet;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.BNVisualPropertyValue;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.BioFabricVisualLexicon;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.CyBFNetworkView;
+import com.boofisher.app.cyBioFabric.internal.cytoscape.view.listeners.BioFabricFitContentListener;
+import com.boofisher.app.cyBioFabric.internal.cytoscape.view.listeners.BioFabricZoomInListener;
+import com.boofisher.app.cyBioFabric.internal.cytoscape.view.listeners.BioFabricZoomOutListener;
 import com.boofisher.app.cyBioFabric.internal.eventbus.EventBusProvider;
 import com.boofisher.app.cyBioFabric.internal.graphics.GraphicsConfiguration;
 import com.boofisher.app.cyBioFabric.internal.graphics.RenderingPanel;
@@ -35,8 +34,6 @@ import com.boofisher.app.cyBioFabric.internal.task.TaskFactoryListener;
 import org.apache.log4j.Logger;
 import org.cytoscape.application.CyUserLog;
 import org.cytoscape.model.CyNetwork;
-import org.cytoscape.view.layout.CyLayoutAlgorithm;
-import org.cytoscape.view.layout.CyLayoutAlgorithmManager;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.view.model.VisualProperty;
@@ -55,9 +52,9 @@ public class CyBFRenderingEngine implements RenderingEngine<CyNetwork> {
 	private BioFabricWindow bioFabricWindow;
 	private BioFabricWindow selectionWindow;	
 	private final BioFabricNetworkViewAddedHandler addNetworkHandler; 
-    private final BioFabricNetworkViewToBeDestroyedHandler destroyNetworkHandler;    
+    private final BioFabricNetworkViewToBeDestroyedHandler destroyNetworkHandler;
     private final int count;
-	
+	        
 	
 	public CyBFRenderingEngine(
 			JComponent component,
@@ -75,7 +72,8 @@ public class CyBFRenderingEngine implements RenderingEngine<CyNetwork> {
 		this.networkView = viewModel;
 		this.visualLexicon = visualLexicon;
 		this.addNetworkHandler = addNetworkHandler;
-		this.destroyNetworkHandler = destroyNetworkHandler; 			
+		this.destroyNetworkHandler = destroyNetworkHandler;
+		
 		
 		this.count = count; //will count the number of biofabric applications created giving a unique number to each application
 		
@@ -95,9 +93,7 @@ public class CyBFRenderingEngine implements RenderingEngine<CyNetwork> {
 										
 		if (container instanceof RootPaneContainer) {	
 			//run the bioFabricApplication once per renderer
-			BioFabricApplication bioFabricApplication = new BioFabricApplication(false, count, inputComponent);
-			
-			registerHandlers(bioFabricApplication);
+			BioFabricApplication bioFabricApplication = new BioFabricApplication(false, count, inputComponent);			
 			
 			final HashMap<String, Object> args = new HashMap<String, Object>();		
 			bioFabricApplication.launch(args);
@@ -128,8 +124,10 @@ public class CyBFRenderingEngine implements RenderingEngine<CyNetwork> {
 				bfn = bnvpv.getBioFabricNetwork();
 			}
 			
-			installBioFabricNetwork(bfn, bioFabricWindow, selectionWindow);						
-			System.out.println("Attempting to install BioFabric Network");
+			installBioFabricNetwork(bfn, bioFabricWindow, selectionWindow, true);
+			
+			registerHandlers(bioFabricApplication, new BioFabricZoomInListener(bioFabricWindow),
+					new BioFabricZoomOutListener(bioFabricWindow), new BioFabricFitContentListener(bioFabricWindow));
 			logger.warn("Added main view");			
 		} else {			
 			container.setVisible(false);
@@ -152,9 +150,18 @@ public class CyBFRenderingEngine implements RenderingEngine<CyNetwork> {
 		}							
 	}
 	
-	private void registerHandlers(BioFabricApplication bfa){
-		addNetworkHandler.registerApplication(networkView.getSUID(), bfa);
+	/*
+	 * Method will add the biofabric application to the handler and ensure it is
+	 * destroyed properly by calling the bfa shut down procedure
+	 * */
+	private void registerHandlers(BioFabricApplication bfa, BioFabricZoomInListener zoomIn, 
+			BioFabricZoomOutListener zoomOut, BioFabricFitContentListener fitContent){
+		addNetworkHandler.registerApplication(networkView.getSUID(), bfa);//TODO: this is not used remove or implement
 		destroyNetworkHandler.registerApplication(networkView.getSUID(), bfa);
+		
+		networkView.addBioFabricViewListener(zoomIn);
+		networkView.addBioFabricViewListener(zoomOut);
+		networkView.addBioFabricViewListener(fitContent);		
 	}
 
 	
@@ -183,7 +190,7 @@ public class CyBFRenderingEngine implements RenderingEngine<CyNetwork> {
 	
 	//TODO not sure if I need to call this on the selectionWindow
 	//Disable menu toolbar in biofabric network manually if desired
-	public void installBioFabricNetwork(BioFabricNetwork bfn, BioFabricWindow bfw, BioFabricWindow selectionWindow){
+	public void installBioFabricNetwork(BioFabricNetwork bfn, BioFabricWindow bfw, BioFabricWindow selectionWindow, boolean showNav){
 		  
 		if(bfn != null){			
 			
@@ -204,7 +211,7 @@ public class CyBFRenderingEngine implements RenderingEngine<CyNetwork> {
 			  System.err.println("Attempting to install a null BioFabricNetwork");
 		  }
 		  
-		  bfw.showNavAndControl(true);
+		  bfw.showNavAndControl(showNav);
 	  }
 	
 	@Override

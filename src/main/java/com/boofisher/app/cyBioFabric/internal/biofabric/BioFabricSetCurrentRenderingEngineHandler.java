@@ -34,7 +34,7 @@ public class BioFabricSetCurrentRenderingEngineHandler {
 		
 		if(e.getRenderingEngine() == null){
 		//do nothing
-		//changing to a biofabric renderer
+		//else if changing to a biofabric renderer
 		}else if(e.getRenderingEngine().getRendererId().equals(CyBFNetworkViewRenderer.ID)){
 			System.out.println(" Should be a BioFabric renderer: " + e.getRenderingEngine().getRendererId());	
 			if(!(layoutAlgorithmManager.getDefaultLayout() instanceof BioFabricLayoutInterface)){
@@ -47,6 +47,7 @@ public class BioFabricSetCurrentRenderingEngineHandler {
 					layoutAlgorithmManager.setDefaultLayout(layout);
 				}
 			}
+	    //else changing to a non-biofabric renderer	
 		}else{
 			System.out.println(" Should be a non BioFabric renderer: " + e.getRenderingEngine().getRendererId());			
 			//handle case where we are changing to a non BioFabric renderer with BioFabirc default layout

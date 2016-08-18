@@ -518,7 +518,7 @@ public class CommandSet implements ZoomChangeTracker, SelectionChangeListener, F
     HashMap<Integer, ChecksForEnabled> useMap = (withIcon) ? withIcons_ : noIcons_;
     Integer actionKeyObject = Integer.valueOf(actionKey);
     ChecksForEnabled retval = useMap.get(actionKeyObject);
-    if (retval != null) {
+    if (retval != null) {    	
       return (retval);
     } else {
       switch (actionKey) { 
@@ -573,16 +573,16 @@ public class CommandSet implements ZoomChangeTracker, SelectionChangeListener, F
         case SEARCH:
           retval = new SearchAction(withIcon); 
           break;
-        case ZOOM_IN:
-          retval = new InOutZoomAction(withIcon, '+'); 
+        case ZOOM_IN:        	
+          retval = new InOutZoomAction(withIcon, '+');          
           break;
-        case ZOOM_OUT:
+        case ZOOM_OUT:        	
           retval = new InOutZoomAction(withIcon, '-'); 
           break;
         case CLEAR_SELECTIONS:
           retval = new ClearSelectionsAction(withIcon); 
           break;
-        case ZOOM_TO_MODEL:
+        case ZOOM_TO_MODEL:        	
           retval = new ZoomToModelAction(withIcon); 
           break;
         case ZOOM_TO_SELECTIONS:
@@ -4658,13 +4658,16 @@ public class CommandSet implements ZoomChangeTracker, SelectionChangeListener, F
 			forcedTop.add("YOX1");
 			forcedTop.add("RME1");
             
-            (new ControlTopLayout()).doLayout(rbd_, forcedTop);
+			//TODO: implement forced top
+            //(new ControlTopLayout()).doLayout(rbd_, forcedTop);
             break;
           case HIER_DAG_LAYOUT:
-            (new HierDAGLayout()).doLayout(rbd_);
+        	  //TODO: Implement heir dag
+            //(new HierDAGLayout()).doLayout(rbd_);
             break;
           case WORLD_BANK_LAYOUT:
-            (new ProcessWorldBankCSV()).doLayout(rbd_);
+        	//TODO: implement world bank  
+            //(new ProcessWorldBankCSV()).doLayout(rbd_);
             break;
           case NODE_ATTRIB_LAYOUT:
           case LINK_ATTRIB_LAYOUT:

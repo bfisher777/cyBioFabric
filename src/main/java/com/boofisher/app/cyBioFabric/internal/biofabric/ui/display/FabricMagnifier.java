@@ -365,7 +365,7 @@ public class FabricMagnifier extends JPanel {
 
   public void setMiniZoom() {
     Dimension screenDim = getSize();
-    System.out.println("CS IS " + currSize_);
+    //System.out.println("CS IS " + currSize_);
     int worldWidth = (currSize_ * BioFabricPanel.GRID_SIZE);
     int worldHeight  = (currSize_ * BioFabricPanel.GRID_SIZE);
     worldRec_ = new Rectangle((int)center_.getX() - (worldWidth / 2), 

@@ -43,10 +43,12 @@ import com.boofisher.app.cyBioFabric.internal.biofabric.util.BTProgressMonitor;
 import com.boofisher.app.cyBioFabric.internal.biofabric.util.ResourceManager;
 import com.boofisher.app.cyBioFabric.internal.biofabric.util.TrueObjChoiceContent;
 import com.boofisher.app.cyBioFabric.internal.biofabric.util.UiUtil;
+import com.boofisher.app.cyBioFabric.internal.tools.NodeNameSUIDPair;
 
 /****************************************************************************
 **
 ** This does node clustering layout
+** TODO class is broken need to fix
 */
 
 public class NodeClusterLayout {
@@ -118,7 +120,7 @@ public class NodeClusterLayout {
       if (srcClust.equals(trgClust)) {
         BioFabricNetwork.RelayoutBuildData rbdpc = perClust.get(srcClust);
         if (rbdpc == null) {
-          rbdpc = new BioFabricNetwork.RelayoutBuildData(new HashSet<FabricLink>(), new HashSet<String>(), rbd.colGen, intraLay);
+          rbdpc = new BioFabricNetwork.RelayoutBuildData(new HashSet<FabricLink>(), new ArrayList<NodeNameSUIDPair>(), rbd.colGen, intraLay);
           rbdpc.allNodes = new HashSet<String>();
           perClust.put(srcClust, rbdpc);
         }
@@ -148,8 +150,8 @@ public class NodeClusterLayout {
     for (String node : rbd.allNodes) {
     	String clust = params.getClusterForNode(node.toUpperCase());
     	BioFabricNetwork.RelayoutBuildData rbdpc = perClust.get(clust);
-    	if (rbdpc == null) {
-    	  rbdpc  = new BioFabricNetwork.RelayoutBuildData(new HashSet<FabricLink>(), new HashSet<String>(), rbd.colGen, intraLay);
+    	if (rbdpc == null) {    		
+    	  rbdpc  = new BioFabricNetwork.RelayoutBuildData(new HashSet<FabricLink>(), new ArrayList<NodeNameSUIDPair>(), rbd.colGen, intraLay);
         rbdpc.allNodes = new HashSet<String>();
         perClust.put(clust, rbdpc);
     	}  		
@@ -204,14 +206,14 @@ public class NodeClusterLayout {
       } else {
         DefaultLayout dl = new DefaultLayout();
         List<String> starts = (hubs == null) ? null : hubs.get(clustName);
-        targets = dl.defaultNodeOrder(pcrbd.allLinks, pcrbd.loneNodes, starts);  
+        targets = null; //dl.defaultNodeOrder(pcrbd.allLinks, pcrbd.loneNodes, starts); TODO: fix this  
       }
       allTargets.addAll(targets);
     }
     interNodesOnly.removeAll(allTargets);
     allTargets.addAll(interNodesOnly);
     
-    (new DefaultLayout()).installNodeOrder(allTargets, rbd);
+    //(new DefaultLayout()).installNodeOrder(allTargets, rbd); TODO: fix this
     
     (new DefaultEdgeLayout()).layoutEdges(rbd);
     

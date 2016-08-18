@@ -179,7 +179,7 @@ public class BioFabricOverview extends JPanel {
   
   /***************************************************************************
   **
-  ** Set the viewport location
+  ** Set the viewport location, green-rectangle with cross-hair
   */
 
   public void setViewInWorld(Rectangle2D viewInWorld) {

@@ -1234,6 +1234,7 @@ public class BioFabricNetwork {
   /***************************************************************************
   **
   ** Fill out model with submodel data
+  ** TODO: counting on this being used in a new biofabric network and not the main network
   */
 
   private void fillSubModel(BioFabricNetwork bfn, List<NodeInfo> targetList, List<LinkInfo> linkList) {
@@ -2391,6 +2392,7 @@ public class BioFabricNetwork {
   /***************************************************************************
   **
   ** For XML I/O
+  ** Not used in application
   */  
       
   public static class NetworkDataWorker extends AbstractFactoryClient {

@@ -217,7 +217,6 @@ public class ZoomCommandSupport {
     return (new ZoomResult(retval));
   }  
 
-  
   /***************************************************************************
   **
   ** do the zoom operations
