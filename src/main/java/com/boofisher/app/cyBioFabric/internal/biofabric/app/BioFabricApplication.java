@@ -21,26 +21,19 @@
 package com.boofisher.app.cyBioFabric.internal.biofabric.app;
 
 import java.awt.Dimension;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.JComponent;
-import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import com.boofisher.app.cyBioFabric.internal.biofabric.cmd.CommandSet;
 import com.boofisher.app.cyBioFabric.internal.biofabric.gaggle.DeadFabricGoose;
 import com.boofisher.app.cyBioFabric.internal.biofabric.gaggle.FabricGooseInterface;
 import com.boofisher.app.cyBioFabric.internal.biofabric.gaggle.FabricGooseManager;
-import com.boofisher.app.cyBioFabric.internal.biofabric.model.BioFabricNetwork;
 import com.boofisher.app.cyBioFabric.internal.biofabric.ui.dialogs.UpdateJavaDialog;
 import com.boofisher.app.cyBioFabric.internal.biofabric.util.ExceptionHandler;
-import com.boofisher.app.cyBioFabric.internal.biofabric.util.ResourceManager;
 import com.boofisher.app.cyBioFabric.internal.biofabric.util.UiUtil;
-import com.boofisher.app.cyBioFabric.internal.layouts.DefaultBioFabricLayoutBuildTool;
 
 /****************************************************************************
 **
@@ -65,7 +58,7 @@ public class BioFabricApplication {
   private BioFabricWindow bfw_;
   private BioFabricWindow selectionWindow_;
   private int count; //used to increment class name in init CommandSet  
-  private final JComponent inputComponent;
+  private JComponent inputComponent;
   
   ////////////////////////////////////////////////////////////////////////////
   //
@@ -78,11 +71,10 @@ public class BioFabricApplication {
   ** Now supporting Cytoscape App usage
   */
   
-  public BioFabricApplication(boolean forCyto, int count, JComponent inputComponent){
+  public BioFabricApplication(boolean forCyto, int count){
 	  
     forCyto_ = forCyto;
-    this.count = count;
-    this.inputComponent = inputComponent;
+    this.count = count;    
   }
   
   ////////////////////////////////////////////////////////////////////////////
@@ -91,6 +83,10 @@ public class BioFabricApplication {
   //
   ////////////////////////////////////////////////////////////////////////////
     
+  public void attachInputComponent(JComponent inputComponent){
+	  this.inputComponent = inputComponent;
+  }
+  
   /***************************************************************************
   **
   ** Shutdown operations

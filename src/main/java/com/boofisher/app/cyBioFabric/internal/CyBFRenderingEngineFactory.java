@@ -1,32 +1,22 @@
 package com.boofisher.app.cyBioFabric.internal;
 
 import java.awt.Container;
-import java.util.HashMap;
-
 import javax.swing.JComponent;
 
 import com.boofisher.app.cyBioFabric.internal.CyBFRenderingEngine;
-import com.boofisher.app.cyBioFabric.internal.biofabric.BioFabricNetworkViewAddedListener;
-import com.boofisher.app.cyBioFabric.internal.biofabric.BioFabricNetworkViewToBeDestroyedListener;
-import com.boofisher.app.cyBioFabric.internal.biofabric.BioFabricNetworkViewAddedHandler;
-import com.boofisher.app.cyBioFabric.internal.biofabric.BioFabricNetworkViewToBeDestroyedHandler;
-import com.boofisher.app.cyBioFabric.internal.biofabric.app.BioFabricApplication;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.CyBFNetworkView;
-import com.boofisher.app.cyBioFabric.internal.eventbus.EventBusProvider;
+import com.boofisher.app.cyBioFabric.internal.events.BioFabricNetworkViewAddedHandler;
+import com.boofisher.app.cyBioFabric.internal.events.BioFabricNetworkViewToBeDestroyedHandler;
 import com.boofisher.app.cyBioFabric.internal.graphics.GraphicsConfiguration;
 import com.boofisher.app.cyBioFabric.internal.graphics.GraphicsConfigurationFactory;
-import com.boofisher.app.cyBioFabric.internal.layouts.BioFabricLayoutInterface;
-import com.boofisher.app.cyBioFabric.internal.layouts.DefaultBioFabricLayoutAlgorithm;
 import com.boofisher.app.cyBioFabric.internal.task.TaskFactoryListener;
 import org.cytoscape.model.CyNetwork;
-import org.cytoscape.view.layout.CyLayoutAlgorithm;
 import org.cytoscape.view.layout.CyLayoutAlgorithmManager;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.view.presentation.RenderingEngine;
 import org.cytoscape.view.presentation.RenderingEngineFactory;
 import org.cytoscape.view.presentation.RenderingEngineManager;
-import org.cytoscape.work.TaskIterator;
 import org.cytoscape.work.swing.DialogTaskManager;
 
 /** The RenderingEngineFactory for the CyBFRenderingEngine
@@ -50,35 +40,35 @@ public class CyBFRenderingEngineFactory implements RenderingEngineFactory<CyNetw
 	private final VisualLexicon visualLexicon;
 	private final TaskFactoryListener taskFactoryListener;
 	private final DialogTaskManager taskManager;
-	private final EventBusProvider eventBusProvider;
-	
 	private final GraphicsConfigurationFactory graphicsConfigFactory;
+	private final CyLayoutAlgorithmManager layoutAlgorithmManager;
+	private final String defaultLayout;
 	private BioFabricNetworkViewAddedHandler addNetworkHandler; 
-	private BioFabricNetworkViewToBeDestroyedHandler destroyNetworkHandler;
-    private int count;//used to keep track of the number of Biofabric applications created
+	private BioFabricNetworkViewToBeDestroyedHandler destroyNetworkHandler;	
 	
 	
 	public CyBFRenderingEngineFactory(			
 			RenderingEngineManager renderingEngineManager, 
 			VisualLexicon lexicon,
 			TaskFactoryListener taskFactoryListener,
-			DialogTaskManager taskManager,
-			EventBusProvider eventBusFactory,
+			DialogTaskManager taskManager,			
 			GraphicsConfigurationFactory graphicsConfigFactory,
 			BioFabricNetworkViewAddedHandler addNetworkHandler, 
-			BioFabricNetworkViewToBeDestroyedHandler destroyNetworkHandler ) {	
+			BioFabricNetworkViewToBeDestroyedHandler destroyNetworkHandler,
+			CyLayoutAlgorithmManager layoutAlgorithmManager,
+			String defaultLayout) {	
 		
 		//this.layoutAlgorithmManager = layoutAlgorithmManager;
 		this.renderingEngineManager = renderingEngineManager;
 		this.visualLexicon = lexicon;
 		this.taskFactoryListener = taskFactoryListener;
 		this.taskManager = taskManager;
-		this.eventBusProvider = eventBusFactory;
 		this.graphicsConfigFactory = graphicsConfigFactory;
 		this.addNetworkHandler = addNetworkHandler;
-		this.destroyNetworkHandler = destroyNetworkHandler;		
+		this.destroyNetworkHandler = destroyNetworkHandler;
+		this.layoutAlgorithmManager = layoutAlgorithmManager;
+		this.defaultLayout = defaultLayout;
 	}
-	
 	
 	/**
 	 * Catch these errors up front.
@@ -88,6 +78,7 @@ public class CyBFRenderingEngineFactory implements RenderingEngineFactory<CyNetw
 	 */
 	@Override
 	public RenderingEngine<CyNetwork> createRenderingEngine(Object container, View<CyNetwork> viewModel) {
+
 		// Verify the type of the view up front.
 		CyBFNetworkView cyBFViewModel = (CyBFNetworkView) viewModel;
 		JComponent component = (JComponent) container;
@@ -99,16 +90,10 @@ public class CyBFRenderingEngineFactory implements RenderingEngineFactory<CyNetw
 		JComponent inputComponent = getKeyboardComponent(component, cyBFViewModel.getSUID());
 		if(inputComponent == null)
 			inputComponent = component; // happens for birds-eye-view
-		
-		/*//sometimes default layout doesn't get changed so need to change it manually
-		if(!(layoutAlgorithmManager.getDefaultLayout() instanceof BioFabricLayoutInterface)){
-			setLayoutAlgorithm(cyBFViewModel);
-		}*/
-				
-		
-		CyBFRenderingEngine engine = new CyBFRenderingEngine(component, inputComponent, cyBFViewModel, visualLexicon, eventBusProvider,
+						
+		CyBFRenderingEngine engine = new CyBFRenderingEngine(component, inputComponent, cyBFViewModel, visualLexicon,
 				                                             configuration, taskFactoryListener, taskManager, addNetworkHandler,  
-				                                             destroyNetworkHandler, count++);
+				                                             destroyNetworkHandler, layoutAlgorithmManager, defaultLayout);
 		
 		renderingEngineManager.addRenderingEngine(engine);
 
@@ -149,5 +134,7 @@ public class CyBFRenderingEngineFactory implements RenderingEngineFactory<CyNetw
 		TaskIterator taskIterator = layout.createTaskIterator(cyBFViewModel, layout.getDefaultLayoutContext(), CyLayoutAlgorithm.ALL_NODE_VIEWS, null);
 		taskManager.execute(taskIterator);
 	}*/
+	
+	public void setBioFabricApplication(){}
 }
 

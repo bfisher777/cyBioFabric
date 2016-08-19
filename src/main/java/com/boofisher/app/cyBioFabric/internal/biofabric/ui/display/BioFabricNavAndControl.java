@@ -67,7 +67,7 @@ public class BioFabricNavAndControl extends JPanel {
   private JSplitPane spot_;
   private double savedSplitFrac_;
   private static final long serialVersionUID = 1L;
-  
+  private JPanel fopan_;
   ////////////////////////////////////////////////////////////////////////////
   //
   // PUBLIC CONSTRUCTORS
@@ -104,27 +104,27 @@ public class BioFabricNavAndControl extends JPanel {
     
     mvo_ = new MouseOverView();
     
-    JPanel fopan = new JPanel();
-    fopan.setLayout(new BorderLayout());
-    fopan.setBorder(new LineBorder(Color.black, 2));
+    fopan_ = new JPanel();
+    fopan_.setLayout(new BorderLayout());
+    fopan_.setBorder(new LineBorder(Color.black, 2));
     JLabel overLab = new JLabel(ResourceManager.getManager().getString("biofabric.overview"));
     overLab.setBorder(new EmptyBorder(0, 5, 0, 0));
     overLab.setOpaque(true);
     overLab.setBackground(Color.white);
     overLab.setFont(labelFont);
-    fopan.add(overLab, BorderLayout.NORTH);
-    fopan.add(bfo_, BorderLayout.CENTER);
+    fopan_.add(overLab, BorderLayout.NORTH);
+    fopan_.add(bfo_, BorderLayout.CENTER);
     
     lfnt_ = new FabricNavTool.LabeledFabricNavTool(topWindow, labelFont);
     fnt_ = lfnt_.getFabricNavTool();
      
-    spot_ = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, fopan, lfnt_);
+    spot_ = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, null, lfnt_);
     //JPanel dmvo = new JPanel();
    // dmvo.setLayout(new GridLayout(1, 2));
    // dmvo.add(mvo_.getPanel(0));
    // dmvo.add(mvo_.getPanel(1));
   
-    //spot_ = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, fopan, dmvo);
+    //spot_ = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, fopan_, dmvo);
     spot_.setBorder(new EmptyBorder(0,0,0,0));
     spot_.setResizeWeight(1.0);
 
@@ -273,7 +273,7 @@ public class BioFabricNavAndControl extends JPanel {
   */
 
   public BioFabricOverview getOverview() {
-    return (bfo_);
+    return bfo_;
   }
    
   /***************************************************************************
@@ -284,5 +284,9 @@ public class BioFabricNavAndControl extends JPanel {
   public void setFabricPanel(BioFabricPanel cp) {
     fnt_.setFabricPanel(cp);
     return;
+  }
+  
+  public JPanel getFabricOverviewPanel(){
+	  return fopan_;
   }
 }

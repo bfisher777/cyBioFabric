@@ -2,8 +2,6 @@ package com.boofisher.app.cyBioFabric.internal.graphics;
 
 import javax.swing.JComponent;
 
-import com.boofisher.app.cyBioFabric.internal.data.GraphicsData;
-
 import com.google.common.eventbus.EventBus;
 
 /**
@@ -42,13 +40,7 @@ public interface GraphicsConfiguration {
 	 * Called first, before initialize(GraphicsData) is called.
 	 */
 	public void initializeFrame(JComponent container, JComponent inputComponent);
-	
-	
-	/**
-	 * Gives the GraphicsConfiguration access to the GraphicsData for the current renderer.
-	 * Called once before rendering begins.
-	 */
-	public void initialize(GraphicsData graphicsData);
+
 	
 	
 	/**

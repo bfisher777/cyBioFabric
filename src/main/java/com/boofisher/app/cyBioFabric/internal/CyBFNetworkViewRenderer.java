@@ -13,14 +13,17 @@ public class CyBFNetworkViewRenderer implements NetworkViewRenderer {
 	private final CyNetworkViewFactory networkViewFactory;
 	private final RenderingEngineFactory<CyNetwork> mainFactory;
 	private final RenderingEngineFactory<CyNetwork> birdsEyeFactory;
+	private final RenderingEngineFactory<CyNetwork> thumbnailFactory;
 	
 	public CyBFNetworkViewRenderer(CyNetworkViewFactory networkViewFactory, 
 			                       RenderingEngineFactory<CyNetwork> mainFactory, 
-			                       RenderingEngineFactory<CyNetwork> birdsEyeFactory) {
+			                       RenderingEngineFactory<CyNetwork> birdsEyeFactory,
+			                       RenderingEngineFactory<CyNetwork> thumbnailFactory) {
 		
 		this.networkViewFactory = networkViewFactory;
 		this.mainFactory = mainFactory;
 		this.birdsEyeFactory = birdsEyeFactory;
+		this.thumbnailFactory = thumbnailFactory;		
 	}
 	
 	
@@ -30,18 +33,23 @@ public class CyBFNetworkViewRenderer implements NetworkViewRenderer {
 	}
 
 	@Override
-	public CyNetworkViewFactory getNetworkViewFactory() {
-		return networkViewFactory;
+	public CyNetworkViewFactory getNetworkViewFactory() {		
+		return networkViewFactory;		
 	}
 
 	@Override
-	public RenderingEngineFactory<CyNetwork> getRenderingEngineFactory(String context) {
+	public RenderingEngineFactory<CyNetwork> getRenderingEngineFactory(String context) {		
 		switch(context) {
-			case DEFAULT_CONTEXT: return mainFactory;
-			case BIRDS_EYE_CONTEXT: return birdsEyeFactory;
-			case THUMBNAIL_CONTEXT: return null;
-			case VISUAL_STYLE_PREVIEW_CONTEXT: return null;
-			default: return null;
+			case DEFAULT_CONTEXT:				
+				return mainFactory;
+			case BIRDS_EYE_CONTEXT:				
+				return birdsEyeFactory;
+			case THUMBNAIL_CONTEXT:				
+				return thumbnailFactory;
+			case VISUAL_STYLE_PREVIEW_CONTEXT: 
+				return null;
+			default: 				
+				return null;
 		}
 	}
 
