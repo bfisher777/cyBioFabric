@@ -738,6 +738,7 @@ public class ZoomCommandSupport {
   **
   ** Zoom to show current model.  If it is off to one corner of the worksheet, we will scroll
   ** as needed.
+  ** TODO: added check for vDim.getHeight > 0 was failing on fitContent calls from CyBFNetworkView when starting
   */ 
     
   public void zoomToModel() {
@@ -748,17 +749,24 @@ public class ZoomCommandSupport {
       Point2D cent = sup_.getRawCenterPoint();
       bounds = centeredUnion(union, cent);
     }
+    
     ZoomResult zres = calcOptimalZoom(bounds); 
     Dimension vDim = scrollDims();
-    setCurrentZoom(zres);    
-    sup_.setWideZoomFactor(getCurrentZoom(), vDim);
     
-    int x = bounds.x + (bounds.width / 2);
-    int y = bounds.y + (bounds.height / 2);    
-    Point pt = new Point(x, y);
-    pt = sup_.pointToViewport(pt);
-    viewportUpdate(pt, vDim);
-    sup_.repaint();
+    if(vDim.getHeight() > 0 && vDim.getWidth() > 0){
+	    setCurrentZoom(zres);    
+	    sup_.setWideZoomFactor(getCurrentZoom(), vDim);
+	    
+	    int x = bounds.x + (bounds.width / 2);
+	    int y = bounds.y + (bounds.height / 2);    
+	    Point pt = new Point(x, y);
+	    pt = sup_.pointToViewport(pt);
+    
+	    viewportUpdate(pt, vDim);
+	    sup_.repaint();
+    }else{
+    	//System.out.println("Problem in ZoomCommandSupport zoomToModel: vDim.getHeight(): " + vDim.getHeight() + " vDim.getWidth(): " + vDim.getWidth());
+    }
     if (tracker_ != null) tracker_.zoomStateChanged(false);
     return;
   }

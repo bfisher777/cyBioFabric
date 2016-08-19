@@ -20,6 +20,12 @@ public enum GraphicsConfigurationFactory {
 		public BirdsEyeGraphicsConfiguration createGraphicsConfiguration() {
 			return new BirdsEyeGraphicsConfiguration();
 		}
+	},
+	
+	THUMBNAIL_FACTORY {
+		public ThumbnailGraphicsConfiguration createGraphicsConfiguration() {
+			return new ThumbnailGraphicsConfiguration();
+		}
 	};
 	
 	public abstract GraphicsConfiguration createGraphicsConfiguration();

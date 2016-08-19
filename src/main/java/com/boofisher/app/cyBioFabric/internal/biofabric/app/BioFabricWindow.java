@@ -569,9 +569,9 @@ public class BioFabricWindow extends JInternalFrame implements BackgroundWorkerC
   
   private void stockToolBar(JToolBar toolBar, boolean isMain, CommandSet fc) {
     toolBar.removeAll();  
-    toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.ZOOM_OUT)));
-    toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.ZOOM_IN)));
-    toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.ZOOM_TO_MODEL)));
+    //toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.ZOOM_OUT)));
+    //toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.ZOOM_IN)));
+    //toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.ZOOM_TO_MODEL)));
     toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.ZOOM_TO_RECT)));    
     toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.ZOOM_TO_SELECTIONS)));
     toolBar.addSeparator();
@@ -619,5 +619,9 @@ public class BioFabricWindow extends JInternalFrame implements BackgroundWorkerC
       }      
     } 
     return;
+  }
+  
+  public BioFabricNavAndControl getNAC(){
+	  return nac_;
   }
 }

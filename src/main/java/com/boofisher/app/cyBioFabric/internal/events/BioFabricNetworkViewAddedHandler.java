@@ -1,4 +1,4 @@
-package com.boofisher.app.cyBioFabric.internal.biofabric;
+package com.boofisher.app.cyBioFabric.internal.events;
 
 import java.util.HashMap;
 import java.util.Map;

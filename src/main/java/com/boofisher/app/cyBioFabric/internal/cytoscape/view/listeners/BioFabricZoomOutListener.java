@@ -17,10 +17,12 @@ public class BioFabricZoomOutListener implements BioFabricZoomOutListenerInterfa
 	
 	@Override
 	public void performZoomOut() {
+		
+		//if it's not gettng called from UI thread then ignore
 		if(SwingUtilities.isEventDispatchThread()){
 			//command name is a unique name for each CommandSet created
 		    CommandSet fc = CommandSet.getCmds(bfw.COMMAND_NAME);
-		    fc.getAction(CommandSet.ZOOM_OUT, false, null).actionPerformed(null);;
+		    fc.getAction(CommandSet.ZOOM_OUT, false, null).actionPerformed(null);
 		}else{
 			SwingUtilities.invokeLater(new Runnable(){
 
@@ -28,10 +30,10 @@ public class BioFabricZoomOutListener implements BioFabricZoomOutListenerInterfa
 				public void run() {						
 					//command name is a unique name for each CommandSet created
 				    CommandSet fc = CommandSet.getCmds(bfw.COMMAND_NAME);
-				    fc.getAction(CommandSet.ZOOM_OUT, false, null).actionPerformed(null);;					
+				    fc.getAction(CommandSet.ZOOM_OUT, false, null).actionPerformed(null);				
 				}					
 			});
-		}	
+		}
 	}
 
 }

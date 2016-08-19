@@ -12,8 +12,8 @@ import org.apache.log4j.Logger;
 import org.cytoscape.application.CyUserLog;
 import org.cytoscape.application.NetworkViewRenderer;
 import org.cytoscape.application.events.CyShutdownListener;
-import org.cytoscape.application.events.SetCurrentRenderingEngineListener;
 import org.cytoscape.application.swing.CySwingApplication;
+import org.cytoscape.application.swing.CytoPanelComponent;
 import org.cytoscape.service.util.AbstractCyActivator;
 import org.cytoscape.task.EdgeViewTaskFactory;
 import org.cytoscape.task.NetworkViewLocationTaskFactory;
@@ -27,24 +27,20 @@ import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.view.model.events.NetworkViewAboutToBeDestroyedListener;
 import org.cytoscape.view.model.events.NetworkViewAddedListener;
 import org.cytoscape.view.presentation.RenderingEngineManager;
-import org.cytoscape.view.presentation.events.RenderingEngineAddedEvent;
-import org.cytoscape.view.presentation.events.RenderingEngineAddedListener;
 import org.cytoscape.view.vizmap.VisualMappingManager;
 import org.cytoscape.work.swing.DialogTaskManager;
 import org.cytoscape.work.undo.UndoSupport;
 import org.osgi.framework.BundleContext;
 
-import com.boofisher.app.cyBioFabric.internal.biofabric.BioFabricNetworkViewAddedListener;
-import com.boofisher.app.cyBioFabric.internal.biofabric.BioFabricNetworkViewToBeDestroyedListener;
-import com.boofisher.app.cyBioFabric.internal.biofabric.BioFabricShutdownHandler;
-import com.boofisher.app.cyBioFabric.internal.biofabric.BioFabricShutdownListener;
-import com.boofisher.app.cyBioFabric.internal.biofabric.BioFabricNetworkViewAddedHandler;
-import com.boofisher.app.cyBioFabric.internal.biofabric.BioFabricNetworkViewToBeDestroyedHandler;
-import com.boofisher.app.cyBioFabric.internal.biofabric.BioFabricSetCurrentRenderingEngineHandler;
-import com.boofisher.app.cyBioFabric.internal.biofabric.BioFabricSetCurrentRenderingEngineListener;
 import com.boofisher.app.cyBioFabric.internal.biofabric.util.ResourceManager;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.BioFabricVisualLexicon;
-import com.boofisher.app.cyBioFabric.internal.eventbus.EventBusProvider;
+import com.boofisher.app.cyBioFabric.internal.events.BioFabricNetworkViewAddedHandler;
+import com.boofisher.app.cyBioFabric.internal.events.BioFabricNetworkViewAddedListener;
+import com.boofisher.app.cyBioFabric.internal.events.BioFabricNetworkViewToBeDestroyedHandler;
+import com.boofisher.app.cyBioFabric.internal.events.BioFabricNetworkViewToBeDestroyedListener;
+import com.boofisher.app.cyBioFabric.internal.events.BioFabricShutdownHandler;
+import com.boofisher.app.cyBioFabric.internal.events.BioFabricShutdownListener;
+import com.boofisher.app.cyBioFabric.internal.graphics.BioFabricCytoPanel;
 import com.boofisher.app.cyBioFabric.internal.graphics.GraphicsConfigurationFactory;
 import com.boofisher.app.cyBioFabric.internal.layouts.BioFabricLayoutInterface;
 import com.boofisher.app.cyBioFabric.internal.layouts.DefaultBioFabricLayoutAlgorithm;
@@ -54,12 +50,11 @@ import com.boofisher.app.cyBioFabric.internal.task.TaskFactoryListener;
  * The application Simple Renderer will perform simple rendering of the input file to generate the image.
  * The app provides no user input handling and is meant to be a demonstration of writing a simple renderer
  * using Java 2-D with Cytoscape. */
-public class CyActivator extends AbstractCyActivator {
-	
+public class CyActivator extends AbstractCyActivator {	
 	final Logger logger = Logger.getLogger(CyUserLog.NAME);
 
 	@Override
-	public void start(BundleContext context) throws Exception {
+	public void start(BundleContext context) throws Exception {						
 		
 		ResourceManager.initManager("com.boofisher.app.cyBioFabric.internal.biofabric.props.BioFabric");
 		
@@ -67,7 +62,9 @@ public class CyActivator extends AbstractCyActivator {
 		UndoSupport undoSupport = getService(context, UndoSupport.class);
 		
 		//A task factory specifically for layout algorithms.
-		CyLayoutAlgorithmManager layoutAlgorithmManager =  getService(context, CyLayoutAlgorithmManager.class);		
+		CyLayoutAlgorithmManager layoutAlgorithmManager =  getService(context, CyLayoutAlgorithmManager.class);	
+		//Save the default layout, restore it later in CyBFRenderingEngine
+		String defaultLayout = layoutAlgorithmManager.getDefaultLayout().getName();
 		
 		/*A RenderingEngine should provide one, immutable lexicon implementing this interface. 
 		 * This is a pre-defined tree of VisualProperties designed by the RenderingEngine developer.*/
@@ -127,25 +124,19 @@ public class CyActivator extends AbstractCyActivator {
 		
 		BioFabricShutdownHandler biofabricShutdownHandler = new BioFabricShutdownHandler();
 		BioFabricShutdownListener bioFabricShutdownListener = new BioFabricShutdownListener(biofabricShutdownHandler);
-		registerService(context, bioFabricShutdownListener, CyShutdownListener.class, new Properties());
+		registerService(context, bioFabricShutdownListener, CyShutdownListener.class, new Properties());		
+			
+		/*//add a new panel
+		BioFabricCytoPanel bioFabricNavPanel = new BioFabricCytoPanel();
+		//Register it as a service:
+		registerService(context, bioFabricNavPanel, CytoPanelComponent.class, new Properties());*/
 		
-		BioFabricSetCurrentRenderingEngineHandler rendererSetCurrentHandler = new BioFabricSetCurrentRenderingEngineHandler(layoutAlgorithmManager);
-		BioFabricSetCurrentRenderingEngineListener rendererSetCurrentListener = new BioFabricSetCurrentRenderingEngineListener(rendererSetCurrentHandler);
-		registerService(context, rendererSetCurrentListener, SetCurrentRenderingEngineListener.class, new Properties());
-				
-		/*EventBus allows publish-subscribe-style communication between components without 
-		requiring the components to explicitly register with one another (and thus be aware 
-				of each other). It is designed exclusively to replace traditional Java in-process 
-		event distribution using explicit registration. It is not a general-purpose 
-		publish-subscribe system, nor is it intended for interprocess communication.*/
-		/*Acts as a single point for accessing the event bus for a CyBFNetworkView.*/
-		EventBusProvider eventBusProvider = new EventBusProvider();
-				
+		
 		// CyBF NetworkView factory
 		/*Factory for CyNetworkView objects. Modules which need to create view models should import this as a service.
 		 * Create a CyBFNetworkView*/
 		CyBFNetworkViewFactory cyBFNetworkViewFactory = new CyBFNetworkViewFactory(cyBFVisualLexicon, 
-				visualMappingManagerService, eventBusProvider, layoutAlgorithmManager, bfLayoutAlg);
+				visualMappingManagerService, layoutAlgorithmManager, bfLayoutAlg);
 		Properties cyBFNetworkViewFactoryProps = new Properties();
 		cyBFNetworkViewFactoryProps.setProperty("serviceType", "factory");
 		registerService(context, cyBFNetworkViewFactory, CyNetworkViewFactory.class, cyBFNetworkViewFactoryProps);
@@ -162,20 +153,25 @@ public class CyActivator extends AbstractCyActivator {
 		Your RenderingEngineFactory must also register the newly created RenderingEngine with the Cytoscape RenderingEngineManager.
 		In CyBF there is one class CyBFRenderingEngineFactory that implements RenderingEngineFactory. Two instances are created,
 		each is parameterized with a GraphicsConfigurationFactory which provides functionality that is specific to the 
-		main view or the birds-eye view.*/
+		main view or the birds-eye view.*/	
 		CyBFRenderingEngineFactory cyBFMainRenderingEngineFactory = new CyBFRenderingEngineFactory(
-				renderingEngineManager, cyBFVisualLexicon, taskFactoryListener, dialogTaskManager, eventBusProvider, mainFactory, 
-				addNetworkHandler, destroyNetworkHandler);		
+				renderingEngineManager, cyBFVisualLexicon, taskFactoryListener, dialogTaskManager, mainFactory, 
+				addNetworkHandler, destroyNetworkHandler, layoutAlgorithmManager, defaultLayout);		
 		// Bird's Eye RenderingEngine factory
 		GraphicsConfigurationFactory birdsEyeFactory = GraphicsConfigurationFactory.BIRDS_EYE_FACTORY;
 		CyBFRenderingEngineFactory cyBFBirdsEyeRenderingEngineFactory = new CyBFRenderingEngineFactory(
-				renderingEngineManager, cyBFVisualLexicon, taskFactoryListener, dialogTaskManager, eventBusProvider, birdsEyeFactory, 
-				addNetworkHandler, destroyNetworkHandler);
-
+				renderingEngineManager, cyBFVisualLexicon, taskFactoryListener, dialogTaskManager, birdsEyeFactory, 
+				addNetworkHandler, destroyNetworkHandler, layoutAlgorithmManager, defaultLayout);
+		
+		//Thumbnail RenderingEngine factory
+		GraphicsConfigurationFactory thumbnailFactory = GraphicsConfigurationFactory.THUMBNAIL_FACTORY;
+		CyBFRenderingEngineFactory cyBFThumbnailRenderingEngineFactory = new CyBFRenderingEngineFactory(
+				renderingEngineManager, cyBFVisualLexicon, taskFactoryListener, dialogTaskManager, thumbnailFactory, 
+				addNetworkHandler, destroyNetworkHandler, layoutAlgorithmManager, defaultLayout);
 		
 		// NetworkViewRenderer, this is the main entry point that Cytoscape will call into
-		CyBFNetworkViewRenderer networkViewRenderer = new CyBFNetworkViewRenderer(
-				cyBFNetworkViewFactory, cyBFMainRenderingEngineFactory, cyBFBirdsEyeRenderingEngineFactory);
+		CyBFNetworkViewRenderer networkViewRenderer = new CyBFNetworkViewRenderer(cyBFNetworkViewFactory, 
+				cyBFMainRenderingEngineFactory, cyBFBirdsEyeRenderingEngineFactory, cyBFThumbnailRenderingEngineFactory);
 		registerService(context, networkViewRenderer, NetworkViewRenderer.class, new Properties());
 		
 		// Still need to register the rendering engine factory directly		
@@ -186,7 +182,8 @@ public class CyActivator extends AbstractCyActivator {
 		// About dialog
 		AboutDialogAction aboutDialogAction = new AboutDialogAction(application, openBrowser);
 		aboutDialogAction.setPreferredMenu("Apps.CyBioFabric");
-		registerAllServices(context, aboutDialogAction, new Properties());				
+		registerAllServices(context, aboutDialogAction, new Properties());	
+		
 	}
 
 	
