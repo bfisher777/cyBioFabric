@@ -37,6 +37,7 @@ import com.boofisher.app.cyBioFabric.internal.biofabric.model.FabricLink;
 **
 ** This is the default layout algorithm for edges. Actually usable in combination 
 ** with a wide variety of different node layout algorithms, not just the default
+** Modified to work with Cytoscape
 */
 
 public class DefaultEdgeLayout {

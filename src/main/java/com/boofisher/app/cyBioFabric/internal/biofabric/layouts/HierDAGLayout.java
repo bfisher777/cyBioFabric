@@ -37,7 +37,7 @@ import com.boofisher.app.cyBioFabric.internal.biofabric.model.FabricLink;
 ** This is a hierarchical layout of a DAG
 */
 
-public class HierDAGLayout {
+public class HierDAGLayout {/*
   
   ////////////////////////////////////////////////////////////////////////////
   //
@@ -68,10 +68,10 @@ public class HierDAGLayout {
   //
   ////////////////////////////////////////////////////////////////////////////
 
-  /***************************************************************************
+  *//***************************************************************************
   **
   ** Constructor
-  */
+  *//*
 
   public HierDAGLayout() {
      l2s_ = new HashMap<String, Set<String>>();
@@ -86,10 +86,10 @@ public class HierDAGLayout {
   //
   ////////////////////////////////////////////////////////////////////////////
  
-  /***************************************************************************
+  *//***************************************************************************
   **
   ** Relayout the network!
-  */
+  *//*
   
   public void doLayout(BioFabricNetwork.RelayoutBuildData rbd) {   
     doNodeLayout(rbd);
@@ -97,10 +97,10 @@ public class HierDAGLayout {
     return;
   }
   
-  /***************************************************************************
+  *//***************************************************************************
   **
   ** Relayout the network!
-  */
+  *//*
   
   public List<String> doNodeLayout(BioFabricNetwork.RelayoutBuildData rbd) {
     
@@ -116,10 +116,10 @@ public class HierDAGLayout {
   }
   
 
-  /***************************************************************************
+  *//***************************************************************************
   **
   ** Relayout the network!
-  */
+  *//*
   
   public List<String> orderByNodeDegree(BioFabricNetwork.RelayoutBuildData rbd) {
     
@@ -144,10 +144,10 @@ public class HierDAGLayout {
     
   }
   
-  /***************************************************************************
+  *//***************************************************************************
   ** 
   ** Build the set of guys we are looking at and degrees
-  */
+  *//*
 
   public Map<String, Set<String>> linksToSources(Set<String> nodeList, Set<FabricLink> linkList) {   
       
@@ -174,20 +174,20 @@ public class HierDAGLayout {
     return (l2s_);
   }
   
-  /***************************************************************************
+  *//***************************************************************************
   ** 
   ** Add to list to place
-  */
+  *//*
 
   public void addToPlaceList(List<String> nextBatch) {         
     placeList_.addAll(nextBatch);
     return;
   }
   
-  /***************************************************************************
+  *//***************************************************************************
   ** 
   ** Extract the root nodes in order from highest degree to low
-  */
+  *//*
 
   public List<String> extractRoots() {
  
@@ -237,10 +237,10 @@ public class HierDAGLayout {
     return (buildList);
   }
   
-  /***************************************************************************
+  *//***************************************************************************
   ** 
   ** Find the next guys to go:
-  */
+  *//*
 
   public List<String> findNextCandidates() {
  
@@ -284,10 +284,10 @@ public class HierDAGLayout {
   //
   ////////////////////////////////////////////////////////////////////////////
   
-  /****************************************************************************
+  *//****************************************************************************
   **
   ** A Class
-  */
+  *//*
   
   public class SourcedNode implements Comparable<SourcedNode> {
     
@@ -381,4 +381,4 @@ public class HierDAGLayout {
       return (this.node_.compareTo(otherDeg.node_));
     } 
   }
-}
+*/}

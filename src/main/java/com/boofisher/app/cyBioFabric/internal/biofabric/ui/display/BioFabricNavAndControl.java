@@ -79,11 +79,12 @@ public class BioFabricNavAndControl extends JPanel {
   ** Constructor
   */
 
-  public BioFabricNavAndControl(boolean isMain, JInternalFrame topWindow) {
+  public BioFabricNavAndControl(boolean isMain, JInternalFrame topWindow, String commandName) {
 
     floc_ = new FabricLocation();
 
-    CommandSet fc = CommandSet.getCmds((isMain) ? "mainWindow" : "selectionWindow");
+    //CommandSet fc = CommandSet.getCmds((isMain) ? "mainWindow" : "selectionWindow");
+    CommandSet fc = CommandSet.getCmds(commandName);
     fmt_ = new FabricMagnifyingTool(fc.getColorGenerator());
     fmt_.keyInstall((JPanel)topWindow.getContentPane());
     JPanel fmpan = new JPanel();

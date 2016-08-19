@@ -17,10 +17,11 @@
 **    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
-package com.boofisher.app.cyBioFabric.internal.biofabric;
+package com.boofisher.app.cyBioFabric.internal.layouts;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -33,7 +34,10 @@ import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
+import org.cytoscape.view.presentation.property.BasicVisualLexicon;
+
 import com.boofisher.app.cyBioFabric.internal.biofabric.ui.FabricColorGenerator;
+import com.boofisher.app.cyBioFabric.internal.tools.NodeNameSUIDPair;
 import com.boofisher.app.cyBioFabric.internal.biofabric.model.BioFabricNetwork;
 import com.boofisher.app.cyBioFabric.internal.biofabric.model.FabricLink;
 
@@ -43,7 +47,7 @@ import com.boofisher.app.cyBioFabric.internal.biofabric.model.FabricLink;
 ** Build a biofabric network using default layout
 */
 
-public class DefaultLayoutBuildTool {
+public class DefaultBioFabricLayoutBuildTool {
   
   ////////////////////////////////////////////////////////////////////////////
   //
@@ -55,7 +59,7 @@ public class DefaultLayoutBuildTool {
   private FabricColorGenerator colorGenerator;  
 
   
-  public DefaultLayoutBuildTool(){
+  public DefaultBioFabricLayoutBuildTool(){
 	  this.colorGenerator = new FabricColorGenerator();
 	  this.colorGenerator.newColorModel();	  
   }
@@ -67,7 +71,7 @@ public class DefaultLayoutBuildTool {
     
   public BioFabricNetwork loadDataFromCytoscape(CyNetworkView networkView) {  
     ArrayList<FabricLink> links = new ArrayList<FabricLink>();
-    HashSet<String> loneNodes = new HashSet<String>();       
+    ArrayList<NodeNameSUIDPair> loneNodes = new ArrayList<NodeNameSUIDPair>();       
 	  try { 
 	    bioFabricDataLoader(networkView, links, loneNodes); 
 	    return finishLoad(networkView, links, loneNodes);
@@ -83,7 +87,7 @@ public class DefaultLayoutBuildTool {
  ** Process a network
  */
 
- private void bioFabricDataLoader(CyNetworkView networkView, List<FabricLink> links, Set<String> loneNodes) { 
+ private void bioFabricDataLoader(CyNetworkView networkView, List<FabricLink> links, ArrayList<NodeNameSUIDPair> loneNodes) { 
 	  		  
 	  CyNetwork network = networkView.getModel();		  		 
 	  Collection<View<CyNode>> nodeViews = networkView.getNodeViews();
@@ -96,12 +100,15 @@ public class DefaultLayoutBuildTool {
 		  CyNode nodeSource = edgeView.getModel().getSource();
 		  CyNode nodeTarget = edgeView.getModel().getTarget();
 		  //set source, target and relationship
-		  String source = nodeSource.getSUID().toString();	
-		  String target = nodeTarget.getSUID().toString();
-		  String rel = network.getRow(edgeModel).get(CyNetwork.NAME, String.class);//name of the edge?
+		  //String source = nodeSource.getSUID().toString();	
+		  //String target = nodeTarget.getSUID().toString();
 		  
+		  String source = networkView.getModel().getRow(nodeSource).get(CyNetwork.NAME, String.class);
+		  String target = networkView.getModel().getRow(nodeTarget).get(CyNetwork.NAME, String.class);
+		  
+		  String rel = network.getRow(edgeModel).get(CyEdge.INTERACTION, String.class);//name of the edge?		 
 			  
-		  FabricLink nextLink = new FabricLink(source, target, rel, false, edgeModel.getSUID());
+		  FabricLink nextLink = new FabricLink(source, target, rel, false, edgeModel.getSUID(), nodeSource.getSUID(), nodeTarget.getSUID());
 		  links.add(nextLink);
 	      // We never create shadow feedback links
 		  //TODO do new shadow links need to be added to the network
@@ -110,24 +117,20 @@ public class DefaultLayoutBuildTool {
 			  //CyEdge newEdge = network.addEdge(nodeSource, nodeTarget, edgeView.getModel().isDirected());
 			  //network.getRow(newEdge).set(CyNetwork.NAME, rel);
 			  //fabricEdges.add(newEdge);
-			  FabricLink nextShadowLink = new FabricLink(source, target, rel, true, edgeModel.getSUID());
+			  FabricLink nextShadowLink = new FabricLink(source, target, rel, true, edgeModel.getSUID(), nodeSource.getSUID(), nodeTarget.getSUID());
 			  links.add(nextShadowLink);
-	      }			      		        
+	      }	
+		  edgeView.setVisualProperty(BasicVisualLexicon.EDGE_LABEL, rel);
 	  }	
 	  
-	  /*//create views for newly created shadow edges
-	  eventHelper.flushPayloadEvents();
-	  //now that views are created iterate through and set fabric edges to hidden
-	  for(CyEdge edge: fabricEdges){
-		  View<CyEdge> view = networkView.getEdgeView(edge);
-		  view.setVisualProperty(BioFabricVisualLexicon.EDGE_VISIBLE, false);
-	  }*/
 	  
 	  //add nodes of degree 0 to list loneNodes
-	  for(View<CyNode> nodeView : nodeViews){
-		  if(networkView.getModel().getAdjacentEdgeList(nodeView.getModel(), CyEdge.Type.ANY).size() == 0){
+	  for(View<CyNode> nodeView : nodeViews){		  
+		  //TODO: does this work with directed networks?
+		  if(networkView.getModel().getAdjacentEdgeList(nodeView.getModel(), CyEdge.Type.ANY).size() == 0){			  
 			  //String loner = network.getRow(nodeView.getModel()).get(CyNetwork.NAME, String.class);
-		  	  loneNodes.add(nodeView.getModel().getSUID().toString());
+		  	  //loneNodes.add(nodeView.getModel().getSUID().toString());
+			  loneNodes.add(new NodeNameSUIDPair(nodeView.getModel().getSUID(), nodeView.getVisualProperty(BasicVisualLexicon.NODE_LABEL)));
 		  }
 	  }		  
  }
@@ -138,7 +141,7 @@ public class DefaultLayoutBuildTool {
   ** Method may return null.
   */ 
     
-  private BioFabricNetwork finishLoad(CyNetworkView networkView, List<FabricLink> links, Set<String> loneNodes) {
+  private BioFabricNetwork finishLoad(CyNetworkView networkView, List<FabricLink> links, ArrayList<NodeNameSUIDPair> loneNodes) {
 	  BioFabricNetwork bfn = null;
 	  
 	  try {	      
@@ -150,7 +153,7 @@ public class DefaultLayoutBuildTool {
 	      preprocessLinks(links, reducedLinks, culledLinks);
 
 	      BioFabricNetwork.RelayoutBuildData bfnbd = new BioFabricNetwork.RelayoutBuildData(networkView, reducedLinks, loneNodes, this.colorGenerator, 
-	                                                                                      BioFabricNetwork.BuildMode.BUILD_FROM_GAGGLE);
+	                                                                                      BioFabricNetwork.BuildMode.BUILD_FROM_SIF);
 	       
 	      // Possibly expensive network analysis preparation:
 	      bfn = new BioFabricNetwork(bfnbd);	      

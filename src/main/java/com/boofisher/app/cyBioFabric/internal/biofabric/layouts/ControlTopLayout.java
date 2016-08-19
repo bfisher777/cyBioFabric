@@ -41,7 +41,7 @@ import com.boofisher.app.cyBioFabric.internal.biofabric.util.UiUtil;
 ** Control nodes at top
 */
 
-public class ControlTopLayout {
+public class ControlTopLayout {/*
   
   ////////////////////////////////////////////////////////////////////////////
   //
@@ -67,10 +67,10 @@ public class ControlTopLayout {
   //
   ////////////////////////////////////////////////////////////////////////////
 
-  /***************************************************************************
+  *//***************************************************************************
   **
   ** Constructor
-  */
+  *//*
 
   public ControlTopLayout() {
  
@@ -82,10 +82,10 @@ public class ControlTopLayout {
   //
   ////////////////////////////////////////////////////////////////////////////
   
-  /***************************************************************************
+  *//***************************************************************************
   **
   ** Relayout the network!
-  */
+  *//*
   
   public void doLayout(BioFabricNetwork.RelayoutBuildData rbd, List<String> forcedTop) {   
     doNodeLayout(rbd, forcedTop);
@@ -93,10 +93,10 @@ public class ControlTopLayout {
     return;
   }
   
-  /***************************************************************************
+  *//***************************************************************************
   **
   ** Relayout the network!
-  */
+  *//*
   
   public List<String> doNodeLayout(BioFabricNetwork.RelayoutBuildData rbd, List<String> forcedTop) {
     
@@ -116,11 +116,11 @@ public class ControlTopLayout {
     return (targets);
   }
   
-  /***************************************************************************
+  *//***************************************************************************
   **
   ** Target nodes are ordered by degree. Within degree, targets are arranged
   ** to "odometer" thru the inputs
-  */
+  *//*
   
    private List<String> orderByNodeDegree(BioFabricNetwork.RelayoutBuildData rbd, List<String> forcedTop) {
    
@@ -155,11 +155,11 @@ public class ControlTopLayout {
     return (outList);
   }
  
-  /***************************************************************************
+  *//***************************************************************************
   ** 
   ** Calculate control node order; this will create a partial ordering. Cycles
   ** are currently broken arbitrarily:
-  */
+  *//*
 
   private List<String> controlSort(Set<String> nodes, Set<FabricLink> links) { 
     
@@ -236,10 +236,10 @@ public class ControlTopLayout {
     return (retval);
   }  
 
-  /***************************************************************************
+  *//***************************************************************************
   ** 
   ** Calculate an ordering of nodes that puts the highest degree nodes first:
-  */
+  *//*
 
   private List<String> allNodeOrder(Set<String> nodes, Set<FabricLink> links) {    
     GraphSearcher gs = new GraphSearcher(nodes, links); 
@@ -248,10 +248,10 @@ public class ControlTopLayout {
     return (retval);
   }
  
-  /***************************************************************************
+  *//***************************************************************************
   ** 
   ** Order source nodes by median target degree
-  */
+  *//*
 
   private SortedSet<GraphSearcher.NodeDegree> medianTargetDegree(Set<String> nodes, Set<FabricLink> links) { 
     
@@ -288,10 +288,10 @@ public class ControlTopLayout {
     return (retval);
   }
 
-  /***************************************************************************
+  *//***************************************************************************
   ** 
   ** Calculate control node order
-  */
+  *//*
 
   private List<String> controlSortDegreeOnly(Set<String> nodes, Set<FabricLink> links) { 
     
@@ -317,10 +317,10 @@ public class ControlTopLayout {
     return (retval);
   }
   
-  /***************************************************************************
+  *//***************************************************************************
   ** 
   ** Return source nodes
-  */
+  *//*
 
   private Set<String> controlNodes(Set<String> nodes, Set<FabricLink> links) { 
     
@@ -333,10 +333,10 @@ public class ControlTopLayout {
     return (srcs);
   }
   
-  /***************************************************************************
+  *//***************************************************************************
   **
   ** Generate breadth-first-order
-  */
+  *//*
 
   private List<String> orderBreadth(Set<String> nodes, Set<FabricLink> links) {
    
@@ -367,10 +367,10 @@ public class ControlTopLayout {
     return (outList);
   }
   
-  /***************************************************************************
+  *//***************************************************************************
   **
   ** Test frame
-  */
+  *//*
 
   private List<String> orderPureDegree(Set<String> nodes, Set<FabricLink> links) {
        
@@ -395,10 +395,10 @@ public class ControlTopLayout {
     return (outList);
   }
   
-  /***************************************************************************
+  *//***************************************************************************
   **
   ** Test frame
-  */
+  *//*
 
   private List<String> orderCtrlMedianTargetDegree(Set<String> nodes, Set<FabricLink> links) {
  
@@ -424,10 +424,10 @@ public class ControlTopLayout {
     return (outList);
   }
   
-  /***************************************************************************
+  *//***************************************************************************
   **
   ** Test frame
-  */
+  *//*
 
   private List<String> mainSourceSortedTargs(Set<String> nodes, Set<FabricLink> links) {
   
@@ -447,6 +447,6 @@ public class ControlTopLayout {
       }
     }
     return (outList);
-  }
+  }*/
 }
 

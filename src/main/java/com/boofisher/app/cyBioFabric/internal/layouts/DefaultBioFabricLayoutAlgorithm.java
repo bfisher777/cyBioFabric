@@ -10,15 +10,16 @@ import org.cytoscape.view.model.View;
 import org.cytoscape.work.TaskIterator;
 import org.cytoscape.work.undo.UndoSupport;
 
-public class BioFabricLayoutAlgorithm extends AbstractLayoutAlgorithm {
+//**note AbstractLayoutAlgorithm implements the getName method for the interface
+public class DefaultBioFabricLayoutAlgorithm extends AbstractLayoutAlgorithm implements BioFabricLayoutInterface{
 	
-	public BioFabricLayoutAlgorithm(UndoSupport undo) {
-		super("biofabric", "BioFabric Layout", undo);	
+	public DefaultBioFabricLayoutAlgorithm(UndoSupport undo) {
+		super("default-biofabric-layout", "Default BioFabric Layout", undo);	
 	}
 
 	@Override
 	public TaskIterator createTaskIterator(CyNetworkView networkView, Object context, Set<View<CyNode>> nodesToLayOut, String layoutAttribute) {
-		return new TaskIterator(new BioFabricLayoutAlgorithmTask(getName(), networkView, nodesToLayOut, layoutAttribute, undoSupport));
-	}
+		return new TaskIterator(new DefaultBioFabricLayoutAlgorithmTask(toString(), networkView, nodesToLayOut, layoutAttribute, undoSupport));
+	}		
 }
 
