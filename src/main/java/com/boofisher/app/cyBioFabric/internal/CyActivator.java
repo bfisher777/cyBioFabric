@@ -13,7 +13,6 @@ import org.cytoscape.application.CyUserLog;
 import org.cytoscape.application.NetworkViewRenderer;
 import org.cytoscape.application.events.CyShutdownListener;
 import org.cytoscape.application.swing.CySwingApplication;
-import org.cytoscape.application.swing.CytoPanelComponent;
 import org.cytoscape.service.util.AbstractCyActivator;
 import org.cytoscape.task.EdgeViewTaskFactory;
 import org.cytoscape.task.NetworkViewLocationTaskFactory;
@@ -40,7 +39,6 @@ import com.boofisher.app.cyBioFabric.internal.events.BioFabricNetworkViewToBeDes
 import com.boofisher.app.cyBioFabric.internal.events.BioFabricNetworkViewToBeDestroyedListener;
 import com.boofisher.app.cyBioFabric.internal.events.BioFabricShutdownHandler;
 import com.boofisher.app.cyBioFabric.internal.events.BioFabricShutdownListener;
-import com.boofisher.app.cyBioFabric.internal.graphics.BioFabricCytoPanel;
 import com.boofisher.app.cyBioFabric.internal.graphics.GraphicsConfigurationFactory;
 import com.boofisher.app.cyBioFabric.internal.layouts.BioFabricLayoutInterface;
 import com.boofisher.app.cyBioFabric.internal.layouts.DefaultBioFabricLayoutAlgorithm;

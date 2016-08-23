@@ -22,8 +22,10 @@ package com.boofisher.app.cyBioFabric.internal.biofabric.ui.dialogs;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.JOptionPane;
 import javax.swing.border.EmptyBorder;
 import java.util.ArrayList;
@@ -71,7 +73,7 @@ public class LinkGroupingSetupDialog extends JDialog implements DialogSupport.Di
   */ 
 
   public LinkGroupingSetupDialog(JInternalFrame parent, List<String> currentTags, Set<FabricLink.AugRelation> allRelations) {     
-    super();
+    super((JFrame) SwingUtilities.getRoot(parent), ResourceManager.getManager().getString("linkGroupEdit.title"), true);
     parent_ = parent;
     allRelations_ = allRelations;
         

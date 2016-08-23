@@ -98,10 +98,7 @@ import com.boofisher.app.cyBioFabric.internal.biofabric.io.FabricFactory;
 import com.boofisher.app.cyBioFabric.internal.biofabric.io.FabricSIFLoader;
 import com.boofisher.app.cyBioFabric.internal.biofabric.layouts.NodeClusterLayout;
 import com.boofisher.app.cyBioFabric.internal.biofabric.layouts.NodeSimilarityLayout;
-import com.boofisher.app.cyBioFabric.internal.biofabric.layouts.ControlTopLayout;
 import com.boofisher.app.cyBioFabric.internal.biofabric.layouts.DefaultLayout;
-import com.boofisher.app.cyBioFabric.internal.biofabric.layouts.HierDAGLayout;
-import com.boofisher.app.cyBioFabric.internal.biofabric.layouts.ProcessWorldBankCSV;
 import com.boofisher.app.cyBioFabric.internal.biofabric.model.BioFabricNetwork;
 import com.boofisher.app.cyBioFabric.internal.biofabric.model.FabricLink;
 import com.boofisher.app.cyBioFabric.internal.biofabric.parser.ParserClient;
@@ -359,9 +356,6 @@ public class CommandSet implements ZoomChangeTracker, SelectionChangeListener, F
   */   
   
   public void optionsHaveChanged(boolean needRebuild, boolean needRecolor) {
-	  
-	  //TODO remove this
-	  System.out.println("Options have changed is called");
 	  
     if (!needRebuild && !needRecolor) {
       bfp_.repaint();
@@ -905,7 +899,8 @@ public class CommandSet implements ZoomChangeTracker, SelectionChangeListener, F
   ** Load network from gaggle
   */ 
     
-  public boolean loadFromGaggle(List<FabricLink> links, List<String> singles) { 
+  public boolean loadFromGaggle(List<FabricLink> links, List<String> singles) {
+	  System.out.println("Loading from gaggle");
     HashSet<FabricLink> reducedLinks = new HashSet<FabricLink>();
     HashSet<FabricLink> culledLinks = new HashSet<FabricLink>();
     BioFabricNetwork.preprocessLinks(links, reducedLinks, culledLinks);
@@ -1186,6 +1181,7 @@ public class CommandSet implements ZoomChangeTracker, SelectionChangeListener, F
        
   public void postRecolorOperations(BufferedImage topImage) {
     topWindow_.getOverview().installImage(topImage, bfp_.getWorldRect());
+    topWindow_.getThumbnailView().installImage(topImage, bfp_.getWorldRect());
     return;
   }
    
@@ -1196,6 +1192,7 @@ public class CommandSet implements ZoomChangeTracker, SelectionChangeListener, F
        
   public void postLoadOperations(BufferedImage topImage) {
     topWindow_.getOverview().installImage(topImage, bfp_.getWorldRect());
+    topWindow_.getThumbnailView().installImage(topImage, bfp_.getWorldRect());
     bfp_.installModelPost();
     bfp_.installZooms();
     bfp_.initZoom();
@@ -2216,13 +2213,14 @@ public class CommandSet implements ZoomChangeTracker, SelectionChangeListener, F
     
     public void actionPerformed(ActionEvent e) {
       try {
+    	      	  
         boolean haveSelection = bfp_.haveASelection();
         boolean buildingSels = bfp_.amBuildingSelections();
         FabricSearchDialog fsd = new FabricSearchDialog(topWindow_, topWindow_.getFabricPanel().getNetwork(), 
                                                         haveSelection, buildingSels);      
-        fsd.setVisible(true);
-        if (fsd.itemWasFound()) {
-          Set<String> matches = fsd.getMatches();
+        fsd.setVisible(true);        
+        if (fsd.itemWasFound()) {        	
+          Set<String> matches = fsd.getMatches();          
           boolean doDiscard = fsd.discardSelections();
           topWindow_.getFabricPanel().installSearchResult(matches, doDiscard);
         }

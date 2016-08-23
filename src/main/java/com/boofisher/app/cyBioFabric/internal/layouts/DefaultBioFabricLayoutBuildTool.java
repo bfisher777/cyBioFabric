@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNetwork;
@@ -39,6 +40,11 @@ import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 import com.boofisher.app.cyBioFabric.internal.biofabric.ui.FabricColorGenerator;
 import com.boofisher.app.cyBioFabric.internal.tools.NodeNameSUIDPair;
 import com.boofisher.app.cyBioFabric.internal.biofabric.model.BioFabricNetwork;
+import com.boofisher.app.cyBioFabric.internal.biofabric.model.MasterBioFabricNetwork;
+import com.boofisher.app.cyBioFabric.internal.biofabric.model.BioFabricNetwork.BuildData;
+import com.boofisher.app.cyBioFabric.internal.biofabric.model.BioFabricNetwork.LinkInfo;
+import com.boofisher.app.cyBioFabric.internal.biofabric.model.BioFabricNetwork.NodeInfo;
+import com.boofisher.app.cyBioFabric.internal.biofabric.model.MasterBioFabricNetwork.ColumnAssign;
 import com.boofisher.app.cyBioFabric.internal.biofabric.model.FabricLink;
 
 
@@ -143,7 +149,7 @@ public class DefaultBioFabricLayoutBuildTool {
     
   private BioFabricNetwork finishLoad(CyNetworkView networkView, List<FabricLink> links, ArrayList<NodeNameSUIDPair> loneNodes) {
 	  BioFabricNetwork bfn = null;
-	  
+	  MasterBioFabricNetwork masterBfn = null;
 	  try {	      
 	      SortedMap<FabricLink.AugRelation, Boolean> relaMap = BioFabricNetwork.extractRelations(links);               	 
 	                  
@@ -154,17 +160,89 @@ public class DefaultBioFabricLayoutBuildTool {
 
 	      BioFabricNetwork.RelayoutBuildData bfnbd = new BioFabricNetwork.RelayoutBuildData(networkView, reducedLinks, loneNodes, this.colorGenerator, 
 	                                                                                      BioFabricNetwork.BuildMode.BUILD_FROM_SIF);
+	      
+	      Set singleNodes = new HashSet<String>();
+	      
+	      for(NodeNameSUIDPair pair : loneNodes){
+	    	  singleNodes.add(pair.getName());
+	      }
 	       
+	      MasterBioFabricNetwork.OrigBuildData masterbfnOD = new MasterBioFabricNetwork.OrigBuildData(reducedLinks, singleNodes, this.colorGenerator, MasterBioFabricNetwork.BUILD_FROM_SIF);
+
+	      
 	      // Possibly expensive network analysis preparation:
-	      bfn = new BioFabricNetwork(bfnbd);	      
+	      bfn = new BioFabricNetwork(bfnbd);
+	      masterBfn = new MasterBioFabricNetwork(masterbfnOD);
+	      
+	      compareNetworks(bfn, masterBfn, masterbfnOD);
 	      
     } catch (OutOfMemoryError oom) {
       System.err.println("Out Of Memomry: " + oom.toString());
       return null;  
     }
-    System.out.println("Finished building BioFabricNetwork");
+    
     return bfn;
   } 
+  
+  
+  public void compareNetworks(BioFabricNetwork bfn, MasterBioFabricNetwork mbfn, MasterBioFabricNetwork.OrigBuildData origBD){
+	  System.out.println("Comparing networks:");
+	  
+	  HashMap masterRowToTarg_ = mbfn.rowToTarg_;
+	  HashMap<Integer, String> rowToTarg_ = bfn.rowToTarg_;
+	  assert(masterRowToTarg_.size() == rowToTarg_.size());	  
+	  System.out.println("masterRowToTarg_.size() == rowToTarg_.size(): " + (masterRowToTarg_.size() == rowToTarg_.size()));
+	  
+	  
+	  int masterRowCount_ = mbfn.rowCount_;
+	  int rowCount_ = bfn.rowCount_;
+	  assert(rowCount_ == masterRowCount_);
+	  System.out.println("rowCount_ == masterRowCount_: " + (rowCount_ == masterRowCount_));
+	  //
+	  // Link and node definitions:
+	  //
+	  
+	  TreeMap masterFullLinkDefs_ = mbfn.fullLinkDefs_;
+	  TreeMap<Integer, LinkInfo> fullLinkDefs_ = bfn.fullLinkDefs_;
+	  assert(masterFullLinkDefs_.size() == fullLinkDefs_.size());
+	  System.out.println("masterFullLinkDefs_.size() == fullLinkDefs_.size(): " + (masterFullLinkDefs_.size() == fullLinkDefs_.size()));
+	  
+	  TreeMap masterNonShadowedLinkMap_ = mbfn.nonShadowedLinkMap_;
+	  TreeMap<Integer, Integer> nonShadowedLinkMap_ = bfn.nonShadowedLinkMap_;
+	  assert(masterNonShadowedLinkMap_.size() == nonShadowedLinkMap_.size());
+	  System.out.println("masterNonShadowedLinkMap_.size() == nonShadowedLinkMap_.size(): " + (masterNonShadowedLinkMap_.size() == nonShadowedLinkMap_.size()));	  
+	  
+	  HashMap masterNodeDefs_ = mbfn.nodeDefs_;	  	 
+	  HashMap<String, NodeInfo> nodeDefs_ = bfn.nodeDefs_;
+	  assert(masterNodeDefs_.size() == nodeDefs_.size());
+	  System.out.println("masterNodeDefs_.size() == nodeDefs_.size(): " + (masterNodeDefs_.size() == nodeDefs_.size()));
+	  
+	  List masterLinkGrouping_ = mbfn.linkGrouping_;
+	  List<String> linkGrouping_ = bfn.linkGrouping_;
+	  assert(masterLinkGrouping_.size() == linkGrouping_.size());
+	  System.out.println("masterLinkGrouping_.size() == linkGrouping_.size(): " + (masterLinkGrouping_.size() == linkGrouping_.size()));
+	  //
+	  // Columns assignments, shadow and non-shadow states:
+	  //
+	 
+	  MasterBioFabricNetwork.ColumnAssign masterNormalCols_ = mbfn.normalCols_;
+	  BioFabricNetwork.ColumnAssign normalCols_ = bfn.normalCols_;
+	  assert(masterNormalCols_.columnCount == normalCols_.columnCount);
+	  System.out.println("masterNormalCols_.columnCount == normalCols_.columnCount: " + (masterNormalCols_.columnCount == normalCols_.columnCount));
+	  assert(masterNormalCols_.columnToSource.size() == normalCols_.columnToSource.size());
+	  assert(masterNormalCols_.columnToTarget.size() == normalCols_.columnToTarget.size());
+	  
+	  MasterBioFabricNetwork.ColumnAssign masterShadowCols_ = mbfn.shadowCols_;
+	  BioFabricNetwork.ColumnAssign shadowCols_ = bfn.shadowCols_;
+	  assert(masterShadowCols_.columnCount == shadowCols_.columnCount);
+	  
+	  
+	  FabricColorGenerator masterColGen_ = mbfn.colGen_;	  	  	  
+	  FabricColorGenerator colGen_ = bfn.colGen_;
+	 
+	  
+	  BuildData bd_ = bfn.bd_; //added to pass to cytoscape renderer
+  }
   
   /***************************************************************************
    ** 

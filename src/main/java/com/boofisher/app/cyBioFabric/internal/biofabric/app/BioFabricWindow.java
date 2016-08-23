@@ -74,6 +74,7 @@ public class BioFabricWindow extends JInternalFrame implements BackgroundWorkerC
   private FabricMagnifyingTool fmt_;
   private HashMap<Integer, Action> actionMap_;
   private BioFabricNavAndControl nac_;
+  private BioFabricOverview thumbnailView_; //used to create Cytoscape thumbnail view
   private boolean doGaggle_;
   private boolean isMain_;
   private JButton gaggleInstallButton_;
@@ -223,7 +224,7 @@ public class BioFabricWindow extends JInternalFrame implements BackgroundWorkerC
     stockActionMap(fc, isMain_);
     stockToolBar(toolBar, isMain_, fc);
        
-    
+    thumbnailView_ = new BioFabricOverview();
     nac_ = new BioFabricNavAndControl(isMain_, this, COMMAND_NAME);
     fmt_ = nac_.getFMT();
     cp_ = new BioFabricPanel(fc.getColorGenerator(), bfa_, fmt_, nac_.getOverview(), nac_.getNavTool(), isMain_, this);
@@ -563,7 +564,7 @@ public class BioFabricWindow extends JInternalFrame implements BackgroundWorkerC
   }
 
   /***************************************************************************
-  **
+  ** TODO: Transfer to cytoscape 
   ** Stock the tool bar
   */ 
   
@@ -623,5 +624,9 @@ public class BioFabricWindow extends JInternalFrame implements BackgroundWorkerC
   
   public BioFabricNavAndControl getNAC(){
 	  return nac_;
+  }
+  
+  public BioFabricOverview getThumbnailView(){ 
+	  return thumbnailView_;
   }
 }

@@ -34,7 +34,6 @@ import java.util.TreeSet;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.view.model.CyNetworkView;
-
 import com.boofisher.app.cyBioFabric.internal.biofabric.model.BioFabricNetwork;
 import com.boofisher.app.cyBioFabric.internal.biofabric.model.FabricLink;
 import com.boofisher.app.cyBioFabric.internal.tools.NodeNameSUIDPair;
@@ -106,6 +105,28 @@ public class DefaultLayout {
   **
   ** Install node orders
   */
+  
+/*
+  private void fillNodesFromOrder(List targets, FabricColorGenerator colGen) {
+    //
+    // Now have the ordered list of targets we are going to display.
+    // Build target->row maps and the inverse:
+    //
+    
+    int numColors = colGen.getNumColors();
+
+    int currRow = 0;
+    Iterator trit = targets.iterator();
+    while (trit.hasNext()) {
+      String target = (String)trit.next();
+      Integer rowObj = new Integer(currRow);
+      rowToTarg_.put(rowObj, target);
+      String colorKey = colGen.getGeneColor(currRow % numColors);  
+      nodeDefs_.put(target, new NodeInfo(target, currRow++, colorKey));
+    }
+    rowCount_ = targets.size();
+    return;
+  }*/
   
   public void installNodeOrder(List<NodeNameSUIDPair> targets, BioFabricNetwork.RelayoutBuildData rbd) {
   
