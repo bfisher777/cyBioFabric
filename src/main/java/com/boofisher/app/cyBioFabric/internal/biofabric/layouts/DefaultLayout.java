@@ -19,6 +19,11 @@
 
 package com.boofisher.app.cyBioFabric.internal.biofabric.layouts;
 
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -86,11 +91,27 @@ public class DefaultLayout {
   /***************************************************************************
   **
   ** Relayout the network!
+  ** startNodes is a list of node suid's
   */
   
   public List<NodeNameSUIDPair> doNodeLayout(BioFabricNetwork.RelayoutBuildData rbd, List<String> startNodes) {
     
-    List<NodeNameSUIDPair> targets = defaultNodeOrder(rbd.networkView, rbd.allLinks, rbd.loneNodes, startNodes);       
+	  
+	//convert the startNode list into a list of node name and suid pairs  
+	ArrayList<NodeNameSUIDPair> pairStartNodes = null;
+	
+	if(startNodes != null && !startNodes.isEmpty()){
+		pairStartNodes = new ArrayList<NodeNameSUIDPair>();  
+		for(String nodeName : startNodes){
+			long nodeSUID = Long.parseLong(nodeName);
+	    	CyNode node = rbd.networkView.getModel().getNode(nodeSUID);     	  
+	    	
+	        String name = rbd.networkView.getModel().getRow(node).get(CyNetwork.NAME, String.class);
+	        pairStartNodes.add(new NodeNameSUIDPair(nodeSUID, name));
+		}  
+	}
+	  
+    List<NodeNameSUIDPair> targets = defaultNodeOrder(rbd.networkView, rbd.allLinks, rbd.loneNodes, pairStartNodes);       
 
     //
     // Now have the ordered list of targets we are going to display.
@@ -148,7 +169,7 @@ public class DefaultLayout {
   ** Calculate default node order
   */
 
-  public List<NodeNameSUIDPair> defaultNodeOrder(CyNetworkView networkView, Set<FabricLink> allLinks, ArrayList<NodeNameSUIDPair> loneNodes, List<String> startNodes) {    
+  public List<NodeNameSUIDPair> defaultNodeOrder(CyNetworkView networkView, Set<FabricLink> allLinks, ArrayList<NodeNameSUIDPair> loneNodes, List<NodeNameSUIDPair> startNodes) {    
     //
     // Note the allLinks Set has pruned out duplicates and synonymous non-directional links
     //
@@ -156,27 +177,29 @@ public class DefaultLayout {
     // Build a target list, top to bottom, that adds the node with the most
     // links first, and adds those link targets ASAP. If caller supplies a start node,
     // we go there first:
-    // 
+    // 	  	  
     
-    HashMap<String, Integer> linkCounts = new HashMap<String, Integer>();
-    HashMap<String, Set<String>> targsPerSource = new HashMap<String, Set<String>>();
-    ArrayList<String> targets = new ArrayList<String>();
-         
-    HashSet<String> targsToGo = new HashSet<String>();
+	  
+	  
+    HashMap<NodeNameSUIDPair, Integer> linkCounts = new HashMap<NodeNameSUIDPair, Integer>();
+    HashMap<NodeNameSUIDPair, Set<NodeNameSUIDPair>> targsPerSource = new HashMap<NodeNameSUIDPair, Set<NodeNameSUIDPair>>();
+    ArrayList<NodeNameSUIDPair> targets = new ArrayList<NodeNameSUIDPair>();
+                 
+    HashSet<NodeNameSUIDPair> targsToGo = new HashSet<NodeNameSUIDPair>();
     Iterator<FabricLink> alit = allLinks.iterator();
     while (alit.hasNext()) {
       FabricLink nextLink = alit.next();
-      String source = nextLink.getSrcModelSUID().toString();
-      String target = nextLink.getTargetModelSUID().toString();
-      Set<String> targs = targsPerSource.get(source);
+      NodeNameSUIDPair source = new NodeNameSUIDPair(nextLink.getSrcModelSUID(), nextLink.getSrc());
+      NodeNameSUIDPair target = new NodeNameSUIDPair(nextLink.getTargetModelSUID(), nextLink.getTrg());
+      Set<NodeNameSUIDPair> targs = targsPerSource.get(source);
       if (targs == null) {
-        targs = new HashSet<String>();
+        targs = new HashSet<NodeNameSUIDPair>();
         targsPerSource.put(source, targs);
       }
       targs.add(target);
       targs = targsPerSource.get(target);
       if (targs == null) {
-        targs = new HashSet<String>();
+        targs = new HashSet<NodeNameSUIDPair>();
         targsPerSource.put(target, targs);
       }
       targs.add(source);
@@ -186,24 +209,25 @@ public class DefaultLayout {
       linkCounts.put(source, (srcCount == null) ? Integer.valueOf(1) : Integer.valueOf(srcCount.intValue() + 1));
       Integer trgCount = linkCounts.get(target);
       linkCounts.put(target, (trgCount == null) ? Integer.valueOf(1) : Integer.valueOf(trgCount.intValue() + 1));
-    }
+    }    
     
     //
     // Rank the nodes by link count:
     //
     
-    TreeMap<Integer, SortedSet<String>> countRank = new TreeMap<Integer, SortedSet<String>>(Collections.reverseOrder());
-    Iterator<String> lcit = linkCounts.keySet().iterator();
+    TreeMap<Integer, SortedSet<NodeNameSUIDPair>> countRank = new TreeMap<Integer, SortedSet<NodeNameSUIDPair>>(Collections.reverseOrder());
+    Iterator<NodeNameSUIDPair> lcit = linkCounts.keySet().iterator();
     while (lcit.hasNext()) {
-      String src = lcit.next();
+    	NodeNameSUIDPair src = lcit.next();
       Integer count = linkCounts.get(src);
-      SortedSet<String> perCount = countRank.get(count);
+      SortedSet<NodeNameSUIDPair> perCount = countRank.get(count);
       if (perCount == null) {
-        perCount = new TreeSet<String>();
+        perCount = new TreeSet<NodeNameSUIDPair>();
         countRank.put(count, perCount);
       }
       perCount.add(src);
     }
+          
     
     //
     // Handle the specified starting nodes case:
@@ -211,7 +235,7 @@ public class DefaultLayout {
     //
     
     if ((startNodes != null) && !startNodes.isEmpty()) {
-      ArrayList<String> queue = new ArrayList<String>();
+      ArrayList<NodeNameSUIDPair> queue = new ArrayList<NodeNameSUIDPair>();
       targsToGo.removeAll(startNodes);
       targets.addAll(startNodes);
       queue.addAll(startNodes);
@@ -223,48 +247,49 @@ public class DefaultLayout {
     // Get all kids added in.  Now doing this without recursion; seeing blown
     // stacks for huge networks!
     //
-     
+ 
     while (!targsToGo.isEmpty()) {
       Iterator<Integer> crit = countRank.keySet().iterator();
       while (crit.hasNext()) {
         Integer key = crit.next();
-        SortedSet<String> perCount = countRank.get(key);
-        Iterator<String> pcit = perCount.iterator();
+        SortedSet<NodeNameSUIDPair> perCount = countRank.get(key);
+        Iterator<NodeNameSUIDPair> pcit = perCount.iterator();                
+        
         while (pcit.hasNext()) {
-          String node = pcit.next();    
+          NodeNameSUIDPair node = pcit.next();    
           if (targsToGo.contains(node)) {
-            ArrayList<String> queue = new ArrayList<String>();
+            ArrayList<NodeNameSUIDPair> queue = new ArrayList<NodeNameSUIDPair>();
             targsToGo.remove(node);
             targets.add(node);
             addMyKidsNR(targets, targsPerSource, linkCounts, targsToGo, node, queue);
-          }
-        }
+          }          
+        }        
       }
-    }
+    }   
     
     //create a list of name suid pairs
-    ArrayList<NodeNameSUIDPair> targetPairs = new ArrayList<NodeNameSUIDPair>(); 
+/*    ArrayList<NodeNameSUIDPair> targetPairs = new ArrayList<NodeNameSUIDPair>(); 
     Iterator<String> edgeNodesItr = targets.iterator();
     while(edgeNodesItr.hasNext()){
     	long nodeSuid = Long.parseLong(edgeNodesItr.next());
     	CyNode node = networkView.getModel().getNode(nodeSuid); 
     	String name = networkView.getModel().getRow(node).get(CyNetwork.NAME, String.class);
     	targetPairs.add(new NodeNameSUIDPair(nodeSuid, name));
-    }
-    
+    }        
+    */
     //
     //
     // Tag on lone nodes.  If a node is by itself, but also shows up in the links,
     // we drop it:
     //
-    loneNodes.removeAll(targetPairs);
+    loneNodes.removeAll(targets);
     //HashSet<String> remains = new HashSet<String>(loneNodes);
     //remains.removeAll(targets);
     //targets.addAll(new TreeSet<String>(loneNodes));
     
-    targetPairs.addAll(loneNodes);
+    targets.addAll(loneNodes);
     
-    return (targetPairs);
+    return (targets);
   }
         
   /***************************************************************************
@@ -272,33 +297,33 @@ public class DefaultLayout {
   ** Node ordering
   */
   
-  private ArrayList<String> orderMyKids(Map<String, Set<String>> targsPerSource, Map<String, Integer> linkCounts, 
-                                        HashSet<String> targsToGo, String node) {
-    Set<String> targs = targsPerSource.get(node);
+  private ArrayList<NodeNameSUIDPair> orderMyKids(Map<NodeNameSUIDPair, Set<NodeNameSUIDPair>> targsPerSource, Map<NodeNameSUIDPair, Integer> linkCounts, 
+                                        HashSet<NodeNameSUIDPair> targsToGo, NodeNameSUIDPair node) {
+    Set<NodeNameSUIDPair> targs = targsPerSource.get(node);
     if (targs == null) {
     	System.out.println("no kids for " + node);
-    	return (new ArrayList<String>());
+    	return (new ArrayList<NodeNameSUIDPair>());
     }
-    TreeMap<Integer, SortedSet<String>> kidMap = new TreeMap<Integer, SortedSet<String>>(Collections.reverseOrder());
-    Iterator<String> tait = targs.iterator();
+    TreeMap<Integer, SortedSet<NodeNameSUIDPair>> kidMap = new TreeMap<Integer, SortedSet<NodeNameSUIDPair>>(Collections.reverseOrder());
+    Iterator<NodeNameSUIDPair> tait = targs.iterator();
     while (tait.hasNext()) {  
-      String nextTarg = tait.next(); 
+      NodeNameSUIDPair nextTarg = tait.next(); 
       Integer count = linkCounts.get(nextTarg);
-      SortedSet<String> perCount = kidMap.get(count);
+      SortedSet<NodeNameSUIDPair> perCount = kidMap.get(count);
       if (perCount == null) {
-        perCount = new TreeSet<String>();
+        perCount = new TreeSet<NodeNameSUIDPair>();
         kidMap.put(count, perCount);
       }
       perCount.add(nextTarg);
     }
     
-    ArrayList<String> myKidsToProc = new ArrayList<String>();
-    Iterator<SortedSet<String>> kmit = kidMap.values().iterator();
+    ArrayList<NodeNameSUIDPair> myKidsToProc = new ArrayList<NodeNameSUIDPair>();
+    Iterator<SortedSet<NodeNameSUIDPair>> kmit = kidMap.values().iterator();
     while (kmit.hasNext()) {  
-      SortedSet<String> perCount = kmit.next(); 
-      Iterator<String> pcit = perCount.iterator();
+      SortedSet<NodeNameSUIDPair> perCount = kmit.next(); 
+      Iterator<NodeNameSUIDPair> pcit = perCount.iterator();
       while (pcit.hasNext()) {  
-        String kid = pcit.next();
+    	NodeNameSUIDPair kid = pcit.next();
         if (targsToGo.contains(kid)) { 
           myKidsToProc.add(kid);
         }
@@ -312,9 +337,9 @@ public class DefaultLayout {
   ** Node ordering, non-recursive:
   */
   
-  private void addMyKidsNR(ArrayList<String> targets, Map<String, Set<String>> targsPerSource, 
-                           Map<String, Integer> linkCounts, 
-                           HashSet<String> targsToGo, String node, ArrayList<String> queue) {
+  private void addMyKidsNR(ArrayList<NodeNameSUIDPair> targets, Map<NodeNameSUIDPair, Set<NodeNameSUIDPair>> targsPerSource, 
+                           Map<NodeNameSUIDPair, Integer> linkCounts, 
+                           HashSet<NodeNameSUIDPair> targsToGo, NodeNameSUIDPair node, ArrayList<NodeNameSUIDPair> queue) {
     queue.add(node);
     flushQueue(targets, targsPerSource, linkCounts, targsToGo, queue);
     return;
@@ -325,15 +350,15 @@ public class DefaultLayout {
   ** Node ordering, non-recursive:
   */
   
-  private void flushQueue(ArrayList<String> targets, Map<String, Set<String>> targsPerSource, 
-                           Map<String, Integer> linkCounts, 
-                           HashSet<String> targsToGo, ArrayList<String> queue) {
+  private void flushQueue(ArrayList<NodeNameSUIDPair> targets, Map<NodeNameSUIDPair, Set<NodeNameSUIDPair>> targsPerSource, 
+                           Map<NodeNameSUIDPair, Integer> linkCounts, 
+                           HashSet<NodeNameSUIDPair> targsToGo, ArrayList<NodeNameSUIDPair> queue) {
     while (!queue.isEmpty()) {
-      String node = queue.remove(0);
-      ArrayList<String> myKids = orderMyKids(targsPerSource, linkCounts, targsToGo, node);
-      Iterator<String> ktpit = myKids.iterator(); 
+      NodeNameSUIDPair node = queue.remove(0);
+      ArrayList<NodeNameSUIDPair> myKids = orderMyKids(targsPerSource, linkCounts, targsToGo, node);
+      Iterator<NodeNameSUIDPair> ktpit = myKids.iterator(); 
       while (ktpit.hasNext()) {  
-        String kid = ktpit.next();
+    	NodeNameSUIDPair kid = ktpit.next();
         if (targsToGo.contains(kid)) {
           targsToGo.remove(kid);
           targets.add(kid);
@@ -352,7 +377,7 @@ public class DefaultLayout {
   
   public static class Params implements NodeSimilarityLayout.CRParams {
         
-    public List<String> startNodes;
+    public List<String> startNodes;  //start nodes is a list of node SUID strings
 
     public Params(List<String> startNodes) {
       this.startNodes = startNodes;

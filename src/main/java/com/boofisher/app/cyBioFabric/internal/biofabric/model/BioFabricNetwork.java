@@ -21,6 +21,10 @@ package com.boofisher.app.cyBioFabric.internal.biofabric.model;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.TreeSet;
 import java.util.HashMap;
@@ -414,7 +418,7 @@ public class BioFabricNetwork {
     // Note the allLinks Set has pruned out duplicates and synonymous non-directional links
     //
        
-    List<NodeNameSUIDPair> targets =  (new DefaultLayout()).doNodeLayout(rbd, null);
+    List<NodeNameSUIDPair> targets =  (new DefaultLayout()).doNodeLayout(rbd, null);    
     
     //
     // Now have the ordered list of targets we are going to display.
@@ -422,6 +426,8 @@ public class BioFabricNetwork {
     
     fillNodesFromOrder(rbd.networkView, targets, rbd.colGen, rbd.clustAssign);
 
+    
+    
     //
     // This now assigns the link to its column.  Note that we order them
     // so that the shortest vertical link is drawn first!
