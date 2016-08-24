@@ -445,7 +445,7 @@ public class BioFabricPanel extends JPanel implements ZoomTarget, ZoomPresentati
    }
 
   /***************************************************************************
-  ** 
+  ** TODO: make compatible with Cytoscape
   ** Get detail panel
   */
 
@@ -578,7 +578,7 @@ public class BioFabricPanel extends JPanel implements ZoomTarget, ZoomPresentati
   }
   
   /***************************************************************************
-  ** 
+  ** TODO: make compatible with Cytoscape
   ** Get detail panel
   */
 

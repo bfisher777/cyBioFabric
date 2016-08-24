@@ -21,14 +21,17 @@
 package com.boofisher.app.cyBioFabric.internal.biofabric.ui.dialogs;
 
 import java.awt.GridBagLayout;
+import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.util.Set;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.JPanel;
 import javax.swing.Box;
 import javax.swing.border.EmptyBorder;
@@ -91,8 +94,8 @@ public class FabricSearchDialog extends JDialog {
   */ 
   
   public FabricSearchDialog(JInternalFrame parent, BioFabricNetwork bfn, boolean haveSelection, boolean buildingSels) {     
-    super();
-
+    super((JFrame) SwingUtilities.getRoot(parent), ResourceManager.getManager().getString("nsearch.title"), true);
+    
     parent_ = parent;
     itemFound_ = false;
     bfn_ = bfn;
@@ -120,7 +123,7 @@ public class FabricSearchDialog extends JDialog {
     buttonO.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent ev) {
         try {
-          if (!doSearch()) {
+          if (!doSearch()) {        	  
             return;
           }
           FabricSearchDialog.this.setVisible(false);
@@ -257,8 +260,9 @@ public class FabricSearchDialog extends JDialog {
   
   private boolean doSearch() {    
     int matchType = ((ChoiceContent)matchTypeCombo_.getSelectedItem()).val;
-    String search = normalizeSearchString(stringField_.getText().trim());
+    String search = normalizeSearchString(stringField_.getText().trim());    
     result_ = bfn_.nodeMatches(matchType == FULL_MATCH_, search);
+   
     if (result_.isEmpty()) { 
       ResourceManager rMan = ResourceManager.getManager();
       JOptionPane.showMessageDialog(parent_, rMan.getString("nsearch.noMatchMessage"),
@@ -267,7 +271,7 @@ public class FabricSearchDialog extends JDialog {
       return (false);
     }
     doDiscard_ = (discardSelections_ != null) ? discardSelections_.isSelected() : false;
-    itemFound_ = true;
+    itemFound_ = true;     
     return (true);
   }  
  

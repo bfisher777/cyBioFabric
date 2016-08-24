@@ -2,38 +2,52 @@ package com.boofisher.app.cyBioFabric.internal;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.awt.print.Printable;
+import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Properties;
 
+import javax.imageio.ImageIO;
 import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.RootPaneContainer;
 import javax.swing.plaf.basic.BasicInternalFrameUI;
 
-import com.boofisher.app.cyBioFabric.internal.biofabric.BioFabricNetworkViewAddedHandler;
-import com.boofisher.app.cyBioFabric.internal.biofabric.BioFabricNetworkViewToBeDestroyedHandler;
 import com.boofisher.app.cyBioFabric.internal.biofabric.app.BioFabricApplication;
 import com.boofisher.app.cyBioFabric.internal.biofabric.app.BioFabricWindow;
 import com.boofisher.app.cyBioFabric.internal.biofabric.model.BioFabricNetwork;
+import com.boofisher.app.cyBioFabric.internal.biofabric.ui.display.BioFabricOverview;
 import com.boofisher.app.cyBioFabric.internal.biofabric.cmd.CommandSet;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.BNVisualPropertyValue;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.BioFabricVisualLexicon;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.CyBFNetworkView;
+import com.boofisher.app.cyBioFabric.internal.cytoscape.view.listeners.ApplyPreferredLayoutListener;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.listeners.BioFabricFitContentListener;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.listeners.BioFabricZoomInListener;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.listeners.BioFabricZoomOutListener;
-import com.boofisher.app.cyBioFabric.internal.eventbus.EventBusProvider;
+import com.boofisher.app.cyBioFabric.internal.events.BioFabricNetworkViewAddedHandler;
+import com.boofisher.app.cyBioFabric.internal.events.BioFabricNetworkViewToBeDestroyedHandler;
+import com.boofisher.app.cyBioFabric.internal.graphics.BirdsEyeGraphicsConfiguration;
 import com.boofisher.app.cyBioFabric.internal.graphics.GraphicsConfiguration;
-import com.boofisher.app.cyBioFabric.internal.graphics.RenderingPanel;
+import com.boofisher.app.cyBioFabric.internal.graphics.ThumbnailGraphicsConfiguration;
+import com.boofisher.app.cyBioFabric.internal.layouts.BioFabricLayoutInterface;
 import com.boofisher.app.cyBioFabric.internal.task.TaskFactoryListener;
 
 import org.apache.log4j.Logger;
 import org.cytoscape.application.CyUserLog;
 import org.cytoscape.model.CyNetwork;
+import org.cytoscape.view.layout.CyLayoutAlgorithm;
+import org.cytoscape.view.layout.CyLayoutAlgorithmManager;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.model.VisualLexicon;
 import org.cytoscape.view.model.VisualProperty;
@@ -47,13 +61,10 @@ public class CyBFRenderingEngine implements RenderingEngine<CyNetwork> {
 	
 	private final CyBFNetworkView networkView;
 	private final VisualLexicon visualLexicon;
-	
-	private RenderingPanel panel;	
-	private BioFabricWindow bioFabricWindow;
-	private BioFabricWindow selectionWindow;	
+		
 	private final BioFabricNetworkViewAddedHandler addNetworkHandler; 
-    private final BioFabricNetworkViewToBeDestroyedHandler destroyNetworkHandler;
-    private final int count;
+    private final BioFabricNetworkViewToBeDestroyedHandler destroyNetworkHandler;    
+	private final BioFabricApplication bioFabricApplication;
 	        
 	
 	public CyBFRenderingEngine(
@@ -61,23 +72,22 @@ public class CyBFRenderingEngine implements RenderingEngine<CyNetwork> {
 			JComponent inputComponent,
 			CyBFNetworkView viewModel, 
 			VisualLexicon visualLexicon, 
-			EventBusProvider eventBusProvider, 
 			GraphicsConfiguration configuration,
 			TaskFactoryListener taskFactoryListener, 
 			DialogTaskManager taskManager,
 			BioFabricNetworkViewAddedHandler addNetworkHandler, 
-			BioFabricNetworkViewToBeDestroyedHandler destroyNetworkHandler,                      
-            int count) {
+			BioFabricNetworkViewToBeDestroyedHandler destroyNetworkHandler,
+			CyLayoutAlgorithmManager layoutAlgorithmManager,
+			String defaultLayout) {
 		
 		this.networkView = viewModel;
 		this.visualLexicon = visualLexicon;
 		this.addNetworkHandler = addNetworkHandler;
 		this.destroyNetworkHandler = destroyNetworkHandler;
+		this.bioFabricApplication = networkView.getBioFabricApplication();	
 		
-		
-		this.count = count; //will count the number of biofabric applications created giving a unique number to each application
-		
-		setUpCanvas(component, inputComponent, configuration, eventBusProvider, taskFactoryListener, taskManager);
+		setUpCanvas(component, inputComponent, configuration, taskFactoryListener, taskManager, 
+				layoutAlgorithmManager, defaultLayout);
 	}
 	
 	
@@ -88,20 +98,20 @@ public class CyBFRenderingEngine implements RenderingEngine<CyNetwork> {
 	 * the rendered results
 	 */
 	private void setUpCanvas(JComponent container, JComponent inputComponent, 
-			                 GraphicsConfiguration configuration, EventBusProvider eventBusProvider, 
-			                 TaskFactoryListener taskFactoryListener, DialogTaskManager taskManager) {				
+			                 GraphicsConfiguration configuration, TaskFactoryListener taskFactoryListener, 
+			                 DialogTaskManager taskManager, CyLayoutAlgorithmManager layoutAlgorithmManager, 
+			                 String defaultLayout) {				
 										
 		if (container instanceof RootPaneContainer) {	
-			//run the bioFabricApplication once per renderer
-			BioFabricApplication bioFabricApplication = new BioFabricApplication(false, count, inputComponent);			
-			
+					
+			bioFabricApplication.attachInputComponent(inputComponent);
 			final HashMap<String, Object> args = new HashMap<String, Object>();		
 			bioFabricApplication.launch(args);
 						
-			bioFabricWindow = bioFabricApplication.getBioFabricWindow();
-			selectionWindow = bioFabricApplication.getSelectionWindow();
+			BioFabricWindow bioFabricWindow = bioFabricApplication.getBioFabricWindow();
+			BioFabricWindow selectionWindow = bioFabricApplication.getSelectionWindow();
 			
-			clearBorder();
+			clearBorder(bioFabricWindow, selectionWindow);
 			
 			RootPaneContainer rootPaneContainer = (RootPaneContainer) container;
 			Container pane = rootPaneContainer.getContentPane();
@@ -111,7 +121,7 @@ public class CyBFRenderingEngine implements RenderingEngine<CyNetwork> {
 			BNVisualPropertyValue bnvpv = networkView.getVisualProperty(BioFabricVisualLexicon.BIOFABRIC_NETWORK);
 			BioFabricNetwork bfn = bnvpv.getBioFabricNetwork();
 			
-			//this happens when a non-biofabric layout is used and the layout needs to be programmatically called
+			/*//this happens when a non-biofabric layout is used and the layout needs to be programmatically called
 			//in the class CyBFRenderingEnginFactory
 			// TODO Need to create a listener, remove the Thread.sleep
 			while(bfn == null){
@@ -122,53 +132,91 @@ public class CyBFRenderingEngine implements RenderingEngine<CyNetwork> {
 					e.printStackTrace();
 				}
 				bfn = bnvpv.getBioFabricNetwork();
-			}
+			}*/
 			
 			installBioFabricNetwork(bfn, bioFabricWindow, selectionWindow, true);
 			
-			registerHandlers(bioFabricApplication, new BioFabricZoomInListener(bioFabricWindow),
-					new BioFabricZoomOutListener(bioFabricWindow), new BioFabricFitContentListener(bioFabricWindow));
-			logger.warn("Added main view");			
-		} else {			
-			container.setVisible(false);
-			/*// When networkView.updateView() is called it will repaint all containers it owns
-			networkView.addContainer(panel); 
-			panel = new RenderingPanel(networkView, visualLexicon, eventBusProvider, 
-					configuration, inputComponent);
-			panel.setIgnoreRepaint(false); 
-			panel.setDoubleBuffered(true);
+			//handle shutdown events
+			registerHandlers(bioFabricApplication);
 			
-			container.setLayout(new BorderLayout());
-			container.add(panel, BorderLayout.CENTER);
+			//unique name of the Command Set
+			String name = bioFabricWindow.COMMAND_NAME;
+			//listen for cytoscape button and menu events and pass along to biofabric
+			registerViewListeners(new BioFabricZoomInListener(name), 
+					new ApplyPreferredLayoutListener(networkView, layoutAlgorithmManager.getDefaultLayout(), layoutAlgorithmManager, taskManager),
+					new BioFabricZoomOutListener(name), new BioFabricFitContentListener(name));
 			
-			//adds tool bar to frame
-			configuration.initializeFrame(container, inputComponent);
-			//set up event listeners / handlers / fit graph in view
-			configuration.initialize(panel.getGraphicsData());
-			*/
-			logger.warn("Added birds eye view");
-		}							
+			resetDefaultLayout(layoutAlgorithmManager, defaultLayout);		
+			
+		} else if(configuration instanceof ThumbnailGraphicsConfiguration){
+			
+			//TODO: figure out how to scale this to fit the container properly
+			BioFabricWindow bioFabricWindow = bioFabricApplication.getBioFabricWindow();
+			BioFabricOverview overView = bioFabricWindow.getThumbnailView();
+						
+			Container parent = container.getParent();
+			Dimension size = parent.getSize();
+			
+			System.out.println("overView size: " + overView.getSize().toString());
+			System.out.println("container size: " + container.getSize().toString());
+			System.out.println("parent size: " + size.toString());
+			
+			
+			container.setLayout(new BorderLayout());			
+			container.add(overView, BorderLayout.CENTER);			
+			
+		}else if(configuration instanceof BirdsEyeGraphicsConfiguration){			
+			BioFabricWindow bioFabricWindow = bioFabricApplication.getBioFabricWindow();
+			container.setLayout(new BorderLayout());			
+			container.add(bioFabricWindow.getNAC().getFabricOverviewPanel(), BorderLayout.CENTER);	
+		}				
+	}
+	
+	/*
+	 * Method will return Cytoscape to original default layout
+	 * Method will not allow a Biofabric layout to get set to the default layout as they do not
+	 * work with any of the other renderers.
+	 * 
+	 * */
+	private void resetDefaultLayout(CyLayoutAlgorithmManager layoutAlgorithmManager, 
+            String defaultLayout){
+		//reset default layout
+		CyLayoutAlgorithm layout = layoutAlgorithmManager.getLayout(defaultLayout);
+		if(!(layout instanceof BioFabricLayoutInterface)){			
+			layoutAlgorithmManager.setDefaultLayout(layout);
+		}else{
+			layout = layoutAlgorithmManager.getLayout("force-directed");
+			layoutAlgorithmManager.setDefaultLayout(layout);
+		}
 	}
 	
 	/*
 	 * Method will add the biofabric application to the handler and ensure it is
 	 * destroyed properly by calling the bfa shut down procedure
+	 * 
 	 * */
-	private void registerHandlers(BioFabricApplication bfa, BioFabricZoomInListener zoomIn, 
-			BioFabricZoomOutListener zoomOut, BioFabricFitContentListener fitContent){
+	private void registerHandlers(BioFabricApplication bfa){
 		addNetworkHandler.registerApplication(networkView.getSUID(), bfa);//TODO: this is not used remove or implement
-		destroyNetworkHandler.registerApplication(networkView.getSUID(), bfa);
-		
-		networkView.addBioFabricViewListener(zoomIn);
-		networkView.addBioFabricViewListener(zoomOut);
-		networkView.addBioFabricViewListener(fitContent);		
+		destroyNetworkHandler.registerApplication(networkView.getSUID(), bfa);			
 	}
 
+	/*
+	 * Method will add the view listeners to the networkView, used to handle cytoscape button click
+	 * 
+	 * */
+	private void registerViewListeners(BioFabricZoomInListener zoomIn, ApplyPreferredLayoutListener applyLayout,
+			BioFabricZoomOutListener zoomOut, BioFabricFitContentListener fitContent){		
+		networkView.addBioFabricViewListener(zoomIn);
+		networkView.addBioFabricViewListener(zoomOut);
+		networkView.addBioFabricViewListener(fitContent);	
+		networkView.addBioFabricViewListener(applyLayout);
+	}
 	
-	/* http://stackoverflow.com/questions/7218608/hiding-title-bar-of-jinternalframe-java
+	/* 
+	 * http://stackoverflow.com/questions/7218608/hiding-title-bar-of-jinternalframe-java
 	 * http://stackoverflow.com/questions/3620970/how-to-remove-the-borders-in-jinternalframe
 	 * */
-	private void clearBorder(){
+	private void clearBorder(BioFabricWindow bioFabricWindow, BioFabricWindow selectionWindow){
 		
 		((BasicInternalFrameUI)bioFabricWindow.getUI()).setNorthPane(null);	
 		((BasicInternalFrameUI)selectionWindow.getUI()).setNorthPane(null);

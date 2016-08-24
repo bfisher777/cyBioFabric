@@ -30,6 +30,7 @@ import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
 
 import com.boofisher.app.cyBioFabric.internal.biofabric.util.ResourceManager;
@@ -69,7 +70,7 @@ public abstract class BTStashResultsDialog extends JDialog implements DialogSupp
   */ 
   
   protected BTStashResultsDialog(JInternalFrame parent, String titleResource, Dimension size, int columns) {     
-    super();
+    super((JFrame) SwingUtilities.getRoot(parent), ResourceManager.getManager().getString(titleResource), true);
     haveResult_ = false;
     parent_ = parent;
     rMan_ = ResourceManager.getManager();    

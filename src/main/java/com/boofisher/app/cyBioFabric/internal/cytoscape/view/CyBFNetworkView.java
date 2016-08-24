@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.boofisher.app.cyBioFabric.internal.CyBFNetworkViewRenderer;
+import com.boofisher.app.cyBioFabric.internal.biofabric.app.BioFabricApplication;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.CyBFEdgeView;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.CyBFNodeView;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.CyBFView;
@@ -21,9 +22,6 @@ import com.boofisher.app.cyBioFabric.internal.cytoscape.view.listeners.BioFabric
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.listeners.BioFabricZoomInListenerInterface;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.listeners.BioFabricZoomOutListenerInterface;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.listeners.BioFabricZoomSelectedListenerInterface;
-import com.boofisher.app.cyBioFabric.internal.eventbus.EventBusProvider;
-import com.boofisher.app.cyBioFabric.internal.eventbus.FitInViewEvent;
-
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyIdentifiable;
 import org.cytoscape.model.CyNetwork;
@@ -35,8 +33,6 @@ import org.cytoscape.view.model.VisualProperty;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 import org.cytoscape.view.vizmap.VisualMappingManager;
 import org.cytoscape.view.vizmap.VisualStyle;
-
-import com.google.common.eventbus.EventBus;
 /*
  * Used to create view model
  * */
@@ -47,12 +43,6 @@ public class CyBFNetworkView extends CyBFView<CyNetwork> implements CyNetworkVie
 	private final VisualLexicon visualLexicon;
 	
 	private ArrayList<BioFabricViewListenerInterface> bioFabricViewListeners;
-	private BioFabricZoomOutListenerInterface zoomOutListener;
-	private BioFabricZoomInListenerInterface zoomInListener;
-	private BioFabricFitContentListenerInterface fitContentListener;
-	private BioFabricZoomAllNetworkListenerInterface zoomAllNetworkListener;
-	private BioFabricZoomSelectedListenerInterface zoomSelectedListener;
-	private ApplyPreferredLayoutListenerInterface applyPrefferedLayoutListener;
 	
 	/*
 	 * This object (VisualMappingManager) manages mapping from view
@@ -60,8 +50,8 @@ public class CyBFNetworkView extends CyBFView<CyNetwork> implements CyNetworkVie
 	 * VisualMappingFunctions through this class.
 	 * */
 	private final VisualMappingManager visualMappingManager;
-	private final EventBus eventBus;
-	//private final BioFabricNetwork bioFabricNetwork;
+	
+	private BioFabricApplication bioFabricApplication;	
 	/**
 	 * The camera associated with the main network viewing window used to
 	 * perform operations such as fitting all nodes onto the screen
@@ -73,17 +63,16 @@ public class CyBFNetworkView extends CyBFView<CyNetwork> implements CyNetworkVie
 	private Map<Long, View<CyNode>> nodeViews;
 	private Map<Long, View<CyEdge>> edgeViews;
 	
-	private boolean doFitContent;
-	private double  networkScaleFactor;
+	private boolean doFitContent;	
+	//keeping track of last networkScaleFactor
+	private double  networkScaleFactor;	
 	
-	public CyBFNetworkView(CyNetwork network, VisualLexicon visualLexicon, VisualMappingManager visualMappingManager, EventBusProvider eventBusProvider) {
+	public CyBFNetworkView(CyNetwork network, VisualLexicon visualLexicon, VisualMappingManager visualMappingManager, int appNum) {
 		super(new DefaultValueVault(visualLexicon));
 		
 		this.network = network;
 		this.visualLexicon = visualLexicon;
-		this.visualMappingManager = visualMappingManager;
-		
-		this.eventBus = eventBusProvider.getEventBus(this);
+		this.visualMappingManager = visualMappingManager;				
 		
 		nodeViews = new HashMap<>();
 		edgeViews = new HashMap<>();
@@ -100,7 +89,11 @@ public class CyBFNetworkView extends CyBFView<CyNetwork> implements CyNetworkVie
 		
 		this.bioFabricViewListeners = new ArrayList<BioFabricViewListenerInterface>();
 		this.networkScaleFactor = this.getVisualProperty(BasicVisualLexicon.NETWORK_SCALE_FACTOR);
+		//the number of biofabric applications created giving a unique number to each application
+		this.bioFabricApplication = new BioFabricApplication(false, appNum);
 	}
+	
+	public BioFabricApplication getBioFabricApplication(){ return bioFabricApplication; }
 	
 	public void addBioFabricViewListener(BioFabricViewListenerInterface viewListener){
 		this.bioFabricViewListeners.add(viewListener);
@@ -144,13 +137,14 @@ public class CyBFNetworkView extends CyBFView<CyNetwork> implements CyNetworkVie
 	 * Center the network
 	 */
 	@Override
-	public void fitContent() {
+	public void fitContent() {		
 		this.doFitContent = true;
 		updateView();
 	}
 
 	@Override
-	public void fitSelected() {
+	public void fitSelected() {		
+		
 		// Obtain selected nodes
 		Set<View<CyNode>> selectedNodeViews = new HashSet<View<CyNode>>();
 		
@@ -174,8 +168,8 @@ public class CyBFNetworkView extends CyBFView<CyNetwork> implements CyNetworkVie
 	}
 
 	@Override
-	public void updateView() {
-		System.out.println("updateView has been called in CyBFNetworkView");		
+	public void updateView() {		
+		
 		matchNodes();
 		matchEdges();				
 		
@@ -183,7 +177,7 @@ public class CyBFNetworkView extends CyBFView<CyNetwork> implements CyNetworkVie
 			canvases.get(i).repaint();
 		}
 		
-		for(BioFabricViewListenerInterface bFVL : this.bioFabricViewListeners){
+		for(BioFabricViewListenerInterface bFVL : this.bioFabricViewListeners){			
 			fireAway(bFVL);
 		}
 	}
@@ -353,7 +347,7 @@ public class CyBFNetworkView extends CyBFView<CyNetwork> implements CyNetworkVie
 	}
 	
 	private void fireAway(BioFabricViewListenerInterface bFVL){
-		
+				
 		if((bFVL instanceof BioFabricZoomInListenerInterface) && zoomInChanged()){			
 			
 			((BioFabricZoomInListenerInterface)bFVL).performZoomIn();
@@ -401,6 +395,7 @@ public class CyBFNetworkView extends CyBFView<CyNetwork> implements CyNetworkVie
 		}
 	}
 	
+	//TODO: may not need to have to implement this button, need to make sure the correct layout is applied
 	private boolean refreshChanged(){
 		return false;
 	}
@@ -420,5 +415,5 @@ public class CyBFNetworkView extends CyBFView<CyNetwork> implements CyNetworkVie
 	
 	private boolean zoomSelectedChanged(){
 		return false;
-	}
+	}		
 }
