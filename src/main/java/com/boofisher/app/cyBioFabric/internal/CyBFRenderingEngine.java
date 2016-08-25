@@ -1,10 +1,13 @@
 package com.boofisher.app.cyBioFabric.internal;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.GridLayout;
 import java.awt.Image;
+import java.awt.LayoutManager;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.awt.print.Printable;
@@ -37,6 +40,7 @@ import com.boofisher.app.cyBioFabric.internal.cytoscape.view.listeners.BioFabric
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.listeners.BioFabricZoomOutListener;
 import com.boofisher.app.cyBioFabric.internal.events.BioFabricNetworkViewAddedHandler;
 import com.boofisher.app.cyBioFabric.internal.events.BioFabricNetworkViewToBeDestroyedHandler;
+import com.boofisher.app.cyBioFabric.internal.graphics.BioFabricCytoPanel;
 import com.boofisher.app.cyBioFabric.internal.graphics.BirdsEyeGraphicsConfiguration;
 import com.boofisher.app.cyBioFabric.internal.graphics.GraphicsConfiguration;
 import com.boofisher.app.cyBioFabric.internal.graphics.ThumbnailGraphicsConfiguration;
@@ -119,20 +123,7 @@ public class CyBFRenderingEngine implements RenderingEngine<CyNetwork> {
 			pane.add(bioFabricWindow, BorderLayout.CENTER);
 			
 			BNVisualPropertyValue bnvpv = networkView.getVisualProperty(BioFabricVisualLexicon.BIOFABRIC_NETWORK);
-			BioFabricNetwork bfn = bnvpv.getBioFabricNetwork();
-			
-			/*//this happens when a non-biofabric layout is used and the layout needs to be programmatically called
-			//in the class CyBFRenderingEnginFactory
-			// TODO Need to create a listener, remove the Thread.sleep
-			while(bfn == null){
-				try {
-					System.err.println("bfn is null, going to sleep");
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				bfn = bnvpv.getBioFabricNetwork();
-			}*/
+			BioFabricNetwork bfn = bnvpv.getBioFabricNetwork();			
 			
 			installBioFabricNetwork(bfn, bioFabricWindow, selectionWindow, true);
 			
@@ -144,7 +135,7 @@ public class CyBFRenderingEngine implements RenderingEngine<CyNetwork> {
 			//listen for cytoscape button and menu events and pass along to biofabric
 			registerViewListeners(new BioFabricZoomInListener(name), 
 					new ApplyPreferredLayoutListener(networkView, layoutAlgorithmManager.getDefaultLayout(), layoutAlgorithmManager, taskManager),
-					new BioFabricZoomOutListener(name), new BioFabricFitContentListener(name));
+					new BioFabricZoomOutListener(name), new BioFabricFitContentListener(name));															
 			
 			resetDefaultLayout(layoutAlgorithmManager, defaultLayout);		
 			
@@ -156,19 +147,23 @@ public class CyBFRenderingEngine implements RenderingEngine<CyNetwork> {
 						
 			Container parent = container.getParent();
 			Dimension size = parent.getSize();
-			
-			System.out.println("overView size: " + overView.getSize().toString());
-			System.out.println("container size: " + container.getSize().toString());
-			System.out.println("parent size: " + size.toString());
-			
-			
+
 			container.setLayout(new BorderLayout());			
 			container.add(overView, BorderLayout.CENTER);			
 			
 		}else if(configuration instanceof BirdsEyeGraphicsConfiguration){			
 			BioFabricWindow bioFabricWindow = bioFabricApplication.getBioFabricWindow();
+			
 			container.setLayout(new BorderLayout());			
-			container.add(bioFabricWindow.getNAC().getFabricOverviewPanel(), BorderLayout.CENTER);	
+			container.add(bioFabricWindow.getNAC().getFabricOverviewPanel(), BorderLayout.CENTER);
+			
+			Component parent = container.getParent();
+			Dimension parentSize = parent.getSize();
+			
+			int x = parentSize.width - container.getWidth();
+			int y = 0;
+			container.setLocation(x, y);
+			
 		}				
 	}
 	

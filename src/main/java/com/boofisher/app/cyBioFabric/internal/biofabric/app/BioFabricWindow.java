@@ -259,8 +259,8 @@ public class BioFabricWindow extends JInternalFrame implements BackgroundWorkerC
     sp_.setResizeWeight(1.0);
 
 
-    cpane.add(sp_, BorderLayout.CENTER);    
-   // cpane.add(nac_, BorderLayout.SOUTH);    
+    cpane.add(hidingPanel_, BorderLayout.CENTER);//TODO changed this    
+    //cpane.add(nac_, BorderLayout.SOUTH);    
     URL ugif = getClass().getResource("/images/BioFab16White.gif"); 
     Icon icon = new ImageIcon(ugif);
     this.setFrameIcon(icon);
@@ -628,5 +628,5 @@ public class BioFabricWindow extends JInternalFrame implements BackgroundWorkerC
   
   public BioFabricOverview getThumbnailView(){ 
 	  return thumbnailView_;
-  }
+  }  
 }

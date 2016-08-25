@@ -118,7 +118,7 @@ public class BioFabricNavAndControl extends JPanel {
     lfnt_ = new FabricNavTool.LabeledFabricNavTool(topWindow, labelFont);
     fnt_ = lfnt_.getFabricNavTool();
      
-    spot_ = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, null, lfnt_);
+    spot_ = new JSplitPane(JSplitPane.VERTICAL_SPLIT, null, lfnt_);//TODO changed this
     //JPanel dmvo = new JPanel();
    // dmvo.setLayout(new GridLayout(1, 2));
    // dmvo.add(mvo_.getPanel(0));
@@ -128,7 +128,7 @@ public class BioFabricNavAndControl extends JPanel {
     spot_.setBorder(new EmptyBorder(0,0,0,0));
     spot_.setResizeWeight(1.0);
 
-    JSplitPane sp = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, fmpan, spot_);
+    JSplitPane sp = new JSplitPane(JSplitPane.VERTICAL_SPLIT, fmpan, spot_); //TODO changed this
     withControls_ = new JPanel();
     withControls_.setLayout(new BorderLayout());
     withControls_.add(floc_, BorderLayout.NORTH);

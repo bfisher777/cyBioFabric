@@ -12,7 +12,10 @@ import org.apache.log4j.Logger;
 import org.cytoscape.application.CyUserLog;
 import org.cytoscape.application.NetworkViewRenderer;
 import org.cytoscape.application.events.CyShutdownListener;
+import org.cytoscape.application.events.SetCurrentNetworkViewListener;
 import org.cytoscape.application.swing.CySwingApplication;
+import org.cytoscape.application.swing.CytoPanel;
+import org.cytoscape.application.swing.CytoPanelComponent;
 import org.cytoscape.service.util.AbstractCyActivator;
 import org.cytoscape.task.EdgeViewTaskFactory;
 import org.cytoscape.task.NetworkViewLocationTaskFactory;
@@ -37,8 +40,11 @@ import com.boofisher.app.cyBioFabric.internal.events.BioFabricNetworkViewAddedHa
 import com.boofisher.app.cyBioFabric.internal.events.BioFabricNetworkViewAddedListener;
 import com.boofisher.app.cyBioFabric.internal.events.BioFabricNetworkViewToBeDestroyedHandler;
 import com.boofisher.app.cyBioFabric.internal.events.BioFabricNetworkViewToBeDestroyedListener;
+import com.boofisher.app.cyBioFabric.internal.events.BioFabricSetCurrentViewHandler;
+import com.boofisher.app.cyBioFabric.internal.events.BioFabricSetCurrentViewListener;
 import com.boofisher.app.cyBioFabric.internal.events.BioFabricShutdownHandler;
 import com.boofisher.app.cyBioFabric.internal.events.BioFabricShutdownListener;
+import com.boofisher.app.cyBioFabric.internal.graphics.BioFabricCytoPanel;
 import com.boofisher.app.cyBioFabric.internal.graphics.GraphicsConfigurationFactory;
 import com.boofisher.app.cyBioFabric.internal.layouts.BioFabricLayoutInterface;
 import com.boofisher.app.cyBioFabric.internal.layouts.DefaultBioFabricLayoutAlgorithm;
@@ -74,7 +80,7 @@ public class CyActivator extends AbstractCyActivator {
 		cyBFVisualLexiconProps.setProperty("id", "CyBioFabric");
 		registerService(context, cyBFVisualLexicon, VisualLexicon.class, cyBFVisualLexiconProps);
 		
-		//register layout and then set it as the default layout
+		//register biofabric layouts layout
 		BioFabricLayoutInterface bfLayoutAlg = new DefaultBioFabricLayoutAlgorithm(undoSupport);
 		
 		registerLayoutAlgorithms(context,				
@@ -110,8 +116,12 @@ public class CyActivator extends AbstractCyActivator {
 		registerServiceListener(context, taskFactoryListener, "addNetworkViewTaskFactory", "removeNetworkViewTaskFactory", NetworkViewTaskFactory.class);
 		registerServiceListener(context, taskFactoryListener, "addNetworkViewLocationTaskFactory", "removeNetworkViewLocationTaskFactory", NetworkViewLocationTaskFactory.class);
 		
+		//adds the magnifier and the navigation tool to the control panel
+		BioFabricCytoPanel bioFabricNavPanel = new BioFabricCytoPanel();
+		registerService(context, bioFabricNavPanel, CytoPanelComponent.class, new Properties());
 		
 		//create and register all the event listeners
+		//TODO: currently view added handle does nothing, implement or remove
 		BioFabricNetworkViewAddedHandler addNetworkHandler = new BioFabricNetworkViewAddedHandler();
 		BioFabricNetworkViewAddedListener bioFabricViewAddedListener = new BioFabricNetworkViewAddedListener(addNetworkHandler);
 		registerService(context, bioFabricViewAddedListener, NetworkViewAddedListener.class, new Properties());
@@ -122,13 +132,11 @@ public class CyActivator extends AbstractCyActivator {
 		
 		BioFabricShutdownHandler biofabricShutdownHandler = new BioFabricShutdownHandler();
 		BioFabricShutdownListener bioFabricShutdownListener = new BioFabricShutdownListener(biofabricShutdownHandler);
-		registerService(context, bioFabricShutdownListener, CyShutdownListener.class, new Properties());		
-			
-		/*//add a new panel
-		BioFabricCytoPanel bioFabricNavPanel = new BioFabricCytoPanel();
-		//Register it as a service:
-		registerService(context, bioFabricNavPanel, CytoPanelComponent.class, new Properties());*/
+		registerService(context, bioFabricShutdownListener, CyShutdownListener.class, new Properties());
 		
+		BioFabricSetCurrentViewHandler biofabricSetCurrentViewHandler = new BioFabricSetCurrentViewHandler(bioFabricNavPanel);
+		BioFabricSetCurrentViewListener bioFabricSetCurrentViewListener = new BioFabricSetCurrentViewListener(biofabricSetCurrentViewHandler);
+		registerService(context, bioFabricSetCurrentViewListener, SetCurrentNetworkViewListener.class, new Properties());						
 		
 		// CyBF NetworkView factory
 		/*Factory for CyNetworkView objects. Modules which need to create view models should import this as a service.
