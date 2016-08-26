@@ -137,13 +137,14 @@ public class CyBFNetworkView extends CyBFView<CyNetwork> implements CyNetworkVie
 	 * Center the network
 	 */
 	@Override
-	public void fitContent() {
+	public void fitContent() {		
 		this.doFitContent = true;
 		updateView();
 	}
 
 	@Override
-	public void fitSelected() {
+	public void fitSelected() {		
+		
 		// Obtain selected nodes
 		Set<View<CyNode>> selectedNodeViews = new HashSet<View<CyNode>>();
 		
@@ -167,8 +168,8 @@ public class CyBFNetworkView extends CyBFView<CyNetwork> implements CyNetworkVie
 	}
 
 	@Override
-	public void updateView() {
-		System.out.println("updateView has been called in CyBFNetworkView");		
+	public void updateView() {		
+		
 		matchNodes();
 		matchEdges();				
 		
@@ -394,6 +395,7 @@ public class CyBFNetworkView extends CyBFView<CyNetwork> implements CyNetworkVie
 		}
 	}
 	
+	//TODO: may not need to have to implement this button, need to make sure the correct layout is applied
 	private boolean refreshChanged(){
 		return false;
 	}

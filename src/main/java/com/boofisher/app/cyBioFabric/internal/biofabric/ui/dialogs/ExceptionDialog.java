@@ -27,6 +27,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.JDialog;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 import javax.swing.JFrame;
 import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
@@ -75,7 +76,7 @@ public class ExceptionDialog extends JDialog {
   */ 
   
   public ExceptionDialog(JInternalFrame topWindow_, Exception ex, String version) {     
-    super();
+    super((JFrame) SwingUtilities.getRoot(topWindow_), ResourceManager.getManager().getString("exception.title"), true);
        
     ResourceManager rMan = ResourceManager.getManager();    
     setSize(800, 300);

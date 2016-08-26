@@ -7,6 +7,7 @@ import com.boofisher.app.cyBioFabric.internal.CyBFRenderingEngine;
 import com.boofisher.app.cyBioFabric.internal.cytoscape.view.CyBFNetworkView;
 import com.boofisher.app.cyBioFabric.internal.events.BioFabricNetworkViewAddedHandler;
 import com.boofisher.app.cyBioFabric.internal.events.BioFabricNetworkViewToBeDestroyedHandler;
+import com.boofisher.app.cyBioFabric.internal.graphics.BioFabricCytoPanel;
 import com.boofisher.app.cyBioFabric.internal.graphics.GraphicsConfiguration;
 import com.boofisher.app.cyBioFabric.internal.graphics.GraphicsConfigurationFactory;
 import com.boofisher.app.cyBioFabric.internal.task.TaskFactoryListener;

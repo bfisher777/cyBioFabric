@@ -5,7 +5,7 @@ package com.boofisher.app.cyBioFabric.internal.tools;
  * @author Ben
  *
  */
-public class NodeNameSUIDPair {
+public class NodeNameSUIDPair implements Comparable<NodeNameSUIDPair>{
 
 	private Long suid;
 	private String name;
@@ -25,5 +25,16 @@ public class NodeNameSUIDPair {
 		}else{
 			return false;
 		}
+	}
+	
+	@Override
+	public int hashCode(){
+		return this.name.hashCode();
+	}
+
+	@Override
+	public int compareTo(NodeNameSUIDPair o) {
+		// TODO Auto-generated method stub
+		return this.getName().compareTo(o.getName());
 	}
 }

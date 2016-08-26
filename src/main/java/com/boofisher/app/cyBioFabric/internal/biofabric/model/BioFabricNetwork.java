@@ -21,6 +21,10 @@ package com.boofisher.app.cyBioFabric.internal.biofabric.model;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.TreeSet;
 import java.util.HashMap;
@@ -107,33 +111,33 @@ public class BioFabricNetwork {
   // For mapping of selections:
   //
   
-  private HashMap<Integer, String> rowToTarg_;
-  private int rowCount_;
+  public HashMap<Integer, String> rowToTarg_;
+  public int rowCount_;
   
   //
   // Link and node definitions:
   //
   
-  private TreeMap<Integer, LinkInfo> fullLinkDefs_;
-  private TreeMap<Integer, Integer> nonShadowedLinkMap_;
-  private HashMap<String, NodeInfo> nodeDefs_;
+  public TreeMap<Integer, LinkInfo> fullLinkDefs_;
+  public TreeMap<Integer, Integer> nonShadowedLinkMap_;
+  public HashMap<String, NodeInfo> nodeDefs_;
   
   //
   // Grouping for links:
   //
   
-  private List<String> linkGrouping_;
+  public List<String> linkGrouping_;
   
   //
   // Columns assignments, shadow and non-shadow states:
   //
  
-  private ColumnAssign normalCols_;
-  private ColumnAssign shadowCols_;
+  public ColumnAssign normalCols_;
+  public ColumnAssign shadowCols_;
   
-  private FabricColorGenerator colGen_;
+  public FabricColorGenerator colGen_;
   
-  private BuildData bd_; //added to pass to cytoscape renderer
+  public BuildData bd_; //added to pass to cytoscape renderer
   
   ////////////////////////////////////////////////////////////////////////////
   //
@@ -414,7 +418,7 @@ public class BioFabricNetwork {
     // Note the allLinks Set has pruned out duplicates and synonymous non-directional links
     //
        
-    List<NodeNameSUIDPair> targets =  (new DefaultLayout()).doNodeLayout(rbd, null);
+    List<NodeNameSUIDPair> targets =  (new DefaultLayout()).doNodeLayout(rbd, null);    
     
     //
     // Now have the ordered list of targets we are going to display.
@@ -422,6 +426,8 @@ public class BioFabricNetwork {
     
     fillNodesFromOrder(rbd.networkView, targets, rbd.colGen, rbd.clustAssign);
 
+    
+    
     //
     // This now assigns the link to its column.  Note that we order them
     // so that the shortest vertical link is drawn first!
@@ -2299,7 +2305,41 @@ public class BioFabricNetwork {
   ** 
   ** Extract relations
   */
-
+  public static SortedMap extractRelations(List allLinks) {
+	    HashSet flipSet = new HashSet();
+	    HashSet flipRels = new HashSet();
+	    HashSet rels = new HashSet(); 
+	    Iterator alit = allLinks.iterator();
+	    while (alit.hasNext()) {
+	      FabricLink nextLink = (FabricLink)alit.next();
+	      FabricLink.AugRelation relation = nextLink.getAugRelation();
+	      if (!nextLink.isFeedback()) {  // Autofeedback not flippable
+	        FabricLink flipLink = nextLink.flipped();
+	        if (flipSet.contains(flipLink)) {
+	          flipRels.add(relation);
+	        } else {
+	          flipSet.add(flipLink);
+	        }
+	      }
+	      rels.add(relation);
+	    } 
+	    
+	    //
+	    // We have a hint that something is signed if there are two
+	    // separate links running in opposite directions!
+	    //
+	        
+	    TreeMap relMap = new TreeMap();
+	    Boolean noDir = new Boolean(false);
+	    Boolean haveDir = new Boolean(true);
+	    Iterator rit = rels.iterator();
+	    while (rit.hasNext()) {
+	      FabricLink.AugRelation rel = (FabricLink.AugRelation)rit.next();
+	      relMap.put(rel, (flipRels.contains(rel)) ? haveDir : noDir);
+	    }    
+	    return (relMap);
+	  }
+/*
   public static SortedMap<FabricLink.AugRelation, Boolean> extractRelations(List<FabricLink> allLinks) {
     HashSet<FabricLink> flipSet = new HashSet<FabricLink>();
     HashSet<FabricLink.AugRelation> flipRels = new HashSet<FabricLink.AugRelation>();
@@ -2334,7 +2374,7 @@ public class BioFabricNetwork {
     }    
     return (relMap);
   }
-  
+*/  
   /***************************************************************************
   ** 
   ** Process a link set that has not had directionality established

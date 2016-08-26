@@ -24,7 +24,7 @@ public class AboutDialog extends JDialog {
 	private static final String BUILD_PROPS_FILE = "/buildinfo.props";
 	private static final String BUILD_VERSION = "build.version";
 	private static final String BUILD_TIMESTAMP = "build.timestamp";
-	private static final String URL = "http://baderlab.org/Software";
+	private static final String URL = "http://www.biofabric.org/";
 	
 	private final OpenBrowser openBrowser;
 
@@ -59,11 +59,11 @@ public class AboutDialog extends JDialog {
 						+ "<p align=center>"
 						+ "BioFabric Network Renderer for Cytoscape."
 						+ "<BR><BR>"
-						+ "by Ben Fisher<BR>"
-						+ "Code modified slightly from <a href='https://github.com/BaderLab/cy3d-impl'>Cy3D</a><BR>\nRending using Java 2D"
-						+ "<BR>" + "App Homepage:<BR>" + "<a href='"
+						+ "by Ben Fisher<BR>"					
+						+ "<BR>" + "BioFabric Homepage:<BR>" + "<a href='"
 						+ URL + "'>" + URL + "</a><BR>" + "<BR>"
-						+ "<font size='-1'>" + "</font>" + "</p></body></html>");
+						+ "<font size='-1'>" + "</font>" + "</p></body></html>"
+						+ "Code modified slightly from <a href='https://github.com/BaderLab/cy3d-impl'>Cy3D</a><BR>\nRending using Java 2D");
 		
 		setContentPane(editorPane);
 	}
