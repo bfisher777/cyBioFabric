@@ -7,8 +7,8 @@
 	<name>cyBioFabric</name>	
 
 	<properties>
-		<bundle.symbolicName>com.boofisher.app.cyBioFabric</bundle.symbolicName>
-		<bundle.namespace>com.boofisher.app.cyBioFabric</bundle.namespace>
+		<bundle.symbolicName>org.systemsbiology.cyBioFabric</bundle.symbolicName>
+		<bundle.namespace>org.systemsbiology.cyBioFabric</bundle.namespace>
 		<cytoscape.api>3.4.0</cytoscape.api>
 		<timestamp>${maven.build.timestamp}</timestamp>
 		<project.version>0.0.1</project.version>
@@ -16,7 +16,7 @@
 	</properties>
 
 	
-	<groupId>com.boofisher.app</groupId>
+	<groupId>org.systemsbiology.cyBioFabric</groupId>
 	<artifactId>cyBioFabric</artifactId>
 	<version>${project.version}</version>
 
