@@ -219,7 +219,7 @@ public class BioFabricWindow extends JInternalFrame implements BackgroundWorkerC
     fc.setGaggleElements(gaggleGooseChooseMenu, gaggleGooseCombo_);
       
     //TODO move menu to Cytoscape frame
-    menuInstall(fc, isMain_, gaggleGooseChooseMenu);
+    //menuInstall(fc, isMain_, gaggleGooseChooseMenu);
     toolBar = new JToolBar();
     stockActionMap(fc, isMain_);
     stockToolBar(toolBar, isMain_, fc);
@@ -234,6 +234,8 @@ public class BioFabricWindow extends JInternalFrame implements BackgroundWorkerC
     cp_.setBackground(Color.white);
     
     JScrollPane jsp = new JScrollPane(cp_);
+    jsp.getVerticalScrollBar().setUnitIncrement(16);
+    jsp.getHorizontalScrollBar().setUnitIncrement(16);    
     cp_.setScroll(jsp);
     // GOTTA USE THIS ON MY LINUX BOX, BUT NOWHERE ELSE!!!!
     //jsp.getViewport().setScrollMode(JViewport.BACKINGSTORE_SCROLL_MODE);
@@ -255,7 +257,7 @@ public class BioFabricWindow extends JInternalFrame implements BackgroundWorkerC
     hidingPanel_.add(blankPanel, "Hiding");
 
     sp_ = new JSplitPane(JSplitPane.VERTICAL_SPLIT, hidingPanel_, nac_);
-    sp_.setDividerLocation((int)(dim.height * 0.50));
+    sp_.setDividerLocation((int)(dim.height * 0.50));       
     sp_.setResizeWeight(1.0);
 
 
@@ -573,19 +575,19 @@ public class BioFabricWindow extends JInternalFrame implements BackgroundWorkerC
     //toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.ZOOM_OUT)));
     //toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.ZOOM_IN)));
     //toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.ZOOM_TO_MODEL)));
-    toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.ZOOM_TO_RECT)));    
+    //toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.ZOOM_TO_RECT)));    
     toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.ZOOM_TO_SELECTIONS)));
-    toolBar.addSeparator();
-    toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.CENTER_ON_PREVIOUS_SELECTION)));
-    toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.ZOOM_TO_CURRENT_SELECTION)));
-    toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.CENTER_ON_NEXT_SELECTION)));
-    toolBar.addSeparator();        
+    //toolBar.addSeparator();
+    //toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.CENTER_ON_PREVIOUS_SELECTION)));
+    //toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.ZOOM_TO_CURRENT_SELECTION)));
+    //toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.CENTER_ON_NEXT_SELECTION)));
+    //toolBar.addSeparator();        
     toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.ADD_FIRST_NEIGHBORS)));
-    toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.CLEAR_SELECTIONS)));
-    toolBar.addSeparator();        
+    //toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.CLEAR_SELECTIONS)));
+    //toolBar.addSeparator();        
     toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.CANCEL)));
-    toolBar.addSeparator();    
-    toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.SEARCH)));
+    //toolBar.addSeparator();    
+    //toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.SEARCH)));
     if (isMain) {
       toolBar.addSeparator();  
       toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.PROPAGATE_DOWN)));

@@ -59,7 +59,7 @@ public class AboutDialog extends JDialog {
 						+ "<p align=center>"
 						+ "BioFabric Network Renderer for Cytoscape."
 						+ "<BR><BR>"
-						+ "by Ben Fisher<BR>"					
+						+ "Institute for Systems Biology<BR>"					
 						+ "<BR>" + "BioFabric Homepage:<BR>" + "<a href='"
 						+ URL + "'>" + URL + "</a><BR>" + "<BR>"
 						+ "<font size='-1'>" + "</font>" + "</p></body></html>"

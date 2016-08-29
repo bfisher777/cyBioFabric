@@ -16,15 +16,18 @@ import org.systemsbiology.cyBioFabric.internal.biofabric.util.ResourceManager;
 import org.systemsbiology.cyBioFabric.internal.cytoscape.view.CyBFNetworkView;
 import org.systemsbiology.cyBioFabric.internal.graphics.BioFabricCytoPanel;
 import org.systemsbiology.cyBioFabric.internal.icons.BioFabricImageIcon;
+import org.systemsbiology.cyBioFabric.internal.icons.TaskFactoryPredicate;
 
 public class BioFabricSetCurrentViewHandler {	
 	
 	BioFabricCytoPanel panel;
 	List<BioFabricImageIcon> imageIcons;
+	TaskFactoryPredicate taskFactoryPredicate;
 	
-	public BioFabricSetCurrentViewHandler(BioFabricCytoPanel panel, List<BioFabricImageIcon> imageIcons){
+	public BioFabricSetCurrentViewHandler(BioFabricCytoPanel panel, List<BioFabricImageIcon> imageIcons, TaskFactoryPredicate taskFactoryPredicate){
 		this.panel = panel;
 		this.imageIcons = imageIcons;
+		this.taskFactoryPredicate = taskFactoryPredicate;
 	}
 	
 	/* 
@@ -37,9 +40,13 @@ public class BioFabricSetCurrentViewHandler {
 		CyBFNetworkView bfNetworkView = null;
 		Dimension size = panel.getSize();
 		if((view instanceof CyBFNetworkView)){
+			
 			bfNetworkView = (CyBFNetworkView)view;
-			panel.setNavAndControl(bfNetworkView.getBioFabricApplication().getBioFabricWindow().getNAC());			
+			panel.setNavAndControl(bfNetworkView.getBioFabricApplication().getBioFabricWindow().getNAC());
+			
+			taskFactoryPredicate.setIsReady(true);
 		}else{
+			
 			panel.removeAll();
 			panel.revalidate();
 			panel.setSize(size);
@@ -50,30 +57,17 @@ public class BioFabricSetCurrentViewHandler {
 		    magLab.setOpaque(true);
 		    magLab.setBackground(Color.white);
 		    magLab.setFont(labelFont);
-		    panel.add(magLab, BorderLayout.NORTH);		 
+		    panel.add(magLab, BorderLayout.NORTH);	
+		    
+		    taskFactoryPredicate.setIsReady(false);
 		}
 		
 		for(BioFabricImageIcon icon : imageIcons){
 
 			if((view instanceof CyBFNetworkView)){							
-				
-				if(icon instanceof AbstractCyAction){
-					
-					AbstractCyAction cyAction = (AbstractCyAction)icon;
-					
-					if(!cyAction.isEnabled()){						
-						cyAction.setEnabled(true);						
-						//cyAction.updateEnableState();						
-					}
-				}				
+								
 				icon.registerCommandSetName(bfNetworkView.getBioFabricApplication().getBioFabricWindow().COMMAND_NAME);
-			}else if(icon instanceof AbstractCyAction){
-				
-				AbstractCyAction cyAction = (AbstractCyAction)icon;
-				cyAction.setEnabled(false);				
-				//cyAction.updateEnableState();				
-			}
-		}
-	}
-	
+			}			
+		}		
+	}	
 }

@@ -7,8 +7,6 @@ import static org.cytoscape.work.ServiceProperties.MENU_GRAVITY;
 import static org.cytoscape.work.ServiceProperties.TITLE;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -17,12 +15,9 @@ import org.cytoscape.application.CyUserLog;
 import org.cytoscape.application.NetworkViewRenderer;
 import org.cytoscape.application.events.CyShutdownListener;
 import org.cytoscape.application.events.SetCurrentNetworkViewListener;
-import org.cytoscape.application.swing.ActionEnableSupport;
 import org.cytoscape.application.swing.CyAction;
 import org.cytoscape.application.swing.CySwingApplication;
-import org.cytoscape.application.swing.CytoPanel;
 import org.cytoscape.application.swing.CytoPanelComponent;
-import org.cytoscape.model.CyNetworkManager;
 import org.cytoscape.service.util.AbstractCyActivator;
 import org.cytoscape.task.EdgeViewTaskFactory;
 import org.cytoscape.task.NetworkViewLocationTaskFactory;
@@ -38,6 +33,8 @@ import org.cytoscape.view.model.events.NetworkViewAboutToBeDestroyedListener;
 import org.cytoscape.view.model.events.NetworkViewAddedListener;
 import org.cytoscape.view.presentation.RenderingEngineManager;
 import org.cytoscape.view.vizmap.VisualMappingManager;
+import org.cytoscape.work.ServiceProperties;
+import org.cytoscape.work.TaskFactory;
 import org.cytoscape.work.swing.DialogTaskManager;
 import org.cytoscape.work.undo.UndoSupport;
 import org.osgi.framework.BundleContext;
@@ -53,8 +50,9 @@ import org.systemsbiology.cyBioFabric.internal.events.BioFabricShutdownHandler;
 import org.systemsbiology.cyBioFabric.internal.events.BioFabricShutdownListener;
 import org.systemsbiology.cyBioFabric.internal.graphics.BioFabricCytoPanel;
 import org.systemsbiology.cyBioFabric.internal.graphics.GraphicsConfigurationFactory;
+import org.systemsbiology.cyBioFabric.internal.icons.BioFabricAbstractCyActionBuilder;
 import org.systemsbiology.cyBioFabric.internal.icons.BioFabricImageIcon;
-import org.systemsbiology.cyBioFabric.internal.icons.ZoomToRectAction;
+import org.systemsbiology.cyBioFabric.internal.icons.TaskFactoryPredicate;
 import org.systemsbiology.cyBioFabric.internal.layouts.BioFabricLayoutInterface;
 import org.systemsbiology.cyBioFabric.internal.layouts.DefaultBioFabricLayoutAlgorithm;
 import org.systemsbiology.cyBioFabric.internal.task.TaskFactoryListener;
@@ -72,13 +70,13 @@ public class CyActivator extends AbstractCyActivator {
 		ResourceManager.initManager("org.systemsbiology.cyBioFabric.internal.biofabric.props.BioFabric");
 		
 		//A simple interface that posts edits to the Cytoscape undo stack.
-		UndoSupport undoSupport = getService(context, UndoSupport.class);
+		UndoSupport undoSupport = getService(context, UndoSupport.class);				
 		
 		//A task factory specifically for layout algorithms.
 		CyLayoutAlgorithmManager layoutAlgorithmManager =  getService(context, CyLayoutAlgorithmManager.class);	
 		//Save the default layout, restore it later in CyBFRenderingEngine
 		String defaultLayout = layoutAlgorithmManager.getDefaultLayout().getName();
-		
+						
 		/*A RenderingEngine should provide one, immutable lexicon implementing this interface. 
 		 * This is a pre-defined tree of VisualProperties designed by the RenderingEngine developer.*/
 		VisualLexicon cyBFVisualLexicon = new BioFabricVisualLexicon();		
@@ -123,17 +121,38 @@ public class CyActivator extends AbstractCyActivator {
 		registerServiceListener(context, taskFactoryListener, "addNodeViewTaskFactory", "removeNodeViewTaskFactory", NodeViewTaskFactory.class);
 		registerServiceListener(context, taskFactoryListener, "addEdgeViewTaskFactory", "removeEdgeViewTaskFactory", EdgeViewTaskFactory.class);
 		registerServiceListener(context, taskFactoryListener, "addNetworkViewTaskFactory", "removeNetworkViewTaskFactory", NetworkViewTaskFactory.class);
-		registerServiceListener(context, taskFactoryListener, "addNetworkViewLocationTaskFactory", "removeNetworkViewLocationTaskFactory", NetworkViewLocationTaskFactory.class);
-				
-		//Add image icons(buttons) to toolbar
-		CyApplicationManager appManager = getService(context, CyApplicationManager.class);
-		CyNetworkViewManager networkManager = getService(context, CyNetworkViewManager.class);
+		registerServiceListener(context, taskFactoryListener, "addNetworkViewLocationTaskFactory", "removeNetworkViewLocationTaskFactory", NetworkViewLocationTaskFactory.class);								
+		
+		
+		//init a BioFabricActionIconBuilder used to build toolbar and menu items
+		CyApplicationManager applicationManager = getService(context, CyApplicationManager.class);
+		CyNetworkViewManager networkViewManager = getService(context, CyNetworkViewManager.class);
+		TaskFactoryPredicate taskFactoryPredicate = new TaskFactoryPredicate();
+		registerService(context, taskFactoryPredicate, TaskFactory.class, new Properties());
+		BioFabricAbstractCyActionBuilder bioFabricActionIconBuilder = new BioFabricAbstractCyActionBuilder(applicationManager, networkViewManager, taskFactoryPredicate);					
+		
+		//Add image icons(buttons / items) to toolbar	
 		ArrayList<BioFabricImageIcon> buttons = new ArrayList<BioFabricImageIcon>();
-		Map<String, String> configProps = new HashMap<String, String>();
-		configureZoomRectProperties(configProps);
-		ZoomToRectAction zoomToRectAction = new ZoomToRectAction(configProps, appManager, networkManager);
-		buttons.add(zoomToRectAction);
-		registerService(context, zoomToRectAction, CyAction.class, new Properties());
+		registerService(context, bioFabricActionIconBuilder.buildAZoomRectButton(buttons), CyAction.class, new Properties());		
+		registerService(context, bioFabricActionIconBuilder.buildACenterOnPreviousButton(buttons), CyAction.class, new Properties());
+		registerService(context, bioFabricActionIconBuilder.buildAZoomToCurrentButton(buttons), CyAction.class, new Properties());
+		registerService(context, bioFabricActionIconBuilder.buildACenterOnNextButton(buttons), CyAction.class, new Properties());
+		registerService(context, bioFabricActionIconBuilder.buildASearchButton(buttons), CyAction.class, new Properties());
+		registerService(context, bioFabricActionIconBuilder.buildAClearSelectionsButton(buttons), CyAction.class, new Properties());		
+		//create menu items for CyBioFabric		
+		registerService(context, bioFabricActionIconBuilder.buildAImportWithEdgeWeightsMenuItem(buttons), CyAction.class, new Properties());
+		registerService(context, bioFabricActionIconBuilder.buildAImportWithNodeAttributesMenuItem(buttons), CyAction.class, new Properties());
+		registerService(context, bioFabricActionIconBuilder.buildAEditAccumulateSelectionsMenuItem(buttons), CyAction.class, new Properties());
+		registerService(context, bioFabricActionIconBuilder.buildAEditSetDisplayOptionsMenuItem(buttons), CyAction.class, new Properties());
+		registerService(context, bioFabricActionIconBuilder.buildAViewSelectARectangleAndZoomMenuItem(buttons), CyAction.class, new Properties());
+		registerService(context, bioFabricActionIconBuilder.buildAViewZoomToNetworkMagPositionMenuItem(buttons), CyAction.class, new Properties());
+		registerService(context, bioFabricActionIconBuilder.buildAViewZoomToMousePositionMenuItem(buttons), CyAction.class, new Properties());
+		registerService(context, bioFabricActionIconBuilder.buildAViewCenterOnPreviousSelectionMenuItem(buttons), CyAction.class, new Properties());
+		registerService(context, bioFabricActionIconBuilder.buildAViewZoomToCurrentSelectionMenuItem(buttons), CyAction.class, new Properties());
+		registerService(context, bioFabricActionIconBuilder.buildAViewCenterOnNextSelectionMenuItem(buttons), CyAction.class, new Properties());
+		registerService(context, bioFabricActionIconBuilder.buildAToolsCompareMultipleNodesMenuItem(buttons), CyAction.class, new Properties());
+		registerService(context, bioFabricActionIconBuilder.buildAToolsSearchForNodesMenuItem(buttons), CyAction.class, new Properties());
+		bioFabricActionIconBuilder = null;//done building buttons and menu items
 		
 		//adds the magnifier and the navigation tool to the control panel
 		BioFabricCytoPanel bioFabricNavPanel = new BioFabricCytoPanel();
@@ -153,7 +172,7 @@ public class CyActivator extends AbstractCyActivator {
 		BioFabricShutdownListener bioFabricShutdownListener = new BioFabricShutdownListener(biofabricShutdownHandler);
 		registerService(context, bioFabricShutdownListener, CyShutdownListener.class, new Properties());
 		
-		BioFabricSetCurrentViewHandler biofabricSetCurrentViewHandler = new BioFabricSetCurrentViewHandler(bioFabricNavPanel, buttons);
+		BioFabricSetCurrentViewHandler biofabricSetCurrentViewHandler = new BioFabricSetCurrentViewHandler(bioFabricNavPanel, buttons, taskFactoryPredicate);
 		BioFabricSetCurrentViewListener bioFabricSetCurrentViewListener = new BioFabricSetCurrentViewListener(biofabricSetCurrentViewHandler);
 		registerService(context, bioFabricSetCurrentViewListener, SetCurrentNetworkViewListener.class, new Properties());						
 		
@@ -214,70 +233,18 @@ public class CyActivator extends AbstractCyActivator {
 	
 	private void registerLayoutAlgorithms(BundleContext context, CyLayoutAlgorithm... algorithms) {
 		for(int i = 0; i < algorithms.length; i++) {
-			Properties props = new Properties();
-			props.setProperty("preferredTaskManager", "menu");
+			Properties props = new Properties();			
+			props.setProperty("preferredTaskManager", "menu.CyBioFabric");
+			props.setProperty(ServiceProperties.PREFERRED_MENU, ResourceManager.getManager().getString("cytoLayouts.subMenuName"));
 			props.setProperty(TITLE, algorithms[i].toString());
 			props.setProperty(MENU_GRAVITY, "30." + (i+1));
 			if(i == 0)
-				props.setProperty(INSERT_SEPARATOR_BEFORE, "true");
+				props.setProperty(INSERT_SEPARATOR_BEFORE, "false");
 			if(i == algorithms.length-1)
 				props.setProperty(INSERT_SEPARATOR_AFTER, "true");
-			
+					
 			registerService(context, algorithms[i], CyLayoutAlgorithm.class, props);
 		}
-	}
-	
-	/*title - (The title of the menu.)
-	preferredMenu - (The preferred menu for the action.)
-	largeIconURL - (The icon to be used for the toolbar.)
-	smallIconURL - (The icon to be used for the menu.)
-	tooltip - (The toolbar or menu tooltip.)
-	inToolBar - (Whether the action should be in the toolbar.)
-	inMenuBar - (Whether the action should be in a menu.)
-	insertSeparatorBefore - (Whether a separator should be inserted before this menu item.)
-	insertSeparatorAfter - (Whether a separator should be inserted after this menu item.)
-	enableFor - (System state that the action should be enabled for. See {@link ActionEnableSupport} for more detail.)
-	accelerator - (Accelerator key bindings.)
-	menuGravity - (Float value with 0.0 representing the top and larger values moving towards the bottom of the menu.)
-	toolBarGravity - (Float value with 0.0 representing the top and larger values moving towards the bottom of the toolbar.)*/
-	private void configureZoomRectProperties(Map<String, String> configProps){
-
-		String iconName = ResourceManager.getManager().getString("command.ZoomToRect");		
-		
-		configProps.put("title", iconName);
-		//configProps.put("preferredMenu", preferredMenu);
-		configProps.put("largeIconURL", "/images/ZoomToFabricRect24.gif");
-		//configProps.put("smallIconURL", smallIconURL);
-		configProps.put("tooltip", iconName);
-		configProps.put("inToolBar", new Boolean(true).toString());
-		configProps.put("inMenuBar", new Boolean(false).toString());
-		configProps.put("insertSeparatorBefore", new Boolean(false).toString());
-		configProps.put("insertSeparatorAfter", new Boolean(false).toString());
-		configProps.put("enableFor", ActionEnableSupport.ENABLE_FOR_NETWORK_AND_VIEW);
-		//configProps.put("accelerator", accelerator);//custom key binding
-		//configProps.put("menuGravity", new Float(5).toString());
-		configProps.put("toolBarGravity", new Float(5).toString());			
-	}
-	
-	private void configureProperties(String title, String preferredMenu, String largeIconURL, String smallIconURL, String tooltip,
-			String inToolBar, String inMenuBar, String insertSeparatorBefore, String insertSeparatorAfter, String enableFor,
-			String accelerator, String menuGravity, String toolBarGravity, Map<String, String> configProps){
-		
-		configProps.put("title", title);
-		configProps.put("preferredMenu", preferredMenu);
-		configProps.put("largeIconURL", largeIconURL);
-		configProps.put("smallIconURL", smallIconURL);
-		configProps.put("tooltip", tooltip);
-		configProps.put("inToolBar", inToolBar);
-		configProps.put("inMenuBar", inMenuBar);
-		configProps.put("insertSeparatorBefore", insertSeparatorBefore);
-		configProps.put("insertSeparatorAfter", insertSeparatorAfter);
-		configProps.put("enableFor", enableFor);
-		configProps.put("accelerator", accelerator);
-		configProps.put("menuGravity", menuGravity);
-		configProps.put("toolBarGravity", toolBarGravity);			
-	}
-	
-	
+	}	
 }
 

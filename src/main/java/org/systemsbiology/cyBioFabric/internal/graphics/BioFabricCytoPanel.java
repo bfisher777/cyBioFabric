@@ -37,9 +37,9 @@ public class BioFabricCytoPanel extends JPanel implements CytoPanelComponent {
 	private String name = "BioFabric Magnifier Control and Tour Control";	
 	
 	public BioFabricCytoPanel(){
-		this.setLayout(new GridLayout());
+		this.setLayout(new BorderLayout());
 		this.setBorder(new LineBorder(Color.black, 2));
-	    Font labelFont = new Font("SansSerif", Font.BOLD, 15);
+	    Font labelFont = new Font("SansSerif", Font.BOLD, 10);
 	    JLabel magLab = new JLabel(ResourceManager.getManager().getString("cytoPanel.default"));
 	    magLab.setBorder(new EmptyBorder(0, 5, 0, 0));
 	    magLab.setOpaque(true);

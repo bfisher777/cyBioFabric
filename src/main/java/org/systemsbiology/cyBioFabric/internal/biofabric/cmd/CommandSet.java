@@ -2859,7 +2859,7 @@ public class CommandSet implements ZoomChangeTracker, SelectionChangeListener, F
         URL ugif = getClass().getResource("/images/FIXME24.gif");  
         putValue(Action.SMALL_ICON, new ImageIcon(ugif));
       } else {
-        char mnem = rMan.getChar((doWeights) ? "command.LoadSIFWithWeightsMnem" :"command.LoadSIFMnem"); 
+        char mnem = rMan.getChar((doWeights) ? "command.LoadSIFWithWeightsMnem" :"command.LoadSIFMnem"); //TODO added command.LoadSIFWithWeightsMnem to properties
         putValue(Action.MNEMONIC_KEY, Integer.valueOf(mnem)); 
       }
       doWeights_ = doWeights;

@@ -236,6 +236,7 @@ public class BioFabricOverview extends JPanel {
     }
     if (currSize_ == null) {
       currSize_ = getSize();
+      System.out.println("BioFabricOverview resizeImage, Current Size: " + currSize_.toString());//TODO added 3 print statements
     }
     //
     // Don't do this step if the overview is not currently bring displayed
@@ -244,7 +245,9 @@ public class BioFabricOverview extends JPanel {
       return;
     }
     double imgAR = (double)img_.getWidth() / (double)img_.getHeight();
+    System.out.println("BioFabricOverview aspect ratio, imageAR: " + imgAR);
     double panelAR = currSize_.getWidth() / currSize_.getHeight();
+    System.out.println("BioFabricOverview aspect ratio, panelAR: " + panelAR);
     int imgHeight;
     int imgWidth;
     int startX;

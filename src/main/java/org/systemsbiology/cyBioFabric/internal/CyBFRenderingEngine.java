@@ -6,6 +6,7 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.print.PageFormat;
@@ -136,11 +137,9 @@ public class CyBFRenderingEngine implements RenderingEngine<CyNetwork>, Printabl
 			
 			//TODO: figure out how to scale this to fit the container properly
 			BioFabricWindow bioFabricWindow = bioFabricApplication.getBioFabricWindow();
-			BioFabricOverview overView = bioFabricWindow.getThumbnailView();
-
+			BioFabricOverview overView = bioFabricWindow.getThumbnailView();						
 			container.setLayout(new BorderLayout());			
-			container.add(overView, BorderLayout.CENTER);			
-			
+			container.add(overView);			
 		}else if(configuration instanceof BirdsEyeGraphicsConfiguration){			
 			BioFabricWindow bioFabricWindow = bioFabricApplication.getBioFabricWindow();
 			
@@ -182,7 +181,7 @@ public class CyBFRenderingEngine implements RenderingEngine<CyNetwork>, Printabl
 	 * 
 	 * */
 	private void registerViewListeners(BioFabricZoomInListener zoomIn, ApplyPreferredLayoutListener applyLayout,
-			BioFabricZoomOutListener zoomOut, BioFabricFitContentListener fitContent){		
+		BioFabricZoomOutListener zoomOut, BioFabricFitContentListener fitContent){		
 		networkView.addBioFabricViewListener(zoomIn);
 		networkView.addBioFabricViewListener(zoomOut);
 		networkView.addBioFabricViewListener(fitContent);	
