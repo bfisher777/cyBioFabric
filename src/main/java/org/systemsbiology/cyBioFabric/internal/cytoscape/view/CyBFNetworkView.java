@@ -148,20 +148,27 @@ public class CyBFNetworkView extends CyBFView<CyNetwork> implements CyNetworkVie
 	public void fitSelected() {		
 		
 		System.out.println("fitSelected has been called");
-		//Get the selected nodes and edges
-		List<CyNode> selectedNodes = CyTableUtil.getNodesInState(network, "selected", true);
-		List<CyEdge> selectedEdges = CyTableUtil.getEdgesInState(network, "selected", true);
-		
-		BioFabricWindow bioFabricWindow = bioFabricApplication.getBioFabricWindow();
-		
-		if(bioFabricWindow != null){
-			bioFabricWindow.getFabricPanel().selectFromCytoscape(selectedNodes, selectedEdges);
+		for(BioFabricViewListenerInterface bFVL : this.bioFabricViewListeners){								
+			if((bFVL instanceof BioFabricZoomSelectedListenerInterface) ){				
+				((BioFabricZoomSelectedListenerInterface)bFVL).performZoomSelected();				
+			}
 		}
+		
 	}
 
+	/*
+	 * Update view is called by the various Cytoscape TaskFactories that manage various events. 
+	 * This method is called when some property has changed, either a view or table property
+	 * This method will handle two broad categories, zoom events and selection events.
+	 * Will handle these by checking for zoom events and then if the event wasn't found we
+	 * assume a selection event triggered the call and so update selections and repaint 
+	 * Add and delete node / edges events will be handled by another listener handler registered 
+	 * in the CyActivator class.
+	 * */
 	@Override
-	public void updateView() {		
-		System.out.println("updateView has been called");
+	public void updateView() {
+		boolean eventHandled = false;
+				
 		matchNodes();
 		matchEdges();				
 		
@@ -170,8 +177,22 @@ public class CyBFNetworkView extends CyBFView<CyNetwork> implements CyNetworkVie
 		}
 		
 		for(BioFabricViewListenerInterface bFVL : this.bioFabricViewListeners){			
-			fireAway(bFVL);
+			eventHandled = fireAway(bFVL);
 		}
+		
+		if(!eventHandled){
+			//Get the selected nodes and edges
+			List<CyNode> selectedNodes = CyTableUtil.getNodesInState(network, "selected", true);
+			List<CyEdge> selectedEdges = CyTableUtil.getEdgesInState(network, "selected", true);
+			
+			BioFabricWindow bioFabricWindow = bioFabricApplication.getBioFabricWindow();
+			
+			if(bioFabricWindow != null){
+				bioFabricWindow.getFabricPanel().selectFromCytoscape(selectedNodes, selectedEdges);
+			}
+		}
+		
+		System.out.println("updateView has been called, eventHandled? " + eventHandled);
 	}
 	
 	// Checks if there is a discrepancy between number of nodes and nodeViews, attempts
@@ -338,33 +359,40 @@ public class CyBFNetworkView extends CyBFView<CyNetwork> implements CyNetworkVie
 		return CyBFNetworkViewRenderer.ID;
 	}
 	
-	private void fireAway(BioFabricViewListenerInterface bFVL){
+	private boolean fireAway(BioFabricViewListenerInterface bFVL){
 				
 		if((bFVL instanceof BioFabricZoomInListenerInterface) && zoomInChanged()){			
 			
 			((BioFabricZoomInListenerInterface)bFVL).performZoomIn();
+			return true;
 			
 		}else if((bFVL instanceof BioFabricZoomOutListenerInterface) && zoomOutChanged()){			
 			
 			((BioFabricZoomOutListenerInterface)bFVL).performZoomOut();
+			return true;
 			
 		}else if((bFVL instanceof ApplyPreferredLayoutListenerInterface) && refreshChanged()){
 			
 			((ApplyPreferredLayoutListenerInterface)bFVL).performApplyLayout();
+			return true;
 			
 		}else if((bFVL instanceof BioFabricFitContentListenerInterface) && fitContentChanged()){
 			
 			((BioFabricFitContentListenerInterface)bFVL).performFitContent();
+			return true;
 			
 		}else if((bFVL instanceof BioFabricZoomAllNetworkListenerInterface) && zoomAllNetworkChanged()){
 			
 			((BioFabricZoomAllNetworkListenerInterface)bFVL).performZoomAllNetwork();
+			return true;
 			
 		}else if((bFVL instanceof BioFabricZoomSelectedListenerInterface) && zoomSelectedChanged()){
 			
 			((BioFabricZoomSelectedListenerInterface)bFVL).performZoomSelected();
+			return true;
 			
 		}
+		return false;
 	}
 
 	private boolean zoomInChanged(){

@@ -133,7 +133,8 @@ public class CyActivator extends AbstractCyActivator {
 		
 		//Add image icons(buttons / items) to toolbar	
 		ArrayList<BioFabricImageIcon> buttons = new ArrayList<BioFabricImageIcon>();
-		registerService(context, bioFabricActionIconBuilder.buildAZoomRectButton(buttons), CyAction.class, new Properties());		
+		registerService(context, bioFabricActionIconBuilder.buildAZoomRectButton(buttons), CyAction.class, new Properties());
+		registerService(context, bioFabricActionIconBuilder.buildACancelButton(buttons), CyAction.class, new Properties());
 		registerService(context, bioFabricActionIconBuilder.buildACenterOnPreviousButton(buttons), CyAction.class, new Properties());
 		registerService(context, bioFabricActionIconBuilder.buildAZoomToCurrentButton(buttons), CyAction.class, new Properties());
 		registerService(context, bioFabricActionIconBuilder.buildACenterOnNextButton(buttons), CyAction.class, new Properties());

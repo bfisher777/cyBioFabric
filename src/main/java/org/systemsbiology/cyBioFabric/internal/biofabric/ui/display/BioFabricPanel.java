@@ -458,7 +458,7 @@ public class BioFabricPanel extends JPanel implements ZoomTarget, ZoomPresentati
 		}
 	  
 		for(String node : currNodeSelections_){
-			addCyNodeSelection(node);
+			removeCyNodeSelection(node);
 		}
 		  
 	    currLinkSelections_.clear();

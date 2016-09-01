@@ -579,7 +579,7 @@ public class BioFabricWindow extends JInternalFrame implements BackgroundWorkerC
     //toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.ZOOM_IN)));
     //toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.ZOOM_TO_MODEL)));
     //toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.ZOOM_TO_RECT)));    
-    toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.ZOOM_TO_SELECTIONS)));
+    //toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.ZOOM_TO_SELECTIONS)));
     //toolBar.addSeparator();
     //toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.CENTER_ON_PREVIOUS_SELECTION)));
     //toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.ZOOM_TO_CURRENT_SELECTION)));
@@ -588,7 +588,7 @@ public class BioFabricWindow extends JInternalFrame implements BackgroundWorkerC
     toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.ADD_FIRST_NEIGHBORS)));
     //toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.CLEAR_SELECTIONS)));
     //toolBar.addSeparator();        
-    toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.CANCEL)));
+    //toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.CANCEL)));
     //toolBar.addSeparator();    
     //toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.SEARCH)));
     if (isMain) {

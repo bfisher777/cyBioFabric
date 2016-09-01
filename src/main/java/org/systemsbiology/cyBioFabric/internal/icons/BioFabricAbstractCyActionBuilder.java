@@ -67,6 +67,29 @@ public class BioFabricAbstractCyActionBuilder {
 		return zoomToCurrentAction;	
 	}
 	
+	public ToolBarCancel buildACancelButton(ArrayList<BioFabricImageIcon> buttons){
+		Map<String, String> configProps = new HashMap<String, String>();
+		String title = ResourceManager.getManager().getString("exportDialog.cancel");
+		String preferredMenu = null;
+		String largeIconURL = "/images/Stop24.gif";
+		String smallIconURL = null;
+		String tooltip = title; 
+		String inMenuBar = Boolean.valueOf(false).toString(); 
+		String inToolBar = Boolean.valueOf(true).toString(); 
+		String insertSeparatorBefore = Boolean.valueOf(false).toString();
+		String insertSeparatorAfter = Boolean.valueOf(false).toString();
+		String enableFor = ActionEnableSupport.ENABLE_FOR_NETWORK_AND_VIEW; 
+		String accelerator = null; 
+		String menuGravity = null; 
+		String toolBarGravity = Float.valueOf(5.02f).toString();
+		
+		configureZoomRectProperties(configProps, title, preferredMenu, largeIconURL, smallIconURL, tooltip, inMenuBar, inToolBar,
+				insertSeparatorBefore, insertSeparatorAfter, enableFor, accelerator, menuGravity, toolBarGravity);
+		ToolBarCancel cancelAction = new ToolBarCancel(configProps, applicationManager, networkViewManager, taskFactoryPredicate);
+		buttons.add(cancelAction);
+		return cancelAction;	
+	}
+	
 	public ToolBarClearSelectionsAction buildAClearSelectionsButton(ArrayList<BioFabricImageIcon> buttons){
 		Map<String, String> configProps = new HashMap<String, String>();
 		String title = ResourceManager.getManager().getString("command.ClearSel");

@@ -44,6 +44,8 @@ import org.systemsbiology.cyBioFabric.internal.cytoscape.view.listeners.ApplyPre
 import org.systemsbiology.cyBioFabric.internal.cytoscape.view.listeners.BioFabricFitContentListener;
 import org.systemsbiology.cyBioFabric.internal.cytoscape.view.listeners.BioFabricZoomInListener;
 import org.systemsbiology.cyBioFabric.internal.cytoscape.view.listeners.BioFabricZoomOutListener;
+import org.systemsbiology.cyBioFabric.internal.cytoscape.view.listeners.BioFabricZoomSelectedListener;
+import org.systemsbiology.cyBioFabric.internal.cytoscape.view.listeners.BioFabricZoomSelectedListenerInterface;
 import org.systemsbiology.cyBioFabric.internal.events.BioFabricNetworkViewAddedHandler;
 import org.systemsbiology.cyBioFabric.internal.events.BioFabricNetworkViewToBeDestroyedHandler;
 import org.systemsbiology.cyBioFabric.internal.graphics.BirdsEyeGraphicsConfiguration;
@@ -129,7 +131,7 @@ public class CyBFRenderingEngine implements RenderingEngine<CyNetwork>, Printabl
 			//listen for cytoscape button and menu events and pass along to biofabric
 			registerViewListeners(new BioFabricZoomInListener(name), 
 					new ApplyPreferredLayoutListener(networkView, layoutAlgorithmManager.getDefaultLayout(), layoutAlgorithmManager, taskManager),
-					new BioFabricZoomOutListener(name), new BioFabricFitContentListener(name));															
+					new BioFabricZoomOutListener(name), new BioFabricFitContentListener(name), new BioFabricZoomSelectedListener(name));															
 			
 			resetDefaultLayout(layoutAlgorithmManager, defaultLayout);		
 			
@@ -182,11 +184,12 @@ public class CyBFRenderingEngine implements RenderingEngine<CyNetwork>, Printabl
 	 * 
 	 * */
 	private void registerViewListeners(BioFabricZoomInListener zoomIn, ApplyPreferredLayoutListener applyLayout,
-		BioFabricZoomOutListener zoomOut, BioFabricFitContentListener fitContent){		
+		BioFabricZoomOutListener zoomOut, BioFabricFitContentListener fitContent, BioFabricZoomSelectedListenerInterface zoomSelected){		
 		networkView.addBioFabricViewListener(zoomIn);
 		networkView.addBioFabricViewListener(zoomOut);
 		networkView.addBioFabricViewListener(fitContent);	
 		networkView.addBioFabricViewListener(applyLayout);
+		networkView.addBioFabricViewListener(zoomSelected);
 	}
 	
 	/* 
