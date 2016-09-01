@@ -56,6 +56,11 @@ import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
 
+import org.cytoscape.model.CyEdge;
+import org.cytoscape.model.CyNetwork;
+import org.cytoscape.model.CyNode;
+import org.cytoscape.view.model.CyNetworkView;
+import org.cytoscape.view.model.View;
 import org.systemsbiology.cyBioFabric.internal.biofabric.app.BioFabricApplication;
 import org.systemsbiology.cyBioFabric.internal.biofabric.app.BioFabricWindow;
 import org.systemsbiology.cyBioFabric.internal.biofabric.cmd.CommandSet;
@@ -88,6 +93,8 @@ import org.systemsbiology.cyBioFabric.internal.biofabric.util.MinMax;
 import org.systemsbiology.cyBioFabric.internal.biofabric.util.TaggedSet;
 import org.systemsbiology.cyBioFabric.internal.biofabric.util.UiUtil;
 import org.systemsbiology.cyBioFabric.internal.biofabric.util.UndoSupport;
+import org.systemsbiology.cyBioFabric.internal.cytoscape.view.BioFabricVisualLexicon;
+import org.systemsbiology.cyBioFabric.internal.task.PopupMenuCreator;
 
 /****************************************************************************
 **
@@ -189,6 +196,7 @@ public class BioFabricPanel extends JPanel implements ZoomTarget, ZoomPresentati
   private Map<String, Rectangle2D> nodeNameLocations_;
   private Map<String, Rectangle2D> drainNameLocations_;
   private PopupMenuControl popCtrl_;
+  //private PopupMenuCreator popupMenuCreator_;//TODO added this
   private static final long serialVersionUID = 1L;
   
   ////////////////////////////////////////////////////////////////////////////
@@ -251,6 +259,7 @@ public class BioFabricPanel extends JPanel implements ZoomTarget, ZoomPresentati
     cursorMgr_ = new CursorManager(this, false);
     worldDim_ = new Dimension(100, 100);
     popCtrl_ = new PopupMenuControl(this);
+    //popupMenuCreator_ = new PopupMenuCreator(bfw.getDialogTaskManager());//TODO added this
   }
 
   ////////////////////////////////////////////////////////////////////////////
@@ -443,15 +452,29 @@ public class BioFabricPanel extends JPanel implements ZoomTarget, ZoomPresentati
      return;
    }
 
+   private void clearSelectionSets(){
+		for(FabricLink link : currLinkSelections_){			
+			removeCyEdgeSelection(link);
+		}
+	  
+		for(String node : currNodeSelections_){
+			addCyNodeSelection(node);
+		}
+		  
+	    currLinkSelections_.clear();
+	    currNodeSelections_.clear();
+	    currColSelections_.clear();
+   }
+   
   /***************************************************************************
   ** TODO: make compatible with Cytoscape
   ** Get detail panel
   */
 
-  public void clearSelections() { 
-    currLinkSelections_.clear();
-    currNodeSelections_.clear();
-    currColSelections_.clear();
+  public void clearSelections() { 	  
+	
+	clearSelectionSets();  
+    
     targetList_.clear();
     linkList_.clear();
     floaterSet_.currSelRect = null;
@@ -467,15 +490,61 @@ public class BioFabricPanel extends JPanel implements ZoomTarget, ZoomPresentati
   }
   
   /***************************************************************************
+   ** TODO added this as a way to update biofabric with cytoscape selection events
+   ** Called from fitSelected methond in CyBFNetworkView class 
+   ** Get detail panel
+   */
+
+   public void selectFromCytoscape(List<CyNode> nodes, List<CyEdge> edges) { 
+     if (!doBuildSelect_) {
+       clearSelectionSets();
+       currSel_ = -1;
+       floaterSet_.currSelRect = null;
+     }
+
+     Iterator<CyNode> nodesIt = nodes.iterator();
+     while (nodesIt.hasNext()) {
+       CyNode selection = nodesIt.next();
+       String name = bfn_.networkView.getModel().getRow(selection).get(CyNetwork.NAME, String.class);
+       BioFabricNetwork.NodeInfo tni = bfn_.getNodeDefinition(name);
+       if (tni != null) {        
+         currNodeSelections_.add(name);
+       }
+     }
+     
+     Iterator<CyEdge> edgesIt = edges.iterator();
+     while (edgesIt.hasNext()) {
+       CyEdge edgeModel = edgesIt.next();       
+	   CyNode nodeSource = edgeModel.getSource();
+	   CyNode nodeTarget = edgeModel.getTarget();
+	   //set source, target and relationship
+	   //String source = nodeSource.getSUID().toString();	
+	   //String target = nodeTarget.getSUID().toString();
+	   
+	   String source = bfn_.networkView.getModel().getRow(nodeSource).get(CyNetwork.NAME, String.class);
+	   String target = bfn_.networkView.getModel().getRow(nodeTarget).get(CyNetwork.NAME, String.class);
+	  
+	   String rel = bfn_.networkView.getModel().getRow(edgeModel).get(CyEdge.INTERACTION, String.class);//name of the edge?	
+       
+       String name = bfn_.networkView.getModel().getRow(edgeModel).get(CyNetwork.NAME, String.class);
+       FabricLink nextLink = new FabricLink(source, target, rel, false, edgeModel.getSUID(), nodeSource.getSUID(), nodeTarget.getSUID());
+             
+       currLinkSelections_.add(nextLink);       
+     }
+     
+
+     buildSelectionGeometry(null, null);
+     return;
+   }
+  
+  /***************************************************************************
   ** 
   ** Get detail panel
   */
 
   public void selectFromGaggle(SelectionSupport.SelectionsForSpecies sfs) { 
     if (!doBuildSelect_) {
-      currLinkSelections_.clear();
-      currNodeSelections_.clear();
-      currColSelections_.clear();
+      clearSelectionSets();
       currSel_ = -1;
       floaterSet_.currSelRect = null;
     }
@@ -585,9 +654,7 @@ public class BioFabricPanel extends JPanel implements ZoomTarget, ZoomPresentati
     
     FabricGooseInterface goose = FabricGooseManager.getManager().getGoose();
     if (doDiscard) {
-      currLinkSelections_.clear();
-      currNodeSelections_.clear();
-      currColSelections_.clear();
+      clearSelectionSets();
       currSel_ = -1;
       floaterSet_.currSelRect = null;
     }       
@@ -600,6 +667,10 @@ public class BioFabricPanel extends JPanel implements ZoomTarget, ZoomPresentati
     }
     
     currNodeSelections_.addAll(results);
+    for(String node : results){//TODO added selected nodes here make sure this is correct
+		addCyNodeSelection(node);
+	}
+    
     if ((goose != null) && goose.isActivated()) {
       gaggleSelectionSupport(goose);
     }  
@@ -2012,7 +2083,7 @@ public class BioFabricPanel extends JPanel implements ZoomTarget, ZoomPresentati
  }
   
   /***************************************************************************
-  **
+  ** TODO added code to add and remove cynodes and cyedges
   ** Run the selection logic
   */  
   
@@ -2096,11 +2167,13 @@ public class BioFabricPanel extends JPanel implements ZoomTarget, ZoomPresentati
             if ((col >= range.min) && (col <= range.max)) {
               if (nodes.contains(target)) {
                 nodes.remove(target);
+                removeCyNodeSelection(target);
               } else {
                 if (nodeRange != null) {
                   nodeRange.update(row);
                 }
                 nodes.add(target);
+                addCyNodeSelection(target);
                 nodeAdd = true;
               }
               gotIt = true;
@@ -2112,11 +2185,13 @@ public class BioFabricPanel extends JPanel implements ZoomTarget, ZoomPresentati
             if (nameLoc.contains(worldPt)) {
               if (nodes.contains(target)) {
                 nodes.remove(target);
+                removeCyNodeSelection(target);
               } else {
                 if (nodeRange != null) {
                   nodeRange.update(row);
                 }
                 nodes.add(target);
+                addCyNodeSelection(target);
                 nodeAdd = true;
               }
             }
@@ -2139,10 +2214,14 @@ public class BioFabricPanel extends JPanel implements ZoomTarget, ZoomPresentati
             String trg = bfn_.getTargetForColumn(colObj, showShadows);
             if (removeIt) {
               links.remove(linf.getLink());
+              removeCyEdgeSelection(linf.getLink());
             } else {
               links.add(linf.getLink().clone());
+              addCyEdgeSelection(linf.getLink());
               nodes.add(src);
+              addCyNodeSelection(src);
               nodes.add(trg);
+              addCyNodeSelection(trg);
             } 
             gotLink = true;
           }
@@ -2153,12 +2232,14 @@ public class BioFabricPanel extends JPanel implements ZoomTarget, ZoomPresentati
     if (!gotLink && (gotDrain != null)) {
       if (nodes.contains(gotDrain)) {
         nodes.remove(gotDrain);
+        removeCyNodeSelection(gotDrain);
       } else {
         if (nodeRange != null) {
           int row = bfn_.getNodeDefinition(gotDrain).nodeRow;
           nodeRange.update(row);
         }
         nodes.add(gotDrain);
+        addCyNodeSelection(gotDrain);
         nodeAdd = true;
       }   
     }
@@ -2172,8 +2253,11 @@ public class BioFabricPanel extends JPanel implements ZoomTarget, ZoomPresentati
           String trg = bfn_.getTargetForColumn(colObj, showShadows);
           BioFabricNetwork.LinkInfo linf = bfn_.getLinkDefinition(colObj, showShadows);
           links.add(linf.getLink().clone());
+          addCyEdgeSelection(linf.getLink());
           nodes.add(src);
+          addCyNodeSelection(src);
           nodes.add(trg);
+          addCyNodeSelection(trg);
         }
       }
      if (nodeAdd && (nodeRange.min != Integer.MAX_VALUE)) {
@@ -2181,14 +2265,91 @@ public class BioFabricPanel extends JPanel implements ZoomTarget, ZoomPresentati
           Integer rowObj = Integer.valueOf(i);
           String target = bfn_.getNodeForRow(rowObj);
           nodes.add(target);
+          addCyNodeSelection(target);
         }
       }
     } 
     return;
   }
   
+  private void addCyNodeSelection(String node){//TODO added selected nodes here make sure this is correct
+	
+	NodeInfo nodeInfo = bfn_.getNodeDefinition(node);		
+	
+	if(bfn_.networkView != null){
+		long nodeSUID = nodeInfo.getNodeSUID();
+		CyNode cyNode = bfn_.networkView.getModel().getNode(nodeSUID); 
+    	  
+    	Boolean isSelected = bfn_.networkView.getModel().getRow(cyNode).get(CyNetwork.SELECTED, Boolean.class);
+    	
+    	if(!isSelected){
+    		//set node row table value
+    		bfn_.networkView.getModel().getRow(cyNode).set(CyNetwork.SELECTED, true);      	
+	    	//Set view model
+	    	View<CyNode> view = bfn_.networkView.getNodeView(cyNode);
+	    	view.setVisualProperty(BioFabricVisualLexicon.NODE_SELECTED, true);
+    	}
+	}			
+  }
+  
+  private void addCyEdgeSelection(FabricLink edge){//TODO added selected edges here make sure this is correct
+	  	 		
+	if(bfn_.networkView != null){
+		long edgeSUID = edge.getEdgeModelSUID();
+		CyEdge cyEdge = bfn_.networkView.getModel().getEdge(edgeSUID); 
+    	  
+    	Boolean isSelected = bfn_.networkView.getModel().getRow(cyEdge).get(CyNetwork.SELECTED, Boolean.class);
+    	
+    	if(!isSelected){
+    		//set node row table value
+    		bfn_.networkView.getModel().getRow(cyEdge).set(CyNetwork.SELECTED, true);      	
+	    	//Set view model
+	    	View<CyEdge> view = bfn_.networkView.getEdgeView(cyEdge);
+	    	view.setVisualProperty(BioFabricVisualLexicon.NODE_SELECTED, true);
+    	}
+	}		
+  }
+  
+  private void removeCyNodeSelection(String node){//TODO remove selected nodes here make sure this is correct
+		
+		NodeInfo nodeInfo = bfn_.getNodeDefinition(node);		
+		
+		if(bfn_.networkView != null){
+			long nodeSUID = nodeInfo.getNodeSUID();
+			CyNode cyNode = bfn_.networkView.getModel().getNode(nodeSUID); 
+	    	  
+	    	Boolean isSelected = bfn_.networkView.getModel().getRow(cyNode).get(CyNetwork.SELECTED, Boolean.class);
+	    	
+	    	if(isSelected){
+	    		//set node row table value
+	    		bfn_.networkView.getModel().getRow(cyNode).set(CyNetwork.SELECTED, false);      	
+		    	//Set view model
+		    	View<CyNode> view = bfn_.networkView.getNodeView(cyNode);
+		    	view.setVisualProperty(BioFabricVisualLexicon.NODE_SELECTED, false);
+	    	}
+		}			
+	  }
+	  
+	  private void removeCyEdgeSelection(FabricLink edge){//TODO remove selected edges here make sure this is correct
+		  	 		
+		if(bfn_.networkView != null){
+			long edgeSUID = edge.getEdgeModelSUID();
+			CyEdge cyEdge = bfn_.networkView.getModel().getEdge(edgeSUID); 
+	    	  
+	    	Boolean isSelected = bfn_.networkView.getModel().getRow(cyEdge).get(CyNetwork.SELECTED, Boolean.class);
+	    	
+	    	if(isSelected){
+	    		//set node row table value
+	    		bfn_.networkView.getModel().getRow(cyEdge).set(CyNetwork.SELECTED, false);      	
+		    	//Set view model
+		    	View<CyEdge> view = bfn_.networkView.getEdgeView(cyEdge);
+		    	view.setVisualProperty(BioFabricVisualLexicon.NODE_SELECTED, false);
+	    	}
+		}		
+	  }
+  
   /***************************************************************************
-  **
+  ** TODO understand this
   ** Build needed selection geometry
   */  
   
@@ -2561,13 +2722,15 @@ public class BioFabricPanel extends JPanel implements ZoomTarget, ZoomPresentati
       return;
     }  
 
+    //TODO understand this
     private void handleClick(int lastX, int lastY, boolean shiftPressed) {    
       Point loc = new Point(lastX, lastY);
       Point rcp = transToRowCol(loc);
       handleSelection(rcp, null, loc, true, shiftPressed);
       return;
     }
-     
+
+    //TODO understand this
     private void handleSelection(Point rcbp, Rectangle rect, Point sloc, boolean onePt, boolean shiftPressed) {
       if (bfn_ == null) {
         return;
@@ -2631,9 +2794,7 @@ public class BioFabricPanel extends JPanel implements ZoomTarget, ZoomPresentati
       }
           
       if (!doBuildSelect_) {
-        currLinkSelections_.clear();
-        currNodeSelections_.clear();
-        currColSelections_.clear();
+    	clearSelectionSets();
         currSel_ = -1;
         floaterSet_.currSelRect = null;
       }
@@ -2771,6 +2932,7 @@ public class BioFabricPanel extends JPanel implements ZoomTarget, ZoomPresentati
       return;
     }
     
+    //TODO need to add a familiar Cytoscape popup
     private void triggerPopup(int x, int y, Point screenAbs) {
       try {
         Point loc = new Point(x, y);

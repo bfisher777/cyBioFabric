@@ -137,7 +137,7 @@ public class CyActivator extends AbstractCyActivator {
 		registerService(context, bioFabricActionIconBuilder.buildACenterOnPreviousButton(buttons), CyAction.class, new Properties());
 		registerService(context, bioFabricActionIconBuilder.buildAZoomToCurrentButton(buttons), CyAction.class, new Properties());
 		registerService(context, bioFabricActionIconBuilder.buildACenterOnNextButton(buttons), CyAction.class, new Properties());
-		registerService(context, bioFabricActionIconBuilder.buildASearchButton(buttons), CyAction.class, new Properties());
+		//registerService(context, bioFabricActionIconBuilder.buildASearchButton(buttons), CyAction.class, new Properties());
 		registerService(context, bioFabricActionIconBuilder.buildAClearSelectionsButton(buttons), CyAction.class, new Properties());		
 		//create menu items for CyBioFabric		
 		registerService(context, bioFabricActionIconBuilder.buildAImportWithEdgeWeightsMenuItem(buttons), CyAction.class, new Properties());

@@ -13,6 +13,7 @@ import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyIdentifiable;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
+import org.cytoscape.model.CyTableUtil;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.model.VisualLexicon;
@@ -22,6 +23,7 @@ import org.cytoscape.view.vizmap.VisualMappingManager;
 import org.cytoscape.view.vizmap.VisualStyle;
 import org.systemsbiology.cyBioFabric.internal.CyBFNetworkViewRenderer;
 import org.systemsbiology.cyBioFabric.internal.biofabric.app.BioFabricApplication;
+import org.systemsbiology.cyBioFabric.internal.biofabric.app.BioFabricWindow;
 import org.systemsbiology.cyBioFabric.internal.cytoscape.view.CyBFEdgeView;
 import org.systemsbiology.cyBioFabric.internal.cytoscape.view.CyBFNodeView;
 import org.systemsbiology.cyBioFabric.internal.cytoscape.view.CyBFView;
@@ -145,31 +147,21 @@ public class CyBFNetworkView extends CyBFView<CyNetwork> implements CyNetworkVie
 	@Override
 	public void fitSelected() {		
 		
-		// Obtain selected nodes
-		Set<View<CyNode>> selectedNodeViews = new HashSet<View<CyNode>>();
+		System.out.println("fitSelected has been called");
+		//Get the selected nodes and edges
+		List<CyNode> selectedNodes = CyTableUtil.getNodesInState(network, "selected", true);
+		List<CyEdge> selectedEdges = CyTableUtil.getEdgesInState(network, "selected", true);
 		
-		for (View<CyNode> nodeView : getNodeViews()) {
-			if (nodeView.getVisualProperty(BasicVisualLexicon.NODE_SELECTED)) {
-				selectedNodeViews.add(nodeView);
-			}
+		BioFabricWindow bioFabricWindow = bioFabricApplication.getBioFabricWindow();
+		
+		if(bioFabricWindow != null){
+			bioFabricWindow.getFabricPanel().selectFromCytoscape(selectedNodes, selectedEdges);
 		}
-		
-		if (selectedNodeViews.isEmpty()) {
-			return;
-		}
-		
-		// MKTODO 
-//		if (networkCamera != null) {
-//			NetworkToolkit.fitInView(networkCamera, selectedNodeViews, 180.0, 2.3, 1.8);
-//		}
-		
-		// Request focus for the network view to be ready for keyboard input
-//		requestNetworkFocus();
 	}
 
 	@Override
 	public void updateView() {		
-		
+		System.out.println("updateView has been called");
 		matchNodes();
 		matchEdges();				
 		

@@ -14,14 +14,14 @@ String preferredMenu = null;
 String largeIconURL = "/images/Back24.gif";
 String smallIconURL = null;
 String tooltip = title; 
-String inMenuBar = new Boolean(false).toString(); 
-String inToolBar = new Boolean(true).toString(); 
-String insertSeparatorBefore = new Boolean(true).toString();
-String insertSeparatorAfter = new Boolean(false).toString();
+String inMenuBar = Boolean.valueOf(false).toString(); 
+String inToolBar = Boolean.valueOf(true).toString(); 
+String insertSeparatorBefore = Boolean.valueOf(true).toString();
+String insertSeparatorAfter = Boolean.valueOf(false).toString();
 String enableFor = ActionEnableSupport.ENABLE_FOR_NETWORK_AND_VIEW; 
 String accelerator = null; 
 String menuGravity = null; 
-String toolBarGravity = new Float(5.01).toString();*/
+String toolBarGravity = Float.valueOf(5.01).toString();*/
 /*
  * Class is responsible for building the biofabric menu items and toolbar items
  * */
@@ -51,14 +51,14 @@ public class BioFabricAbstractCyActionBuilder {
 		String largeIconURL = "/images/ZoomToFabricSelected24.gif";
 		String smallIconURL = null;
 		String tooltip = title; 
-		String inMenuBar = new Boolean(false).toString(); 
-		String inToolBar = new Boolean(true).toString(); 
-		String insertSeparatorBefore = new Boolean(false).toString();
-		String insertSeparatorAfter = new Boolean(false).toString();
+		String inMenuBar = Boolean.valueOf(false).toString(); 
+		String inToolBar = Boolean.valueOf(true).toString(); 
+		String insertSeparatorBefore = Boolean.valueOf(false).toString();
+		String insertSeparatorAfter = Boolean.valueOf(false).toString();
 		String enableFor = ActionEnableSupport.ENABLE_FOR_NETWORK_AND_VIEW; 
 		String accelerator = null; 
 		String menuGravity = null; 
-		String toolBarGravity = new Float(5.02).toString();
+		String toolBarGravity = Float.valueOf(5.02f).toString();
 		
 		configureZoomRectProperties(configProps, title, preferredMenu, largeIconURL, smallIconURL, tooltip, inMenuBar, inToolBar,
 				insertSeparatorBefore, insertSeparatorAfter, enableFor, accelerator, menuGravity, toolBarGravity);
@@ -74,14 +74,14 @@ public class BioFabricAbstractCyActionBuilder {
 		String largeIconURL = "/images/ClearFabricSelected24.gif";
 		String smallIconURL = null;
 		String tooltip = title; 
-		String inMenuBar = new Boolean(false).toString(); 
-		String inToolBar = new Boolean(true).toString(); 
-		String insertSeparatorBefore = new Boolean(false).toString();
-		String insertSeparatorAfter = new Boolean(true).toString();
+		String inMenuBar = Boolean.valueOf(false).toString(); 
+		String inToolBar = Boolean.valueOf(true).toString(); 
+		String insertSeparatorBefore = Boolean.valueOf(false).toString();
+		String insertSeparatorAfter = Boolean.valueOf(true).toString();
 		String enableFor = ActionEnableSupport.ENABLE_FOR_NETWORK_AND_VIEW; 
 		String accelerator = null; 
 		String menuGravity = null; 
-		String toolBarGravity = new Float(5.03).toString();
+		String toolBarGravity = Float.valueOf(5.03f).toString();
 		
 		configureZoomRectProperties(configProps, title, preferredMenu, largeIconURL, smallIconURL, tooltip, inMenuBar, inToolBar,
 				insertSeparatorBefore, insertSeparatorAfter, enableFor, accelerator, menuGravity, toolBarGravity);
@@ -97,14 +97,14 @@ public class BioFabricAbstractCyActionBuilder {
 		String largeIconURL = "/images/Forward24.gif";
 		String smallIconURL = null;
 		String tooltip = title; 
-		String inMenuBar = new Boolean(false).toString(); 
-		String inToolBar = new Boolean(true).toString(); 
-		String insertSeparatorBefore = new Boolean(false).toString();
-		String insertSeparatorAfter = new Boolean(true).toString();
+		String inMenuBar = Boolean.valueOf(false).toString(); 
+		String inToolBar = Boolean.valueOf(true).toString(); 
+		String insertSeparatorBefore = Boolean.valueOf(false).toString();
+		String insertSeparatorAfter = Boolean.valueOf(true).toString();
 		String enableFor = ActionEnableSupport.ENABLE_FOR_NETWORK_AND_VIEW; 
 		String accelerator = null; 
 		String menuGravity = null; 
-		String toolBarGravity = new Float(5.03).toString();
+		String toolBarGravity = Float.valueOf(5.03f).toString();
 		
 		configureZoomRectProperties(configProps, title, preferredMenu, largeIconURL, smallIconURL, tooltip, inMenuBar, inToolBar,
 				insertSeparatorBefore, insertSeparatorAfter, enableFor, accelerator, menuGravity, toolBarGravity);
@@ -120,14 +120,14 @@ public class BioFabricAbstractCyActionBuilder {
 		String largeIconURL = "/images/Back24.gif";
 		String smallIconURL = null;
 		String tooltip = title; 
-		String inMenuBar = new Boolean(false).toString(); 
-		String inToolBar = new Boolean(true).toString(); 
-		String insertSeparatorBefore = new Boolean(true).toString();
-		String insertSeparatorAfter = new Boolean(false).toString();
+		String inMenuBar = Boolean.valueOf(false).toString(); 
+		String inToolBar = Boolean.valueOf(true).toString(); 
+		String insertSeparatorBefore = Boolean.valueOf(true).toString();
+		String insertSeparatorAfter = Boolean.valueOf(false).toString();
 		String enableFor = ActionEnableSupport.ENABLE_FOR_NETWORK_AND_VIEW; 
 		String accelerator = null; 
 		String menuGravity = null; 
-		String toolBarGravity = new Float(5.01).toString();
+		String toolBarGravity = Float.valueOf(5.01f).toString();
 		
 		configureZoomRectProperties(configProps, title, preferredMenu, largeIconURL, smallIconURL, tooltip, inMenuBar, inToolBar,
 				insertSeparatorBefore, insertSeparatorAfter, enableFor, accelerator, menuGravity, toolBarGravity);
@@ -143,14 +143,14 @@ public class BioFabricAbstractCyActionBuilder {
 		String largeIconURL = "/images/ZoomToFabricRect24.gif";
 		String smallIconURL = null;
 		String tooltip = title; 
-		String inMenuBar = new Boolean(false).toString(); 
-		String inToolBar = new Boolean(true).toString(); 
-		String insertSeparatorBefore = new Boolean(false).toString();
-		String insertSeparatorAfter = new Boolean(false).toString();
+		String inMenuBar = Boolean.valueOf(false).toString(); 
+		String inToolBar = Boolean.valueOf(true).toString(); 
+		String insertSeparatorBefore = Boolean.valueOf(false).toString();
+		String insertSeparatorAfter = Boolean.valueOf(false).toString();
 		String enableFor = ActionEnableSupport.ENABLE_FOR_NETWORK_AND_VIEW; 
 		String accelerator = null; 
 		String menuGravity = null; 
-		String toolBarGravity = new Float(5.00).toString();
+		String toolBarGravity = Float.valueOf(5.00f).toString();
 		
 		configureZoomRectProperties(configProps, title, preferredMenu, largeIconURL, smallIconURL, tooltip, inMenuBar, inToolBar,
 				insertSeparatorBefore, insertSeparatorAfter, enableFor, accelerator, menuGravity, toolBarGravity);
@@ -166,14 +166,14 @@ public class BioFabricAbstractCyActionBuilder {
 		String largeIconURL = "/images/Find24.gif";
 		String smallIconURL = null;
 		String tooltip = title; 
-		String inMenuBar = new Boolean(false).toString(); 
-		String inToolBar = new Boolean(true).toString(); 
-		String insertSeparatorBefore = new Boolean(true).toString();
-		String insertSeparatorAfter = new Boolean(true).toString();
+		String inMenuBar = Boolean.valueOf(false).toString(); 
+		String inToolBar = Boolean.valueOf(true).toString(); 
+		String insertSeparatorBefore = Boolean.valueOf(true).toString();
+		String insertSeparatorAfter = Boolean.valueOf(true).toString();
 		String enableFor = ActionEnableSupport.ENABLE_FOR_NETWORK_AND_VIEW; 
 		String accelerator = null; 
 		String menuGravity = null; 
-		String toolBarGravity = new Float(5.04).toString();
+		String toolBarGravity = Float.valueOf(5.04f).toString();
 		
 		configureZoomRectProperties(configProps, title, preferredMenu, largeIconURL, smallIconURL, tooltip, inMenuBar, inToolBar,
 				insertSeparatorBefore, insertSeparatorAfter, enableFor, accelerator, menuGravity, toolBarGravity);
@@ -195,13 +195,13 @@ public class BioFabricAbstractCyActionBuilder {
 		String largeIconURL = null;
 		String smallIconURL = null;
 		String tooltip = title; 
-		String inMenuBar = new Boolean(true).toString(); 
-		String inToolBar = new Boolean(false).toString(); 
-		String insertSeparatorBefore = new Boolean(false).toString();
-		String insertSeparatorAfter = new Boolean(false).toString();
+		String inMenuBar = Boolean.valueOf(true).toString(); 
+		String inToolBar = Boolean.valueOf(false).toString(); 
+		String insertSeparatorBefore = Boolean.valueOf(false).toString();
+		String insertSeparatorAfter = Boolean.valueOf(false).toString();
 		String enableFor = ActionEnableSupport.ENABLE_FOR_NETWORK_AND_VIEW; 
 		String accelerator = null; 
-		String menuGravity = new Float(30).toString(); 
+		String menuGravity = Float.valueOf(30f).toString(); 
 		String toolBarGravity = null;
 		
 		configureZoomRectProperties(configProps, title, preferredMenu, largeIconURL, smallIconURL, tooltip, inMenuBar, inToolBar,
@@ -218,13 +218,13 @@ public class BioFabricAbstractCyActionBuilder {
 		String largeIconURL = null;
 		String smallIconURL = null;
 		String tooltip = title; 
-		String inMenuBar = new Boolean(true).toString(); 
-		String inToolBar = new Boolean(false).toString(); 
-		String insertSeparatorBefore = new Boolean(false).toString();
-		String insertSeparatorAfter = new Boolean(false).toString();
+		String inMenuBar = Boolean.valueOf(true).toString(); 
+		String inToolBar = Boolean.valueOf(false).toString(); 
+		String insertSeparatorBefore = Boolean.valueOf(false).toString();
+		String insertSeparatorAfter = Boolean.valueOf(false).toString();
 		String enableFor = ActionEnableSupport.ENABLE_FOR_NETWORK_AND_VIEW; 
 		String accelerator = null; 
-		String menuGravity = new Float(30).toString(); 
+		String menuGravity = Float.valueOf(30f).toString(); 
 		String toolBarGravity = null;
 		
 		configureZoomRectProperties(configProps, title, preferredMenu, largeIconURL, smallIconURL, tooltip, inMenuBar, inToolBar,
@@ -246,13 +246,13 @@ public class BioFabricAbstractCyActionBuilder {
 		String largeIconURL = null;
 		String smallIconURL = null;
 		String tooltip = title; 
-		String inMenuBar = new Boolean(true).toString(); 
-		String inToolBar = new Boolean(false).toString(); 
-		String insertSeparatorBefore = new Boolean(false).toString();
-		String insertSeparatorAfter = new Boolean(false).toString();
+		String inMenuBar = Boolean.valueOf(true).toString(); 
+		String inToolBar = Boolean.valueOf(false).toString(); 
+		String insertSeparatorBefore = Boolean.valueOf(false).toString();
+		String insertSeparatorAfter = Boolean.valueOf(false).toString();
 		String enableFor = ActionEnableSupport.ENABLE_FOR_NETWORK_AND_VIEW; 
 		String accelerator = null; 
-		String menuGravity = new Float(30).toString(); 
+		String menuGravity = Float.valueOf(30f).toString(); 
 		String toolBarGravity = null;
 		
 		configureZoomRectProperties(configProps, title, preferredMenu, largeIconURL, smallIconURL, tooltip, inMenuBar, inToolBar,
@@ -270,13 +270,13 @@ public class BioFabricAbstractCyActionBuilder {
 		String largeIconURL = null;
 		String smallIconURL = null;
 		String tooltip = ResourceManager.getManager().getString("cytoMenuItemTitle.unAccumulateTooltip"); 
-		String inMenuBar = new Boolean(true).toString(); 
-		String inToolBar = new Boolean(false).toString(); 
-		String insertSeparatorBefore = new Boolean(false).toString();
-		String insertSeparatorAfter = new Boolean(false).toString();
+		String inMenuBar = Boolean.valueOf(true).toString(); 
+		String inToolBar = Boolean.valueOf(false).toString(); 
+		String insertSeparatorBefore = Boolean.valueOf(false).toString();
+		String insertSeparatorAfter = Boolean.valueOf(false).toString();
 		String enableFor = ActionEnableSupport.ENABLE_FOR_NETWORK_AND_VIEW; 
 		String accelerator = null; 
-		String menuGravity = new Float(30).toString(); 
+		String menuGravity = Float.valueOf(30f).toString(); 
 		String toolBarGravity = null;
 				
 		configureZoomRectProperties(configProps, title, preferredMenu, largeIconURL, smallIconURL, tooltip, inMenuBar, inToolBar,
@@ -299,13 +299,13 @@ public class BioFabricAbstractCyActionBuilder {
 		String largeIconURL = null;
 		String smallIconURL = null;
 		String tooltip = title; 
-		String inMenuBar = new Boolean(true).toString(); 
-		String inToolBar = new Boolean(false).toString(); 
-		String insertSeparatorBefore = new Boolean(false).toString();
-		String insertSeparatorAfter = new Boolean(false).toString();
+		String inMenuBar = Boolean.valueOf(true).toString(); 
+		String inToolBar = Boolean.valueOf(false).toString(); 
+		String insertSeparatorBefore = Boolean.valueOf(false).toString();
+		String insertSeparatorAfter = Boolean.valueOf(false).toString();
 		String enableFor = ActionEnableSupport.ENABLE_FOR_NETWORK_AND_VIEW; 
 		String accelerator = null; 
-		String menuGravity = new Float(30).toString(); 
+		String menuGravity = Float.valueOf(30f).toString(); 
 		String toolBarGravity = null;
 				
 		configureZoomRectProperties(configProps, title, preferredMenu, largeIconURL, smallIconURL, tooltip, inMenuBar, inToolBar,
@@ -322,13 +322,13 @@ public class BioFabricAbstractCyActionBuilder {
 		String largeIconURL = null;
 		String smallIconURL = null;
 		String tooltip = title; 
-		String inMenuBar = new Boolean(true).toString(); 
-		String inToolBar = new Boolean(false).toString(); 
-		String insertSeparatorBefore = new Boolean(false).toString();
-		String insertSeparatorAfter = new Boolean(false).toString();
+		String inMenuBar = Boolean.valueOf(true).toString(); 
+		String inToolBar = Boolean.valueOf(false).toString(); 
+		String insertSeparatorBefore = Boolean.valueOf(false).toString();
+		String insertSeparatorAfter = Boolean.valueOf(false).toString();
 		String enableFor = ActionEnableSupport.ENABLE_FOR_NETWORK_AND_VIEW; 
 		String accelerator = null; 
-		String menuGravity = new Float(30).toString(); 
+		String menuGravity = Float.valueOf(30f).toString(); 
 		String toolBarGravity = null;
 				
 		configureZoomRectProperties(configProps, title, preferredMenu, largeIconURL, smallIconURL, tooltip, inMenuBar, inToolBar,
@@ -350,13 +350,13 @@ public class BioFabricAbstractCyActionBuilder {
 		String largeIconURL = null;
 		String smallIconURL = null;
 		String tooltip = title; 
-		String inMenuBar = new Boolean(true).toString(); 
-		String inToolBar = new Boolean(false).toString(); 
-		String insertSeparatorBefore = new Boolean(false).toString();
-		String insertSeparatorAfter = new Boolean(false).toString();
+		String inMenuBar = Boolean.valueOf(true).toString(); 
+		String inToolBar = Boolean.valueOf(false).toString(); 
+		String insertSeparatorBefore = Boolean.valueOf(false).toString();
+		String insertSeparatorAfter = Boolean.valueOf(false).toString();
 		String enableFor = ActionEnableSupport.ENABLE_FOR_NETWORK_AND_VIEW; 
 		String accelerator = null; 
-		String menuGravity = new Float(30).toString(); 
+		String menuGravity = Float.valueOf(30f).toString(); 
 		String toolBarGravity = null;
 				
 		configureZoomRectProperties(configProps, title, preferredMenu, largeIconURL, smallIconURL, tooltip, inMenuBar, inToolBar,
@@ -373,13 +373,13 @@ public class BioFabricAbstractCyActionBuilder {
 		String largeIconURL = null;
 		String smallIconURL = null;
 		String tooltip = title; 
-		String inMenuBar = new Boolean(true).toString(); 
-		String inToolBar = new Boolean(false).toString(); 
-		String insertSeparatorBefore = new Boolean(false).toString();
-		String insertSeparatorAfter = new Boolean(false).toString();
+		String inMenuBar = Boolean.valueOf(true).toString(); 
+		String inToolBar = Boolean.valueOf(false).toString(); 
+		String insertSeparatorBefore = Boolean.valueOf(false).toString();
+		String insertSeparatorAfter = Boolean.valueOf(false).toString();
 		String enableFor = ActionEnableSupport.ENABLE_FOR_NETWORK_AND_VIEW; 
 		String accelerator = null; 
-		String menuGravity = new Float(30).toString(); 
+		String menuGravity = Float.valueOf(30f).toString(); 
 		String toolBarGravity = null;
 				
 		configureZoomRectProperties(configProps, title, preferredMenu, largeIconURL, smallIconURL, tooltip, inMenuBar, inToolBar,
@@ -396,13 +396,13 @@ public class BioFabricAbstractCyActionBuilder {
 		String largeIconURL = null;
 		String smallIconURL = null;
 		String tooltip = title; 
-		String inMenuBar = new Boolean(true).toString(); 
-		String inToolBar = new Boolean(false).toString(); 
-		String insertSeparatorBefore = new Boolean(false).toString();
-		String insertSeparatorAfter = new Boolean(false).toString();
+		String inMenuBar = Boolean.valueOf(true).toString(); 
+		String inToolBar = Boolean.valueOf(false).toString(); 
+		String insertSeparatorBefore = Boolean.valueOf(false).toString();
+		String insertSeparatorAfter = Boolean.valueOf(false).toString();
 		String enableFor = ActionEnableSupport.ENABLE_FOR_NETWORK_AND_VIEW; 
 		String accelerator = null; 
-		String menuGravity = new Float(30).toString(); 
+		String menuGravity = Float.valueOf(30f).toString(); 
 		String toolBarGravity = null;
 				
 		configureZoomRectProperties(configProps, title, preferredMenu, largeIconURL, smallIconURL, tooltip, inMenuBar, inToolBar,
@@ -419,13 +419,13 @@ public class BioFabricAbstractCyActionBuilder {
 		String largeIconURL = null;
 		String smallIconURL = null;
 		String tooltip = title; 
-		String inMenuBar = new Boolean(true).toString(); 
-		String inToolBar = new Boolean(false).toString(); 
-		String insertSeparatorBefore = new Boolean(true).toString();
-		String insertSeparatorAfter = new Boolean(false).toString();
+		String inMenuBar = Boolean.valueOf(true).toString(); 
+		String inToolBar = Boolean.valueOf(false).toString(); 
+		String insertSeparatorBefore = Boolean.valueOf(true).toString();
+		String insertSeparatorAfter = Boolean.valueOf(false).toString();
 		String enableFor = ActionEnableSupport.ENABLE_FOR_NETWORK_AND_VIEW; 
 		String accelerator = null; 
-		String menuGravity = new Float(31).toString(); 
+		String menuGravity = Float.valueOf(31f).toString(); 
 		String toolBarGravity = null;
 				
 		configureZoomRectProperties(configProps, title, preferredMenu, largeIconURL, smallIconURL, tooltip, inMenuBar, inToolBar,
@@ -442,13 +442,13 @@ public class BioFabricAbstractCyActionBuilder {
 		String largeIconURL = null;
 		String smallIconURL = null;
 		String tooltip = title; 
-		String inMenuBar = new Boolean(true).toString(); 
-		String inToolBar = new Boolean(false).toString(); 
-		String insertSeparatorBefore = new Boolean(false).toString();
-		String insertSeparatorAfter = new Boolean(false).toString();
+		String inMenuBar = Boolean.valueOf(true).toString(); 
+		String inToolBar = Boolean.valueOf(false).toString(); 
+		String insertSeparatorBefore = Boolean.valueOf(false).toString();
+		String insertSeparatorAfter = Boolean.valueOf(false).toString();
 		String enableFor = ActionEnableSupport.ENABLE_FOR_NETWORK_AND_VIEW; 
 		String accelerator = null; 
-		String menuGravity = new Float(32).toString(); 
+		String menuGravity = Float.valueOf(32f).toString(); 
 		String toolBarGravity = null;
 				
 		configureZoomRectProperties(configProps, title, preferredMenu, largeIconURL, smallIconURL, tooltip, inMenuBar, inToolBar,
@@ -465,13 +465,13 @@ public class BioFabricAbstractCyActionBuilder {
 		String largeIconURL = null;
 		String smallIconURL = null;
 		String tooltip = title; 
-		String inMenuBar = new Boolean(true).toString(); 
-		String inToolBar = new Boolean(false).toString(); 
-		String insertSeparatorBefore = new Boolean(false).toString();
-		String insertSeparatorAfter = new Boolean(false).toString();
+		String inMenuBar = Boolean.valueOf(true).toString(); 
+		String inToolBar = Boolean.valueOf(false).toString(); 
+		String insertSeparatorBefore = Boolean.valueOf(false).toString();
+		String insertSeparatorAfter = Boolean.valueOf(false).toString();
 		String enableFor = ActionEnableSupport.ENABLE_FOR_NETWORK_AND_VIEW; 
 		String accelerator = null; 
-		String menuGravity = new Float(33).toString(); 
+		String menuGravity = Float.valueOf(33f).toString(); 
 		String toolBarGravity = null;
 				
 		configureZoomRectProperties(configProps, title, preferredMenu, largeIconURL, smallIconURL, tooltip, inMenuBar, inToolBar,

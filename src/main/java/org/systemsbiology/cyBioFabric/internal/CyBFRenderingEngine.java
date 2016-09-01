@@ -119,7 +119,7 @@ public class CyBFRenderingEngine implements RenderingEngine<CyNetwork>, Printabl
 			BNVisualPropertyValue bnvpv = networkView.getVisualProperty(BioFabricVisualLexicon.BIOFABRIC_NETWORK);
 			BioFabricNetwork bfn = bnvpv.getBioFabricNetwork();			
 			
-			installBioFabricNetwork(bfn, bioFabricWindow, selectionWindow, true);
+			installBioFabricNetwork(bfn, bioFabricWindow, selectionWindow, true, taskManager);
 			
 			//handle shutdown events
 			registerHandlers(bioFabricApplication);
@@ -137,7 +137,8 @@ public class CyBFRenderingEngine implements RenderingEngine<CyNetwork>, Printabl
 			
 			//TODO: figure out how to scale this to fit the container properly
 			BioFabricWindow bioFabricWindow = bioFabricApplication.getBioFabricWindow();
-			BioFabricOverview overView = bioFabricWindow.getThumbnailView();						
+			BioFabricOverview overView = bioFabricWindow.getThumbnailView();
+			
 			container.setLayout(new BorderLayout());			
 			container.add(overView);			
 		}else if(configuration instanceof BirdsEyeGraphicsConfiguration){			
@@ -214,7 +215,8 @@ public class CyBFRenderingEngine implements RenderingEngine<CyNetwork>, Printabl
 	
 	//TODO not sure if I need to call this on the selectionWindow
 	//Disable menu toolbar in biofabric network manually if desired
-	public void installBioFabricNetwork(BioFabricNetwork bfn, BioFabricWindow bfw, BioFabricWindow selectionWindow, boolean showNav){
+	public void installBioFabricNetwork(BioFabricNetwork bfn, BioFabricWindow bfw, BioFabricWindow selectionWindow, 
+			boolean showNav, DialogTaskManager taskManager){
 		  
 		if(bfn != null){			
 			
@@ -234,7 +236,7 @@ public class CyBFRenderingEngine implements RenderingEngine<CyNetwork>, Printabl
 		  }else{
 			  System.err.println("Attempting to install a null BioFabricNetwork");
 		  }
-		  
+		  bfw.setDialogTaskManager(taskManager);//TODO used for displaying pop up menu not implemented yet
 		  bfw.showNavAndControl(showNav);
 	  }
 	

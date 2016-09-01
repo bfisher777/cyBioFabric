@@ -81,7 +81,7 @@ public class BioFabricNavAndControl extends JPanel {
 
   public BioFabricNavAndControl(boolean isMain, JInternalFrame topWindow, String commandName) {
 
-    floc_ = new FabricLocation();
+    floc_ = new FabricLocation();//Mouse Over Node Row, Mouse Over Link, Mouse Over Node Link Zone
 
     //CommandSet fc = CommandSet.getCmds((isMain) ? "mainWindow" : "selectionWindow");
     CommandSet fc = CommandSet.getCmds(commandName);
@@ -129,6 +129,7 @@ public class BioFabricNavAndControl extends JPanel {
     //spot_.setResizeWeight(1.0);
 
     JSplitPane sp = new JSplitPane(JSplitPane.VERTICAL_SPLIT, fmpan, spot_); //TODO changed this hor to vert
+    sp.setResizeWeight(0.6);//TODO added this to give the magnifier more space in the CytoPanel
     withControls_ = new JPanel();
     withControls_.setLayout(new BorderLayout());
     withControls_.add(floc_, BorderLayout.NORTH);
@@ -138,7 +139,7 @@ public class BioFabricNavAndControl extends JPanel {
     this.setLayout(clay_);
     this.add(withControls_, "cntrl");
     this.add(new JPanel(), "blank");
-    clay_.show(this, "cntrl");
+    clay_.show(this, "cntrl"); 
     collapsed_ = false;
     
     return;
