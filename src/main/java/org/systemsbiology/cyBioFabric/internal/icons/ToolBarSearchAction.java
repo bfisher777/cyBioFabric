@@ -20,7 +20,7 @@ public class ToolBarSearchAction extends AbstractCyAction implements BioFabricIm
 	private String COMMAND_SET_NAME;	
 	
 	public ToolBarSearchAction(Map<String, String> configProps,  CyApplicationManager applicationManager, 
-			CyNetworkViewManager networkViewManager, TaskFactoryPredicate taskFactoryPredicate){
+			CyNetworkViewManager networkViewManager, BioFabricViewFactoryPredicate taskFactoryPredicate){
 	    super(configProps, applicationManager, networkViewManager, taskFactoryPredicate);
 	    
         

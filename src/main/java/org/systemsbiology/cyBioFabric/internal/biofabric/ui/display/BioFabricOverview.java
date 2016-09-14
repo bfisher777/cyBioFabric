@@ -123,9 +123,11 @@ public class BioFabricOverview extends JPanel {
   /***************************************************************************
   **
   ** Sizing
+  ** Commented out these methods so that Cytoscape thumbnail view can resize
+  ** properly.
   */
 
-  @Override
+ /* @Override
   public Dimension getPreferredSize() {
     return (new Dimension(800, 100));    
   }
@@ -138,7 +140,7 @@ public class BioFabricOverview extends JPanel {
   @Override
   public Dimension getMaximumSize() {
     return (new Dimension(4000, 340));    
-  }
+  }*/
     
   /***************************************************************************
   **
@@ -148,8 +150,7 @@ public class BioFabricOverview extends JPanel {
   @Override
   public void setBounds(int x, int y, int width, int height) {
     super.setBounds(x, y, width, height);
-    currSize_ = new Dimension(width, height);
-    System.out.println("BioFabricOverview, setBounds: " + currSize_.toString() + "x: "+ x+ "y: "+ y);//TODO added 4 print statements need to remove
+    currSize_ = new Dimension(width, height);    
     resizeImage();
     repaint();
     return;
@@ -236,8 +237,7 @@ public class BioFabricOverview extends JPanel {
       return;
     }
     if (currSize_ == null) {    	 
-      currSize_ = getSize();
-      System.out.println("BioFabricOverview resizeImage, Current Size was null: " + currSize_.toString());//TODO added 4 print statements need to remove
+      currSize_ = getSize();      
     }/*else{
     	currSize_ = getSize();
     }*/
@@ -247,15 +247,11 @@ public class BioFabricOverview extends JPanel {
     if ((currSize_.width <= 0) || (currSize_.height <= 0)) {
       return;
     }
-    
-    System.out.println("BioFabricOverview resizeImage, Current Size: " + currSize_.toString());//TODO added 4 print statements need to remove
-    System.out.println("BioFabricOverview resizeImage, img_ width: " + img_.getWidth() + ", img_ height(): " + img_.getHeight());
-    
-    double imgAR = (double)img_.getWidth() / (double)img_.getHeight();
-    System.out.println("BioFabricOverview aspect ratio, imageAR: " + imgAR);
+            
+    double imgAR = (double)img_.getWidth() / (double)img_.getHeight();    
     
     double panelAR = currSize_.getWidth() / currSize_.getHeight();
-    System.out.println("BioFabricOverview aspect ratio, panelAR: " + panelAR);
+    
     int imgHeight;
     int imgWidth;
     int startX;
@@ -267,7 +263,7 @@ public class BioFabricOverview extends JPanel {
         imgHeight = 1;
       }
       startX = 0;
-      System.out.println("currSize_.height: " + currSize_.height + ", imgHeight: " + imgHeight);
+      
       startY = (currSize_.height - imgHeight) / 2;
     } else {    	
       imgHeight = currSize_.height;

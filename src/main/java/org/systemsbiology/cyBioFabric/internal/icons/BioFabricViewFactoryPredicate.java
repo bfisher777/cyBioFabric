@@ -3,7 +3,7 @@ package org.systemsbiology.cyBioFabric.internal.icons;
 import org.cytoscape.work.TaskFactory;
 import org.cytoscape.work.TaskIterator;
 
-public class TaskFactoryPredicate implements TaskFactory{
+public class BioFabricViewFactoryPredicate implements TaskFactory{
 	
 	boolean isBioFabricView;
 
@@ -19,7 +19,7 @@ public class TaskFactoryPredicate implements TaskFactory{
 		return isBioFabricView;
 	}
 	
-	public void setIsReady(boolean ready){
+	public void setIsBioFabricView(boolean ready){
 		isBioFabricView = ready;
 	}
 

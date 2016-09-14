@@ -1,7 +1,7 @@
 package org.systemsbiology.cyBioFabric.internal.tools;
 
 /**
- * Class represents a node name node model suid pair
+ * Class represents a node name and node model suid pair
  * @author Ben
  *
  */
@@ -21,7 +21,7 @@ public class NodeNameSUIDPair implements Comparable<NodeNameSUIDPair>{
 	@Override
 	public boolean equals(Object otherName){
 		if(otherName instanceof NodeNameSUIDPair){
-			return this.name.equals(((NodeNameSUIDPair) otherName).getName());
+			return this.name.equals(((NodeNameSUIDPair) otherName).name);
 		}else{
 			return false;
 		}
@@ -35,6 +35,6 @@ public class NodeNameSUIDPair implements Comparable<NodeNameSUIDPair>{
 	@Override
 	public int compareTo(NodeNameSUIDPair o) {
 		// TODO Auto-generated method stub
-		return this.getName().compareTo(o.getName());
+		return this.name.compareTo(o.name);
 	}
 }

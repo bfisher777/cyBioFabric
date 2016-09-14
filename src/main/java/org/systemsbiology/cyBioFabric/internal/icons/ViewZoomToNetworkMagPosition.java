@@ -17,7 +17,7 @@ public class ViewZoomToNetworkMagPosition extends AbstractCyAction implements Bi
 	private String COMMAND_SET_NAME;	
 	
 	public ViewZoomToNetworkMagPosition(Map<String, String> configProps,  CyApplicationManager applicationManager, 
-			CyNetworkViewManager networkViewManager, TaskFactoryPredicate taskFactoryPredicate){
+			CyNetworkViewManager networkViewManager, BioFabricViewFactoryPredicate taskFactoryPredicate){
 	    super(configProps, applicationManager, networkViewManager, taskFactoryPredicate);	    	    
 		    
 	}

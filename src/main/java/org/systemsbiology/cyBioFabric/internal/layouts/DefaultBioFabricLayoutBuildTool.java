@@ -19,22 +19,14 @@
 
 package org.systemsbiology.cyBioFabric.internal.layouts;
 
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedMap;
-import java.util.TreeMap;
-
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
@@ -43,10 +35,6 @@ import org.cytoscape.view.model.View;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 import org.systemsbiology.cyBioFabric.internal.biofabric.model.BioFabricNetwork;
 import org.systemsbiology.cyBioFabric.internal.biofabric.model.FabricLink;
-import org.systemsbiology.cyBioFabric.internal.biofabric.model.MasterBioFabricNetwork;
-import org.systemsbiology.cyBioFabric.internal.biofabric.model.BioFabricNetwork.BuildData;
-import org.systemsbiology.cyBioFabric.internal.biofabric.model.BioFabricNetwork.LinkInfo;
-import org.systemsbiology.cyBioFabric.internal.biofabric.model.BioFabricNetwork.NodeInfo;
 import org.systemsbiology.cyBioFabric.internal.biofabric.ui.FabricColorGenerator;
 import org.systemsbiology.cyBioFabric.internal.tools.NodeNameSUIDPair;
 
@@ -188,7 +176,7 @@ public class DefaultBioFabricLayoutBuildTool {
     return bfn;
   } 
   
-  
+  /*//for testing
   public void compareNetworks(BioFabricNetwork bfn, MasterBioFabricNetwork mbfn, MasterBioFabricNetwork.OrigBuildData origBD){
 	  List<String> lines = new ArrayList<String>();
 	  
@@ -219,7 +207,7 @@ public class DefaultBioFabricLayoutBuildTool {
 	  TreeMap<Integer, LinkInfo> fullLinkDefs_ = bfn.fullLinkDefs_;
 	  //assert(masterFullLinkDefs_.size() == fullLinkDefs_.size());
 	  lines.add("masterFullLinkDefs_.size() == fullLinkDefs_.size(): " + (masterFullLinkDefs_.size() == fullLinkDefs_.size()) + "\nmasterFullLinkDefs_.size(): " + masterFullLinkDefs_.size() + ", fullLinkDefs_.size(): " + fullLinkDefs_.size());
-	  /*for (Map.Entry<Integer, LinkInfo> entry : fullLinkDefs_.entrySet())
+	  for (Map.Entry<Integer, LinkInfo> entry : fullLinkDefs_.entrySet())
 	  {		  
 	      if(!((MasterBioFabricNetwork.LinkInfo)(masterFullLinkDefs_.get(entry.getKey()))).getSource().equals( fullLinkDefs_.get(entry.getKey()).getSource())){
 	        lines.add("(MasterBioFabricNetwork.LinkInfo)masterRowToTarg_.get(entry.getKey())).getSource().equals( entry.getValue().getSource(): " + ((MasterBioFabricNetwork.LinkInfo)(masterFullLinkDefs_.get(entry.getKey()))).getSource().equals( fullLinkDefs_.get(entry.getKey()).getSource()));
@@ -240,7 +228,7 @@ public class DefaultBioFabricLayoutBuildTool {
 	    	  lines.add("((MasterBioFabricNetwork.LinkInfo)masterRowToTarg_.get(entry.getKey())).getEndRow() == entry.getValue().getEndRow(): " + (((MasterBioFabricNetwork.LinkInfo)(masterFullLinkDefs_.get(entry.getKey()))).getEndRow() == fullLinkDefs_.get(entry.getKey()).getEndRow()));
 	    	  lines.add(((MasterBioFabricNetwork.LinkInfo)(masterFullLinkDefs_.get(entry.getKey()))).getTarget() + " " +  fullLinkDefs_.get(entry.getKey()).getEndRow());
 	      }
-	  }*/
+	  }
 	  
 	  
 	  TreeMap masterNonShadowedLinkMap_ = mbfn.nonShadowedLinkMap_;
@@ -252,20 +240,20 @@ public class DefaultBioFabricLayoutBuildTool {
 	  HashMap<String, NodeInfo> nodeDefs_ = bfn.nodeDefs_;
 	  //assert(masterNodeDefs_.size() == nodeDefs_.size());
 	  lines.add("masterNodeDefs_.size() == nodeDefs_.size(): " + (masterNodeDefs_.size() == nodeDefs_.size()) + "\nmasterNodeDefs_.size(): " + masterNodeDefs_.size() + "nodeDefs_.size(): " + nodeDefs_.size());
-	  /*for (Map.Entry<String, NodeInfo> entry : nodeDefs_.entrySet())
+	  for (Map.Entry<String, NodeInfo> entry : nodeDefs_.entrySet())
 	  {		  
 	      assert(((NodeInfo)masterNodeDefs_.get(entry.getKey())).nodeName.equals( entry.getValue().nodeName));
 	      assert(((NodeInfo)masterNodeDefs_.get(entry.getKey())).nodeRow == entry.getValue().nodeRow);	      
-	  }*/
+	  }
 	  
 	  
 	  List masterLinkGrouping_ = mbfn.linkGrouping_;
 	  List<String> linkGrouping_ = bfn.linkGrouping_;
 	  //assert(masterLinkGrouping_.size() == linkGrouping_.size());
 	  lines.add("masterLinkGrouping_.size() == linkGrouping_.size(): " + (masterLinkGrouping_.size() == linkGrouping_.size()) + "\nmasterLinkGrouping_.size(): " + masterLinkGrouping_.size() + ", linkGrouping_.size(): " + linkGrouping_.size());
-	  /*for(int i = 0; i < linkGrouping_.size(); ++i){
+	  for(int i = 0; i < linkGrouping_.size(); ++i){
 		  assert( linkGrouping_.get(i).equals(masterLinkGrouping_.get(i) ));
-	  }*/
+	  }
 	 
 	  MasterBioFabricNetwork.ColumnAssign masterNormalCols_ = mbfn.normalCols_;
 	  BioFabricNetwork.ColumnAssign normalCols_ = bfn.normalCols_;
@@ -297,7 +285,7 @@ public class DefaultBioFabricLayoutBuildTool {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}
-  }
+  }*/
   
   /***************************************************************************
    ** 

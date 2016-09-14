@@ -20,7 +20,7 @@ public class ToolBarCancel extends AbstractCyAction implements BioFabricImageIco
 	private String COMMAND_SET_NAME;	
 	
 	public ToolBarCancel(Map<String, String> configProps,  CyApplicationManager applicationManager, 
-			CyNetworkViewManager networkViewManager, TaskFactoryPredicate taskFactoryPredicate){
+			CyNetworkViewManager networkViewManager, BioFabricViewFactoryPredicate taskFactoryPredicate){
 	    super(configProps, applicationManager, networkViewManager, taskFactoryPredicate);	    	    
 	    	           
 	    URL ugif = getClass().getResource("/images/Stop24.gif");          

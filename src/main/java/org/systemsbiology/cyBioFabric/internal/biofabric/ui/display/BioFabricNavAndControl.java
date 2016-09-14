@@ -106,13 +106,13 @@ public class BioFabricNavAndControl extends JPanel {
     
     fopan_ = new JPanel();
     fopan_.setLayout(new BorderLayout());
-    fopan_.setBorder(new LineBorder(Color.black, 2));
-    JLabel overLab = new JLabel(ResourceManager.getManager().getString("biofabric.overview"));
+    //fopan_.setBorder(new LineBorder(Color.black, 2));//TODO removed border to make panel look more like cytoscape native
+    /*JLabel overLab = new JLabel(ResourceManager.getManager().getString("biofabric.overview"));
     overLab.setBorder(new EmptyBorder(0, 5, 0, 0));
     overLab.setOpaque(true);
     overLab.setBackground(Color.white);
     overLab.setFont(labelFont);
-    fopan_.add(overLab, BorderLayout.NORTH);
+    fopan_.add(overLab, BorderLayout.NORTH);*/
     fopan_.add(bfo_, BorderLayout.CENTER);
     
     lfnt_ = new FabricNavTool.LabeledFabricNavTool(topWindow, labelFont);

@@ -1692,7 +1692,7 @@ public class CommandSet implements ZoomChangeTracker, SelectionChangeListener, F
     }
 
     public void actionPerformed(ActionEvent e) {
-      try {
+      try {    	  
         bfp_.getZoomController().zoomToSelected();
       } catch (Exception ex) {
         ExceptionHandler.getHandler().displayException(ex);

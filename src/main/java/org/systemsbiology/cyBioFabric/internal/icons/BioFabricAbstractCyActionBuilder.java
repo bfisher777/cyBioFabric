@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.cytoscape.application.CyApplicationManager;
 import org.cytoscape.application.swing.ActionEnableSupport;
+import org.cytoscape.event.CyEventHelper;
 import org.cytoscape.view.model.CyNetworkViewManager;
 import org.cytoscape.work.ServiceProperties;
 import org.systemsbiology.cyBioFabric.internal.biofabric.util.ResourceManager;
@@ -29,14 +30,22 @@ public class BioFabricAbstractCyActionBuilder {
 
 	CyApplicationManager applicationManager;
 	CyNetworkViewManager networkViewManager;
-	TaskFactoryPredicate taskFactoryPredicate;
+	BioFabricViewFactoryPredicate taskFactoryPredicate;
+	BioFabricViewPropertySelectedPredicate taskFactorySelectedNodeEdgePredicate;
+	BioFabricStopButtonFactoryPredicate taskFactoryStopButtonPredicate;//used for the cancel button
+	CyEventHelper cyEventHelperRef;
 	
-	public BioFabricAbstractCyActionBuilder(CyApplicationManager applicationManager,
-			CyNetworkViewManager networkViewManager, TaskFactoryPredicate taskFactoryPredicate){
+	public BioFabricAbstractCyActionBuilder(CyEventHelper cyEventHelperRef, CyApplicationManager applicationManager,
+			CyNetworkViewManager networkViewManager, BioFabricViewFactoryPredicate taskFactoryPredicate, 
+			BioFabricViewPropertySelectedPredicate taskFactorySelectedNodeEdgePredicate,
+			BioFabricStopButtonFactoryPredicate taskFactoryStopButtonPredicate){
 
 		this.applicationManager = applicationManager;
 		this.networkViewManager = networkViewManager;
-		this.taskFactoryPredicate = taskFactoryPredicate;		
+		this.taskFactoryPredicate = taskFactoryPredicate;
+		this.taskFactorySelectedNodeEdgePredicate = taskFactorySelectedNodeEdgePredicate;
+		this.taskFactoryStopButtonPredicate = taskFactoryStopButtonPredicate;
+		this.cyEventHelperRef = cyEventHelperRef;
 	}
 	
 	/******************************************************************************************************************
@@ -62,7 +71,7 @@ public class BioFabricAbstractCyActionBuilder {
 		
 		configureZoomRectProperties(configProps, title, preferredMenu, largeIconURL, smallIconURL, tooltip, inMenuBar, inToolBar,
 				insertSeparatorBefore, insertSeparatorAfter, enableFor, accelerator, menuGravity, toolBarGravity);
-		ToolBarZoomToCurrentAction zoomToCurrentAction = new ToolBarZoomToCurrentAction(configProps, applicationManager, networkViewManager, taskFactoryPredicate);
+		ToolBarZoomToCurrentAction zoomToCurrentAction = new ToolBarZoomToCurrentAction(configProps, applicationManager, networkViewManager, taskFactorySelectedNodeEdgePredicate);
 		buttons.add(zoomToCurrentAction);
 		return zoomToCurrentAction;	
 	}
@@ -85,7 +94,7 @@ public class BioFabricAbstractCyActionBuilder {
 		
 		configureZoomRectProperties(configProps, title, preferredMenu, largeIconURL, smallIconURL, tooltip, inMenuBar, inToolBar,
 				insertSeparatorBefore, insertSeparatorAfter, enableFor, accelerator, menuGravity, toolBarGravity);
-		ToolBarCancel cancelAction = new ToolBarCancel(configProps, applicationManager, networkViewManager, taskFactoryPredicate);
+		ToolBarCancel cancelAction = new ToolBarCancel(configProps, applicationManager, networkViewManager, taskFactoryStopButtonPredicate);
 		buttons.add(cancelAction);
 		return cancelAction;	
 	}
@@ -108,7 +117,7 @@ public class BioFabricAbstractCyActionBuilder {
 		
 		configureZoomRectProperties(configProps, title, preferredMenu, largeIconURL, smallIconURL, tooltip, inMenuBar, inToolBar,
 				insertSeparatorBefore, insertSeparatorAfter, enableFor, accelerator, menuGravity, toolBarGravity);
-		ToolBarClearSelectionsAction clearSelectionsAction = new ToolBarClearSelectionsAction(configProps, applicationManager, networkViewManager, taskFactoryPredicate);
+		ToolBarClearSelectionsAction clearSelectionsAction = new ToolBarClearSelectionsAction(configProps, applicationManager, networkViewManager, taskFactorySelectedNodeEdgePredicate);
 		buttons.add(clearSelectionsAction);
 		return clearSelectionsAction;	
 	}
@@ -131,7 +140,7 @@ public class BioFabricAbstractCyActionBuilder {
 		
 		configureZoomRectProperties(configProps, title, preferredMenu, largeIconURL, smallIconURL, tooltip, inMenuBar, inToolBar,
 				insertSeparatorBefore, insertSeparatorAfter, enableFor, accelerator, menuGravity, toolBarGravity);
-		ToolBarCenterOnNextAction centerOnNextAction = new ToolBarCenterOnNextAction(configProps, applicationManager, networkViewManager, taskFactoryPredicate);
+		ToolBarCenterOnNextAction centerOnNextAction = new ToolBarCenterOnNextAction(configProps, applicationManager, networkViewManager, taskFactorySelectedNodeEdgePredicate);
 		buttons.add(centerOnNextAction);
 		return centerOnNextAction;	
 	}
@@ -154,7 +163,7 @@ public class BioFabricAbstractCyActionBuilder {
 		
 		configureZoomRectProperties(configProps, title, preferredMenu, largeIconURL, smallIconURL, tooltip, inMenuBar, inToolBar,
 				insertSeparatorBefore, insertSeparatorAfter, enableFor, accelerator, menuGravity, toolBarGravity);
-		ToolBarCenterOnPreviousAction centerOnPrevAction = new ToolBarCenterOnPreviousAction(configProps, applicationManager, networkViewManager, taskFactoryPredicate);
+		ToolBarCenterOnPreviousAction centerOnPrevAction = new ToolBarCenterOnPreviousAction(configProps, applicationManager, networkViewManager, taskFactorySelectedNodeEdgePredicate);
 		buttons.add(centerOnPrevAction);
 		return centerOnPrevAction;	
 	}
@@ -384,7 +393,8 @@ public class BioFabricAbstractCyActionBuilder {
 				
 		configureZoomRectProperties(configProps, title, preferredMenu, largeIconURL, smallIconURL, tooltip, inMenuBar, inToolBar,
 				insertSeparatorBefore, insertSeparatorAfter, enableFor, accelerator, menuGravity, toolBarGravity);
-		ViewSelectARectangleAndZoom viewSelectARectangleAndZoomMenuItem = new ViewSelectARectangleAndZoom(configProps, applicationManager, networkViewManager, taskFactoryPredicate);		
+		ViewSelectARectangleAndZoom viewSelectARectangleAndZoomMenuItem = new ViewSelectARectangleAndZoom(configProps, applicationManager, 
+				networkViewManager, taskFactoryPredicate, cyEventHelperRef);		
 		buttons.add(viewSelectARectangleAndZoomMenuItem);
 		return viewSelectARectangleAndZoomMenuItem;	
 	}
@@ -453,7 +463,7 @@ public class BioFabricAbstractCyActionBuilder {
 				
 		configureZoomRectProperties(configProps, title, preferredMenu, largeIconURL, smallIconURL, tooltip, inMenuBar, inToolBar,
 				insertSeparatorBefore, insertSeparatorAfter, enableFor, accelerator, menuGravity, toolBarGravity);
-		ViewCenterOnPreviousSelection viewCenterOnPreviousSelectionMenuItem = new ViewCenterOnPreviousSelection(configProps, applicationManager, networkViewManager, taskFactoryPredicate);		
+		ViewCenterOnPreviousSelection viewCenterOnPreviousSelectionMenuItem = new ViewCenterOnPreviousSelection(configProps, applicationManager, networkViewManager, taskFactorySelectedNodeEdgePredicate);		
 		buttons.add(viewCenterOnPreviousSelectionMenuItem);
 		return viewCenterOnPreviousSelectionMenuItem;	
 	}
@@ -476,7 +486,7 @@ public class BioFabricAbstractCyActionBuilder {
 				
 		configureZoomRectProperties(configProps, title, preferredMenu, largeIconURL, smallIconURL, tooltip, inMenuBar, inToolBar,
 				insertSeparatorBefore, insertSeparatorAfter, enableFor, accelerator, menuGravity, toolBarGravity);
-		ViewZoomToCurrentSelection viewZoomToCurrentSelectionMenuItem = new ViewZoomToCurrentSelection(configProps, applicationManager, networkViewManager, taskFactoryPredicate);		
+		ViewZoomToCurrentSelection viewZoomToCurrentSelectionMenuItem = new ViewZoomToCurrentSelection(configProps, applicationManager, networkViewManager, taskFactorySelectedNodeEdgePredicate);		
 		buttons.add(viewZoomToCurrentSelectionMenuItem);
 		return viewZoomToCurrentSelectionMenuItem;	
 	}
@@ -499,7 +509,7 @@ public class BioFabricAbstractCyActionBuilder {
 				
 		configureZoomRectProperties(configProps, title, preferredMenu, largeIconURL, smallIconURL, tooltip, inMenuBar, inToolBar,
 				insertSeparatorBefore, insertSeparatorAfter, enableFor, accelerator, menuGravity, toolBarGravity);
-		ViewCenterOnNextSelection viewCenterOnNextSelectionMenuItem = new ViewCenterOnNextSelection(configProps, applicationManager, networkViewManager, taskFactoryPredicate);		
+		ViewCenterOnNextSelection viewCenterOnNextSelectionMenuItem = new ViewCenterOnNextSelection(configProps, applicationManager, networkViewManager, taskFactorySelectedNodeEdgePredicate);		
 		buttons.add(viewCenterOnNextSelectionMenuItem);
 		return viewCenterOnNextSelectionMenuItem;	
 	}

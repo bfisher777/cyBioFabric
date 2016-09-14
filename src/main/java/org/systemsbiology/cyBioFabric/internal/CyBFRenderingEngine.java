@@ -181,8 +181,8 @@ public class CyBFRenderingEngine implements RenderingEngine<CyNetwork>, Printabl
 
 	/*
 	 * Method will add the view listeners to the networkView, used to handle cytoscape button click
-	 * 
-	 * */
+	 * TODO move this code inside the CyBFNetworkView, it makes more sense to reside there
+	 * */ 
 	private void registerViewListeners(BioFabricZoomInListener zoomIn, ApplyPreferredLayoutListener applyLayout,
 		BioFabricZoomOutListener zoomOut, BioFabricFitContentListener fitContent, BioFabricZoomSelectedListenerInterface zoomSelected){		
 		networkView.addBioFabricViewListener(zoomIn);

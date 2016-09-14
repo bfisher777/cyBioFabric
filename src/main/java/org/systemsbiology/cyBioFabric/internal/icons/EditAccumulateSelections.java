@@ -19,7 +19,7 @@ public class EditAccumulateSelections extends AbstractCyAction implements BioFab
 	private String COMMAND_SET_NAME;	
 	
 	public EditAccumulateSelections(Map<String, String> configProps,  CyApplicationManager applicationManager, 
-			CyNetworkViewManager networkViewManager, TaskFactoryPredicate taskFactoryPredicate){
+			CyNetworkViewManager networkViewManager, BioFabricViewFactoryPredicate taskFactoryPredicate){
 	    super(configProps, applicationManager, networkViewManager, taskFactoryPredicate);	    	    
 		this.useCheckBoxMenuItem();    
 	}

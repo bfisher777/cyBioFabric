@@ -491,49 +491,54 @@ public class BioFabricPanel extends JPanel implements ZoomTarget, ZoomPresentati
   
   /***************************************************************************
    ** TODO added this as a way to update biofabric with cytoscape selection events
-   ** Called from fitSelected methond in CyBFNetworkView class 
+   ** Called from fitSelected method in CyBFNetworkView class 
    ** Get detail panel
    */
 
-   public void selectFromCytoscape(List<CyNode> nodes, List<CyEdge> edges) { 
-     if (!doBuildSelect_) {
+   public void selectFromCytoscape(List<CyNode> nodes, List<CyEdge> edges) {
+	   
+	 System.out.println("selectFromCytoscape called!");  
+     if (!doBuildSelect_) {       
        clearSelectionSets();
        currSel_ = -1;
        floaterSet_.currSelRect = null;
      }
 
-     Iterator<CyNode> nodesIt = nodes.iterator();
-     while (nodesIt.hasNext()) {
-       CyNode selection = nodesIt.next();
-       String name = bfn_.networkView.getModel().getRow(selection).get(CyNetwork.NAME, String.class);
-       BioFabricNetwork.NodeInfo tni = bfn_.getNodeDefinition(name);
-       if (tni != null) {        
-         currNodeSelections_.add(name);
-       }
+     if(nodes.isEmpty() && edges.isEmpty()){    	 
+    	 this.clearSelections();
+     }else{
+	     Iterator<CyNode> nodesIt = nodes.iterator();
+	     while (nodesIt.hasNext()) {
+	       CyNode selection = nodesIt.next();
+	       String name = bfn_.networkView.getModel().getRow(selection).get(CyNetwork.NAME, String.class);
+	       BioFabricNetwork.NodeInfo tni = bfn_.getNodeDefinition(name);
+	       if (tni != null) { 	    	   
+	         currNodeSelections_.add(name);
+	       }
+	     }
+	     
+	     Iterator<CyEdge> edgesIt = edges.iterator();
+	     while (edgesIt.hasNext()) {
+	       CyEdge edgeModel = edgesIt.next();       
+		   CyNode nodeSource = edgeModel.getSource();
+		   CyNode nodeTarget = edgeModel.getTarget();
+		   //set source, target and relationship
+		   //String source = nodeSource.getSUID().toString();	
+		   //String target = nodeTarget.getSUID().toString();
+		   
+		   String source = bfn_.networkView.getModel().getRow(nodeSource).get(CyNetwork.NAME, String.class);
+		   String target = bfn_.networkView.getModel().getRow(nodeTarget).get(CyNetwork.NAME, String.class);
+		  
+		   String rel = bfn_.networkView.getModel().getRow(edgeModel).get(CyEdge.INTERACTION, String.class);//name of the edge?	
+	       
+	       String name = bfn_.networkView.getModel().getRow(edgeModel).get(CyNetwork.NAME, String.class);
+	       FabricLink nextLink = new FabricLink(source, target, rel, false, edgeModel.getSUID(), nodeSource.getSUID(), nodeTarget.getSUID());
+	       System.out.println("selectFromCytoscape: Added selection link");     
+	       currLinkSelections_.add(nextLink);       
+	     }
      }
-     
-     Iterator<CyEdge> edgesIt = edges.iterator();
-     while (edgesIt.hasNext()) {
-       CyEdge edgeModel = edgesIt.next();       
-	   CyNode nodeSource = edgeModel.getSource();
-	   CyNode nodeTarget = edgeModel.getTarget();
-	   //set source, target and relationship
-	   //String source = nodeSource.getSUID().toString();	
-	   //String target = nodeTarget.getSUID().toString();
-	   
-	   String source = bfn_.networkView.getModel().getRow(nodeSource).get(CyNetwork.NAME, String.class);
-	   String target = bfn_.networkView.getModel().getRow(nodeTarget).get(CyNetwork.NAME, String.class);
-	  
-	   String rel = bfn_.networkView.getModel().getRow(edgeModel).get(CyEdge.INTERACTION, String.class);//name of the edge?	
-       
-       String name = bfn_.networkView.getModel().getRow(edgeModel).get(CyNetwork.NAME, String.class);
-       FabricLink nextLink = new FabricLink(source, target, rel, false, edgeModel.getSUID(), nodeSource.getSUID(), nodeTarget.getSUID());
-             
-       currLinkSelections_.add(nextLink);       
-     }
-     
-
-     buildSelectionGeometry(null, null);
+     //System.out.println("selectFromCytoscape - building selection geometry");
+     buildSelectionGeometry(null, null);     
      return;
    }
   
@@ -1223,7 +1228,7 @@ public class BioFabricPanel extends JPanel implements ZoomTarget, ZoomPresentati
   @Override
   public void setBounds(int x, int y, int width, int height) {
     super.setBounds(x, y, width, height);
-    System.out.println("BFP set bounds " + x + " " + y + " " + width + " " + height);
+    //System.out.println("BFP set bounds " + x + " " + y + " " + width + " " + height);
     return;
   } 
   
@@ -2353,7 +2358,8 @@ public class BioFabricPanel extends JPanel implements ZoomTarget, ZoomPresentati
   ** Build needed selection geometry
   */  
   
-  public void buildSelectionGeometry(String newStartName, Rectangle newStartRect) {     
+  public void buildSelectionGeometry(String newStartName, Rectangle newStartRect) {  
+	  
     Point focus = new Point();
     boolean showShadows = FabricDisplayOptionsManager.getMgr().getDisplayOptions().getDisplayShadows(); 
     //
@@ -2437,6 +2443,8 @@ public class BioFabricPanel extends JPanel implements ZoomTarget, ZoomPresentati
     if ((rects_.size() > 0) && (currSel_ == -1)) {
       currSel_ = 0;
     }
+    
+    //System.out.println("buildSelectionGeometry - painting targetList.size: "  + targetList_.size() + " linkList.size: "  + linkList_.size());
     bumpGuts();
     handleFloaterChange();
     selectionPainter_.buildObjCache(targetList_, linkList_, false, showShadows, 
@@ -2990,7 +2998,7 @@ public class BioFabricPanel extends JPanel implements ZoomTarget, ZoomPresentati
 
           jsp_.getViewport().setViewPosition(new Point(newX, newY));
           jsp_.getViewport().invalidate(); 
-          System.out.println("revalidate MD");
+          //System.out.println("revalidate MD");
           jsp_.revalidate();
           return;
         } else if (collectingZoomMode_) {
@@ -3035,6 +3043,10 @@ public class BioFabricPanel extends JPanel implements ZoomTarget, ZoomPresentati
     }         
   } 
   
+  
+  public boolean getCollectingZoomMode(){//TODO added this to help activate deactivate cancel button
+	  return collectingZoomMode_;
+  }
   ////////////////////////////////////////////////////////////////////////////
   //
   // PUBLIC STATIC METHODS

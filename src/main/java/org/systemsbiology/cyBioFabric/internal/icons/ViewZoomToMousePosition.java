@@ -17,7 +17,7 @@ public class ViewZoomToMousePosition extends AbstractCyAction implements BioFabr
 	private String COMMAND_SET_NAME;	
 	
 	public ViewZoomToMousePosition(Map<String, String> configProps,  CyApplicationManager applicationManager, 
-			CyNetworkViewManager networkViewManager, TaskFactoryPredicate taskFactoryPredicate){
+			CyNetworkViewManager networkViewManager, BioFabricViewFactoryPredicate taskFactoryPredicate){
 	    super(configProps, applicationManager, networkViewManager, taskFactoryPredicate);	    	    
 		    
 	}

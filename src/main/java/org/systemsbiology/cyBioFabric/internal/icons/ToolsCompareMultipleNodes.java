@@ -21,7 +21,7 @@ public class ToolsCompareMultipleNodes extends AbstractCyAction implements BioFa
 	private String COMMAND_SET_NAME;	
 	
 	public ToolsCompareMultipleNodes(Map<String, String> configProps,  CyApplicationManager applicationManager, 
-			CyNetworkViewManager networkViewManager, TaskFactoryPredicate taskFactoryPredicate){
+			CyNetworkViewManager networkViewManager, BioFabricViewFactoryPredicate taskFactoryPredicate){
 	    super(configProps, applicationManager, networkViewManager, taskFactoryPredicate);	    	    	       
 	}
 	

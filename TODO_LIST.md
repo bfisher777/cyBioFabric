@@ -2,30 +2,27 @@
 ##TODO
 cyBioFabric list of things that need to be completed or sorted out.
 
-- [ ] Add better comments
-- [ ] Create test suite
+- [ ] Add / update comments
+- [ ] Create a test suite
 - [ ] Refactor code... remove unused / reorganize (this would be much easier with test suite)
-- [ ] Thumbnail view not resizing properly
-- [ ] Move BioFabric task bar into Cytoscape as buttons and implement
-- [x] Move BioFabric menu into Cytoscape as new menu and implement
+- [ ] Implement a way to export / import using CX data model, http://www.home.ndexbio.org/data-model/
+- [ ] Add a right click feature with menu items add, remove, edit, select (Though commands will not be supported)
+- [ ] Move BioFabric task bar items into Cytoscape as buttons and implement
+- [ ] Implement BioFabric menu items.
+- [ ] Create task factories to disable / enable biofabric menu items tool bar buttons for correct state of application
 - [ ] Need to add short cuts (cytoscape calls them accelerators, see BioFabricAbstractCyActionBuilder class) to menu items and buttons
 - [ ] Add Tunables to retrieve users data when menu items or buttons are selected
 - [ ] Add node added and node removed event listeners / handlers?
 - [ ] Add edge added and edge removed event listeners / handlers?
 - [ ] Add group node /group edges added and removed listeners / handlers?
 - [ ] Rewrite a way to get view info from layout algorithm (currently in network view model, make new columns in network table?)
-- [ ] Fix / implement layout algorithms
+- [ ] Fix / implement BioFabric layout algorithms
 - [ ] Update visual property value node / edge selected
-- [ ] Implement / disable choices in the select menu, there are alot
-- [ ] Implement / disable cytoscape select all nodes and edges menu item
-- [ ] Implement / disable cytoscape deselect all nodes and edges menu item
-- [ ] Implement / disable cytoscape hide selected nodes and edges menu item
-- [ ] Implement / disable cytoscape show selected nodes and edges menu item
-- [ ] Implement / disable cytoscape show all nodes and edges menu item
-- [ ] Update screen drawings when node / edge selected from table data
-- [ ] Implement a way to export / import using CX data model, http://www.home.ndexbio.org/data-model/
-- [x] Remove search button, since Cytoscape has better search?
-- [ ] Right click add, remove, edit, select (Commands will not be supported)
+- [ ] Implement / disable menu item choices in the Cytoscape select menu
+- [ ] Cytoscape implementation of first neighbors doesn't select edges?
+- [ ] Implement undo support? 
+
+
 
 - [ ] Bug can zoom out too far on magnifier using z shortcut. 
 - [ ] Bug when zooming on large networks the minus zoom button sometimes breaks

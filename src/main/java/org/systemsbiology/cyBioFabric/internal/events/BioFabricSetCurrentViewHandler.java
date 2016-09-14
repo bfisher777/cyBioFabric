@@ -10,24 +10,30 @@ import javax.swing.JLabel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
 
-import org.cytoscape.application.swing.AbstractCyAction;
 import org.cytoscape.view.model.CyNetworkView;
 import org.systemsbiology.cyBioFabric.internal.biofabric.util.ResourceManager;
 import org.systemsbiology.cyBioFabric.internal.cytoscape.view.CyBFNetworkView;
 import org.systemsbiology.cyBioFabric.internal.graphics.BioFabricCytoPanel;
 import org.systemsbiology.cyBioFabric.internal.icons.BioFabricImageIcon;
-import org.systemsbiology.cyBioFabric.internal.icons.TaskFactoryPredicate;
+import org.systemsbiology.cyBioFabric.internal.icons.BioFabricStopButtonFactoryPredicate;
+import org.systemsbiology.cyBioFabric.internal.icons.BioFabricViewFactoryPredicate;
+import org.systemsbiology.cyBioFabric.internal.icons.BioFabricViewPropertySelectedPredicate;
 
 public class BioFabricSetCurrentViewHandler {	
 	
 	BioFabricCytoPanel panel;
 	List<BioFabricImageIcon> imageIcons;
-	TaskFactoryPredicate taskFactoryPredicate;
+	BioFabricViewFactoryPredicate taskFactoryPredicate;
+	BioFabricViewPropertySelectedPredicate taskFactorySelectedNodeEdgePredicate;
+	BioFabricStopButtonFactoryPredicate taskFactoryStopButtonPredicate;
 	
-	public BioFabricSetCurrentViewHandler(BioFabricCytoPanel panel, List<BioFabricImageIcon> imageIcons, TaskFactoryPredicate taskFactoryPredicate){
+	public BioFabricSetCurrentViewHandler(BioFabricCytoPanel panel, List<BioFabricImageIcon> imageIcons, BioFabricViewFactoryPredicate taskFactoryPredicate,
+			BioFabricViewPropertySelectedPredicate taskFactorySelectedNodeEdgePredicate, BioFabricStopButtonFactoryPredicate taskFactoryStopButtonPredicate){
 		this.panel = panel;
 		this.imageIcons = imageIcons;
 		this.taskFactoryPredicate = taskFactoryPredicate;
+		this.taskFactorySelectedNodeEdgePredicate = taskFactorySelectedNodeEdgePredicate;
+		this.taskFactoryStopButtonPredicate = taskFactoryStopButtonPredicate;
 	}
 	
 	/* 
@@ -44,9 +50,12 @@ public class BioFabricSetCurrentViewHandler {
 			bfNetworkView = (CyBFNetworkView)view;
 			panel.setNavAndControl(bfNetworkView.getBioFabricApplication().getBioFabricWindow().getNAC());
 			
-			taskFactoryPredicate.setIsReady(true);
-		}else{
-			
+			taskFactoryPredicate.setIsBioFabricView(true);
+			taskFactoryStopButtonPredicate.registerNetworkView(bfNetworkView);
+			taskFactoryStopButtonPredicate.setIsBioFabricView(true);
+			taskFactorySelectedNodeEdgePredicate.registerNetwork(view);
+			taskFactorySelectedNodeEdgePredicate.setIsBioFabricView(true);
+		}else{			
 			panel.removeAll();
 			panel.revalidate();
 			panel.setSize(size);
@@ -59,14 +68,15 @@ public class BioFabricSetCurrentViewHandler {
 		    magLab.setFont(labelFont);
 		    panel.add(magLab, BorderLayout.NORTH);	
 		    
-		    taskFactoryPredicate.setIsReady(false);
+		    taskFactoryPredicate.setIsBioFabricView(false);
+		    taskFactoryStopButtonPredicate.setIsBioFabricView(false);
+		    taskFactorySelectedNodeEdgePredicate.setIsBioFabricView(false);
 		}
 		
 		for(BioFabricImageIcon icon : imageIcons){
 
-			if((view instanceof CyBFNetworkView)){							
-								
-				icon.registerCommandSetName(bfNetworkView.getBioFabricApplication().getBioFabricWindow().COMMAND_NAME);
+			if((view instanceof CyBFNetworkView)){															
+				icon.registerCommandSetName(bfNetworkView.getBioFabricApplication().getBioFabricWindow().COMMAND_NAME);				
 			}			
 		}		
 	}	
