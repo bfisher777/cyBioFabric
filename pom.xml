@@ -4,11 +4,11 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-	<name>cyBioFabric</name>	
+	<name>CyBioFabric</name>	
 
 	<properties>
-		<bundle.symbolicName>com.boofisher.app.cyBioFabric</bundle.symbolicName>
-		<bundle.namespace>com.boofisher.app.cyBioFabric</bundle.namespace>
+		<bundle.symbolicName>org.systemsbiology.cyBioFabric</bundle.symbolicName>
+		<bundle.namespace>org.systemsbiology.cyBioFabric</bundle.namespace>
 		<cytoscape.api>3.4.0</cytoscape.api>
 		<timestamp>${maven.build.timestamp}</timestamp>
 		<project.version>0.0.1</project.version>
@@ -16,8 +16,8 @@
 	</properties>
 
 	
-	<groupId>com.boofisher.app</groupId>
-	<artifactId>cyBioFabric</artifactId>
+	<groupId>org.systemsbiology.cyBioFabric</groupId>
+	<artifactId>CyBioFabric</artifactId>
 	<version>${project.version}</version>
 
 	<modelVersion>4.0.0</modelVersion>
