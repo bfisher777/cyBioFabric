@@ -81,10 +81,12 @@ public class FabricLocation extends JPanel {
     UiUtil.gbcSet(gbc, 0, 0, 10, 1, UiUtil.HOR, 0, 0, 5, 5, 5, 5, UiUtil.CEN, 0.5, 0.0);
     add(nodeName_, gbc);
        
-    UiUtil.gbcSet(gbc, 11, 0, 45, 1, UiUtil.HOR, 0, 0, 5, 5, 5, 5, UiUtil.CEN, 0.5, 0.0);
+    //UiUtil.gbcSet(gbc, 11, 0, 45, 1, UiUtil.HOR, 0, 0, 5, 5, 5, 5, UiUtil.CEN, 0.5, 0.0);
+    UiUtil.gbcSet(gbc, 0, 1, 45, 1, UiUtil.HOR, 0, 0, 5, 5, 5, 5, UiUtil.CEN, 0.5, 0.0);
     add(linkName_, gbc);
     
-    UiUtil.gbcSet(gbc, 56, 0, 10, 1, UiUtil.HOR, 0, 0, 5, 5, 5, 5, UiUtil.CEN, 0.5, 0.0);
+    //UiUtil.gbcSet(gbc, 56, 0, 10, 1, UiUtil.HOR, 0, 0, 5, 5, 5, 5, UiUtil.CEN, 0.5, 0.0);
+    UiUtil.gbcSet(gbc, 0, 2, 10, 1, UiUtil.HOR, 0, 0, 5, 5, 5, 5, UiUtil.CEN, 0.5, 0.0);
     add(linkZone_, gbc);   
   }
 

@@ -5,6 +5,7 @@ import org.systemsbiology.cyBioFabric.internal.biofabric.model.BioFabricNetwork;
 
 
 /*
+ * TODO make serializable or rewrite
  * Class represents a biofabric network in cytoscape can be accessed from the network view
  * */
 public class BNVisualPropertyValue extends AbstractVisualPropertyValue {

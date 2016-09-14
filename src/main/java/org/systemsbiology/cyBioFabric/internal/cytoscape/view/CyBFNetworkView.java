@@ -13,6 +13,7 @@ import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyIdentifiable;
 import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
+import org.cytoscape.model.CyTableUtil;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
 import org.cytoscape.view.model.VisualLexicon;
@@ -22,6 +23,7 @@ import org.cytoscape.view.vizmap.VisualMappingManager;
 import org.cytoscape.view.vizmap.VisualStyle;
 import org.systemsbiology.cyBioFabric.internal.CyBFNetworkViewRenderer;
 import org.systemsbiology.cyBioFabric.internal.biofabric.app.BioFabricApplication;
+import org.systemsbiology.cyBioFabric.internal.biofabric.app.BioFabricWindow;
 import org.systemsbiology.cyBioFabric.internal.cytoscape.view.CyBFEdgeView;
 import org.systemsbiology.cyBioFabric.internal.cytoscape.view.CyBFNodeView;
 import org.systemsbiology.cyBioFabric.internal.cytoscape.view.CyBFView;
@@ -29,7 +31,6 @@ import org.systemsbiology.cyBioFabric.internal.cytoscape.view.DefaultValueVault;
 import org.systemsbiology.cyBioFabric.internal.cytoscape.view.listeners.ApplyPreferredLayoutListenerInterface;
 import org.systemsbiology.cyBioFabric.internal.cytoscape.view.listeners.BioFabricFitContentListenerInterface;
 import org.systemsbiology.cyBioFabric.internal.cytoscape.view.listeners.BioFabricViewListenerInterface;
-import org.systemsbiology.cyBioFabric.internal.cytoscape.view.listeners.BioFabricZoomAllNetworkListenerInterface;
 import org.systemsbiology.cyBioFabric.internal.cytoscape.view.listeners.BioFabricZoomInListenerInterface;
 import org.systemsbiology.cyBioFabric.internal.cytoscape.view.listeners.BioFabricZoomOutListenerInterface;
 import org.systemsbiology.cyBioFabric.internal.cytoscape.view.listeners.BioFabricZoomSelectedListenerInterface;
@@ -91,6 +92,7 @@ public class CyBFNetworkView extends CyBFView<CyNetwork> implements CyNetworkVie
 		this.networkScaleFactor = this.getVisualProperty(BasicVisualLexicon.NETWORK_SCALE_FACTOR);
 		//the number of biofabric applications created giving a unique number to each application
 		this.bioFabricApplication = new BioFabricApplication(false, appNum);
+				
 	}
 	
 	public BioFabricApplication getBioFabricApplication(){ return bioFabricApplication; }
@@ -145,41 +147,89 @@ public class CyBFNetworkView extends CyBFView<CyNetwork> implements CyNetworkVie
 	@Override
 	public void fitSelected() {		
 		
-		// Obtain selected nodes
-		Set<View<CyNode>> selectedNodeViews = new HashSet<View<CyNode>>();
-		
-		for (View<CyNode> nodeView : getNodeViews()) {
-			if (nodeView.getVisualProperty(BasicVisualLexicon.NODE_SELECTED)) {
-				selectedNodeViews.add(nodeView);
+		//System.out.println("fitSelected has been called");
+		for(BioFabricViewListenerInterface bFVL : this.bioFabricViewListeners){								
+			if((bFVL instanceof BioFabricZoomSelectedListenerInterface) ){				
+				((BioFabricZoomSelectedListenerInterface)bFVL).performZoomSelected();				
 			}
 		}
 		
-		if (selectedNodeViews.isEmpty()) {
-			return;
-		}
-		
-		// MKTODO 
-//		if (networkCamera != null) {
-//			NetworkToolkit.fitInView(networkCamera, selectedNodeViews, 180.0, 2.3, 1.8);
-//		}
-		
-		// Request focus for the network view to be ready for keyboard input
-//		requestNetworkFocus();
 	}
 
+	/*
+	 * Update view is called by the various Cytoscape TaskFactories that manage various events. 
+	 * This method is called when some property has changed, either a view or table property
+	 * This method will handle two broad categories, zoom events and selection events.
+	 * Will handle these by checking for zoom events and then if the event wasn't found we
+	 * assume a selection event triggered the call and so update selections and repaint 
+	 * Add and delete node / edges events will be handled by another listener handler registered 
+	 * in the CyActivator class.
+	 * */
 	@Override
-	public void updateView() {		
-		
+	public void updateView() {
+		System.out.println("updateView has been called!");
+		boolean eventHandled = false;
+				
 		matchNodes();
 		matchEdges();				
 		
 		for(int i = 0; i < canvases.size(); i++) {
 			canvases.get(i).repaint();
 		}
-		
-		for(BioFabricViewListenerInterface bFVL : this.bioFabricViewListeners){			
-			fireAway(bFVL);
+				
+		for(BioFabricViewListenerInterface bFVL : this.bioFabricViewListeners){	
+			
+			eventHandled = fireAway(bFVL);
+			
+			if(eventHandled){
+				break;
+			}
 		}
+		
+		if(!eventHandled){
+			//Get the selected nodes and edges
+			List<CyNode> selectedNodes = CyTableUtil.getNodesInState(network, "selected", true);
+			List<CyEdge> selectedEdges = CyTableUtil.getEdgesInState(network, "selected", true);
+			
+			BioFabricWindow bioFabricWindow = bioFabricApplication.getBioFabricWindow();
+			
+			if(bioFabricWindow != null){
+				bioFabricWindow.getFabricPanel().selectFromCytoscape(selectedNodes, selectedEdges);
+			}
+		}		
+		System.out.println("eventHandled? " + eventHandled);
+	}
+	
+	@Override
+	public <T, V extends T> void setViewDefault(VisualProperty<? extends T> visualProperty, V defaultValue) {
+		defaultValues.modifyDefaultValue(visualProperty, defaultValue);
+	}
+	
+	@Override
+	public <T> T getVisualProperty(VisualProperty<T> visualProperty) {
+		T value = super.getVisualProperty(visualProperty);
+		
+		if (value != null) {
+			// If we were given an explicit value, return it
+			return value;
+		} else {
+			// Otherwise, return the default value
+			return defaultValues.getDefaultValue(visualProperty);
+		}
+	}
+
+
+	public void addContainer(Component container) {
+		canvases.add(container);
+	}
+	
+	@Override
+	public void dispose() {
+	}
+
+	@Override
+	public String getRendererId() {
+		return CyBFNetworkViewRenderer.ID;
 	}
 	
 	// Checks if there is a discrepancy between number of nodes and nodeViews, attempts
@@ -276,6 +326,7 @@ public class CyBFNetworkView extends CyBFView<CyNetwork> implements CyNetworkVie
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private void updateToMatchVisualStyle() {
 		
 		// TODO: Make the set declared below a private member field, formalize the set of node or edge specific visual properties
@@ -301,32 +352,7 @@ public class CyBFNetworkView extends CyBFView<CyNetwork> implements CyNetworkVie
 				}
 			}
 		}
-	}
-	
-	@Override
-	public <T, V extends T> void setViewDefault(VisualProperty<? extends T> visualProperty, V defaultValue) {
-		defaultValues.modifyDefaultValue(visualProperty, defaultValue);
-	}
-
-	
-	@Override
-	public <T> T getVisualProperty(VisualProperty<T> visualProperty) {
-		T value = super.getVisualProperty(visualProperty);
-		
-		if (value != null) {
-			// If we were given an explicit value, return it
-			return value;
-		} else {
-			// Otherwise, return the default value
-			return defaultValues.getDefaultValue(visualProperty);
-		}
-	}
-
-
-	public void addContainer(Component container) {
-		canvases.add(container);
-	}
-	
+	}		
 	
 //	/**
 //	 * Requests focus for this network view so that it is ready to accept mouse and keyboard input.
@@ -336,43 +362,32 @@ public class CyBFNetworkView extends CyBFView<CyNetwork> implements CyNetworkVie
 //			container.requestFocus();
 //		}
 //	}
-
-	@Override
-	public void dispose() {
-	}
-
-	@Override
-	public String getRendererId() {
-		return CyBFNetworkViewRenderer.ID;
-	}
 	
-	private void fireAway(BioFabricViewListenerInterface bFVL){
+	private boolean fireAway(BioFabricViewListenerInterface bFVL){
 				
 		if((bFVL instanceof BioFabricZoomInListenerInterface) && zoomInChanged()){			
 			
 			((BioFabricZoomInListenerInterface)bFVL).performZoomIn();
+			return true;
 			
 		}else if((bFVL instanceof BioFabricZoomOutListenerInterface) && zoomOutChanged()){			
 			
 			((BioFabricZoomOutListenerInterface)bFVL).performZoomOut();
+			return true;
 			
 		}else if((bFVL instanceof ApplyPreferredLayoutListenerInterface) && refreshChanged()){
 			
 			((ApplyPreferredLayoutListenerInterface)bFVL).performApplyLayout();
+			return true;
 			
 		}else if((bFVL instanceof BioFabricFitContentListenerInterface) && fitContentChanged()){
 			
 			((BioFabricFitContentListenerInterface)bFVL).performFitContent();
-			
-		}else if((bFVL instanceof BioFabricZoomAllNetworkListenerInterface) && zoomAllNetworkChanged()){
-			
-			((BioFabricZoomAllNetworkListenerInterface)bFVL).performZoomAllNetwork();
-			
-		}else if((bFVL instanceof BioFabricZoomSelectedListenerInterface) && zoomSelectedChanged()){
-			
-			((BioFabricZoomSelectedListenerInterface)bFVL).performZoomSelected();
+			return true;
 			
 		}
+		
+		return false;
 	}
 
 	private boolean zoomInChanged(){
@@ -396,6 +411,7 @@ public class CyBFNetworkView extends CyBFView<CyNetwork> implements CyNetworkVie
 	}
 	
 	//TODO: may not need to have to implement this button, need to make sure the correct layout is applied
+	// I think the button will re-layout the network using the default layout.
 	private boolean refreshChanged(){
 		return false;
 	}
@@ -407,13 +423,5 @@ public class CyBFNetworkView extends CyBFView<CyNetwork> implements CyNetworkVie
 		}else{
 			return false;
 		}
-	}
-	
-	private boolean zoomAllNetworkChanged(){
-		return false;
-	}
-	
-	private boolean zoomSelectedChanged(){
-		return false;
-	}		
+	}	
 }

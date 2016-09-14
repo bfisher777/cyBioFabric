@@ -44,6 +44,8 @@ import org.systemsbiology.cyBioFabric.internal.cytoscape.view.listeners.ApplyPre
 import org.systemsbiology.cyBioFabric.internal.cytoscape.view.listeners.BioFabricFitContentListener;
 import org.systemsbiology.cyBioFabric.internal.cytoscape.view.listeners.BioFabricZoomInListener;
 import org.systemsbiology.cyBioFabric.internal.cytoscape.view.listeners.BioFabricZoomOutListener;
+import org.systemsbiology.cyBioFabric.internal.cytoscape.view.listeners.BioFabricZoomSelectedListener;
+import org.systemsbiology.cyBioFabric.internal.cytoscape.view.listeners.BioFabricZoomSelectedListenerInterface;
 import org.systemsbiology.cyBioFabric.internal.events.BioFabricNetworkViewAddedHandler;
 import org.systemsbiology.cyBioFabric.internal.events.BioFabricNetworkViewToBeDestroyedHandler;
 import org.systemsbiology.cyBioFabric.internal.graphics.BirdsEyeGraphicsConfiguration;
@@ -119,7 +121,7 @@ public class CyBFRenderingEngine implements RenderingEngine<CyNetwork>, Printabl
 			BNVisualPropertyValue bnvpv = networkView.getVisualProperty(BioFabricVisualLexicon.BIOFABRIC_NETWORK);
 			BioFabricNetwork bfn = bnvpv.getBioFabricNetwork();			
 			
-			installBioFabricNetwork(bfn, bioFabricWindow, selectionWindow, true);
+			installBioFabricNetwork(bfn, bioFabricWindow, selectionWindow, true, taskManager);
 			
 			//handle shutdown events
 			registerHandlers(bioFabricApplication);
@@ -129,7 +131,7 @@ public class CyBFRenderingEngine implements RenderingEngine<CyNetwork>, Printabl
 			//listen for cytoscape button and menu events and pass along to biofabric
 			registerViewListeners(new BioFabricZoomInListener(name), 
 					new ApplyPreferredLayoutListener(networkView, layoutAlgorithmManager.getDefaultLayout(), layoutAlgorithmManager, taskManager),
-					new BioFabricZoomOutListener(name), new BioFabricFitContentListener(name));															
+					new BioFabricZoomOutListener(name), new BioFabricFitContentListener(name), new BioFabricZoomSelectedListener(name));															
 			
 			resetDefaultLayout(layoutAlgorithmManager, defaultLayout);		
 			
@@ -137,7 +139,8 @@ public class CyBFRenderingEngine implements RenderingEngine<CyNetwork>, Printabl
 			
 			//TODO: figure out how to scale this to fit the container properly
 			BioFabricWindow bioFabricWindow = bioFabricApplication.getBioFabricWindow();
-			BioFabricOverview overView = bioFabricWindow.getThumbnailView();						
+			BioFabricOverview overView = bioFabricWindow.getThumbnailView();
+			
 			container.setLayout(new BorderLayout());			
 			container.add(overView);			
 		}else if(configuration instanceof BirdsEyeGraphicsConfiguration){			
@@ -178,14 +181,15 @@ public class CyBFRenderingEngine implements RenderingEngine<CyNetwork>, Printabl
 
 	/*
 	 * Method will add the view listeners to the networkView, used to handle cytoscape button click
-	 * 
-	 * */
+	 * TODO move this code inside the CyBFNetworkView, it makes more sense to reside there
+	 * */ 
 	private void registerViewListeners(BioFabricZoomInListener zoomIn, ApplyPreferredLayoutListener applyLayout,
-		BioFabricZoomOutListener zoomOut, BioFabricFitContentListener fitContent){		
+		BioFabricZoomOutListener zoomOut, BioFabricFitContentListener fitContent, BioFabricZoomSelectedListenerInterface zoomSelected){		
 		networkView.addBioFabricViewListener(zoomIn);
 		networkView.addBioFabricViewListener(zoomOut);
 		networkView.addBioFabricViewListener(fitContent);	
 		networkView.addBioFabricViewListener(applyLayout);
+		networkView.addBioFabricViewListener(zoomSelected);
 	}
 	
 	/* 
@@ -214,7 +218,8 @@ public class CyBFRenderingEngine implements RenderingEngine<CyNetwork>, Printabl
 	
 	//TODO not sure if I need to call this on the selectionWindow
 	//Disable menu toolbar in biofabric network manually if desired
-	public void installBioFabricNetwork(BioFabricNetwork bfn, BioFabricWindow bfw, BioFabricWindow selectionWindow, boolean showNav){
+	public void installBioFabricNetwork(BioFabricNetwork bfn, BioFabricWindow bfw, BioFabricWindow selectionWindow, 
+			boolean showNav, DialogTaskManager taskManager){
 		  
 		if(bfn != null){			
 			
@@ -234,7 +239,7 @@ public class CyBFRenderingEngine implements RenderingEngine<CyNetwork>, Printabl
 		  }else{
 			  System.err.println("Attempting to install a null BioFabricNetwork");
 		  }
-		  
+		  bfw.setDialogTaskManager(taskManager);//TODO used for displaying pop up menu not implemented yet
 		  bfw.showNavAndControl(showNav);
 	  }
 	

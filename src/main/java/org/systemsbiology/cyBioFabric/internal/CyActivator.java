@@ -18,6 +18,8 @@ import org.cytoscape.application.events.SetCurrentNetworkViewListener;
 import org.cytoscape.application.swing.CyAction;
 import org.cytoscape.application.swing.CySwingApplication;
 import org.cytoscape.application.swing.CytoPanelComponent;
+import org.cytoscape.event.CyEventHelper;
+import org.cytoscape.model.events.RowsSetListener;
 import org.cytoscape.service.util.AbstractCyActivator;
 import org.cytoscape.task.EdgeViewTaskFactory;
 import org.cytoscape.task.NetworkViewLocationTaskFactory;
@@ -44,6 +46,8 @@ import org.systemsbiology.cyBioFabric.internal.events.BioFabricNetworkViewAddedH
 import org.systemsbiology.cyBioFabric.internal.events.BioFabricNetworkViewAddedListener;
 import org.systemsbiology.cyBioFabric.internal.events.BioFabricNetworkViewToBeDestroyedHandler;
 import org.systemsbiology.cyBioFabric.internal.events.BioFabricNetworkViewToBeDestroyedListener;
+import org.systemsbiology.cyBioFabric.internal.events.BioFabricRowSetHandler;
+import org.systemsbiology.cyBioFabric.internal.events.BioFabricRowSetListener;
 import org.systemsbiology.cyBioFabric.internal.events.BioFabricSetCurrentViewHandler;
 import org.systemsbiology.cyBioFabric.internal.events.BioFabricSetCurrentViewListener;
 import org.systemsbiology.cyBioFabric.internal.events.BioFabricShutdownHandler;
@@ -52,15 +56,16 @@ import org.systemsbiology.cyBioFabric.internal.graphics.BioFabricCytoPanel;
 import org.systemsbiology.cyBioFabric.internal.graphics.GraphicsConfigurationFactory;
 import org.systemsbiology.cyBioFabric.internal.icons.BioFabricAbstractCyActionBuilder;
 import org.systemsbiology.cyBioFabric.internal.icons.BioFabricImageIcon;
-import org.systemsbiology.cyBioFabric.internal.icons.TaskFactoryPredicate;
+import org.systemsbiology.cyBioFabric.internal.icons.BioFabricStopButtonFactoryPredicate;
+import org.systemsbiology.cyBioFabric.internal.icons.BioFabricViewFactoryPredicate;
+import org.systemsbiology.cyBioFabric.internal.icons.BioFabricViewPropertySelectedPredicate;
 import org.systemsbiology.cyBioFabric.internal.layouts.BioFabricLayoutInterface;
 import org.systemsbiology.cyBioFabric.internal.layouts.DefaultBioFabricLayoutAlgorithm;
 import org.systemsbiology.cyBioFabric.internal.task.TaskFactoryListener;
 
-/*Main entry point into cytoscape
- * The application Simple Renderer will perform simple rendering of the input file to generate the image.
- * The app provides no user input handling and is meant to be a demonstration of writing a simple renderer
- * using Java 2-D with Cytoscape. */
+/*
+ * Main entry point into cytoscape
+ * */
 public class CyActivator extends AbstractCyActivator {	
 	final Logger logger = Logger.getLogger(CyUserLog.NAME);
 
@@ -124,34 +129,42 @@ public class CyActivator extends AbstractCyActivator {
 		registerServiceListener(context, taskFactoryListener, "addNetworkViewLocationTaskFactory", "removeNetworkViewLocationTaskFactory", NetworkViewLocationTaskFactory.class);								
 		
 		
-		//init a BioFabricActionIconBuilder used to build toolbar and menu items
+		//init a BioFabricActionIconBuilder used to build toolbar and menu items		
+		CyEventHelper cyEventHelperRef = getService(context,CyEventHelper.class);
 		CyApplicationManager applicationManager = getService(context, CyApplicationManager.class);
 		CyNetworkViewManager networkViewManager = getService(context, CyNetworkViewManager.class);
-		TaskFactoryPredicate taskFactoryPredicate = new TaskFactoryPredicate();
+		//Predicates used to set custom isReady for buttons / menu items when presentation is updated
+		BioFabricViewFactoryPredicate taskFactoryPredicate = new BioFabricViewFactoryPredicate();
 		registerService(context, taskFactoryPredicate, TaskFactory.class, new Properties());
-		BioFabricAbstractCyActionBuilder bioFabricActionIconBuilder = new BioFabricAbstractCyActionBuilder(applicationManager, networkViewManager, taskFactoryPredicate);					
+		BioFabricViewPropertySelectedPredicate taskFactorySelectedNodeEdgePredicate = new BioFabricViewPropertySelectedPredicate();
+		registerService(context, taskFactorySelectedNodeEdgePredicate, TaskFactory.class, new Properties());
+		BioFabricStopButtonFactoryPredicate taskFactoryStopButtonPredicate = new BioFabricStopButtonFactoryPredicate();
+		registerService(context, taskFactoryStopButtonPredicate, TaskFactory.class, new Properties());
+		BioFabricAbstractCyActionBuilder bioFabricActionIconBuilder = new BioFabricAbstractCyActionBuilder(cyEventHelperRef, applicationManager, networkViewManager, taskFactoryPredicate,
+				taskFactorySelectedNodeEdgePredicate, taskFactoryStopButtonPredicate);					
 		
-		//Add image icons(buttons / items) to toolbar	
-		ArrayList<BioFabricImageIcon> buttons = new ArrayList<BioFabricImageIcon>();
-		registerService(context, bioFabricActionIconBuilder.buildAZoomRectButton(buttons), CyAction.class, new Properties());		
-		registerService(context, bioFabricActionIconBuilder.buildACenterOnPreviousButton(buttons), CyAction.class, new Properties());
-		registerService(context, bioFabricActionIconBuilder.buildAZoomToCurrentButton(buttons), CyAction.class, new Properties());
-		registerService(context, bioFabricActionIconBuilder.buildACenterOnNextButton(buttons), CyAction.class, new Properties());
-		registerService(context, bioFabricActionIconBuilder.buildASearchButton(buttons), CyAction.class, new Properties());
-		registerService(context, bioFabricActionIconBuilder.buildAClearSelectionsButton(buttons), CyAction.class, new Properties());		
+		//Add image icons(buttons / items) to toolbar		
+		ArrayList<BioFabricImageIcon> icons = new ArrayList<BioFabricImageIcon>();
+		registerService(context, bioFabricActionIconBuilder.buildAZoomRectButton(icons), CyAction.class, new Properties());
+		registerService(context, bioFabricActionIconBuilder.buildACancelButton(icons), CyAction.class, new Properties());
+		registerService(context, bioFabricActionIconBuilder.buildACenterOnPreviousButton(icons), CyAction.class, new Properties());
+		registerService(context, bioFabricActionIconBuilder.buildAZoomToCurrentButton(icons), CyAction.class, new Properties());
+		registerService(context, bioFabricActionIconBuilder.buildACenterOnNextButton(icons), CyAction.class, new Properties());
+		//registerService(context, bioFabricActionIconBuilder.buildASearchButton(icons), CyAction.class, new Properties());
+		registerService(context, bioFabricActionIconBuilder.buildAClearSelectionsButton(icons), CyAction.class, new Properties());		
 		//create menu items for CyBioFabric		
-		registerService(context, bioFabricActionIconBuilder.buildAImportWithEdgeWeightsMenuItem(buttons), CyAction.class, new Properties());
-		registerService(context, bioFabricActionIconBuilder.buildAImportWithNodeAttributesMenuItem(buttons), CyAction.class, new Properties());
-		registerService(context, bioFabricActionIconBuilder.buildAEditAccumulateSelectionsMenuItem(buttons), CyAction.class, new Properties());
-		registerService(context, bioFabricActionIconBuilder.buildAEditSetDisplayOptionsMenuItem(buttons), CyAction.class, new Properties());
-		registerService(context, bioFabricActionIconBuilder.buildAViewSelectARectangleAndZoomMenuItem(buttons), CyAction.class, new Properties());
-		registerService(context, bioFabricActionIconBuilder.buildAViewZoomToNetworkMagPositionMenuItem(buttons), CyAction.class, new Properties());
-		registerService(context, bioFabricActionIconBuilder.buildAViewZoomToMousePositionMenuItem(buttons), CyAction.class, new Properties());
-		registerService(context, bioFabricActionIconBuilder.buildAViewCenterOnPreviousSelectionMenuItem(buttons), CyAction.class, new Properties());
-		registerService(context, bioFabricActionIconBuilder.buildAViewZoomToCurrentSelectionMenuItem(buttons), CyAction.class, new Properties());
-		registerService(context, bioFabricActionIconBuilder.buildAViewCenterOnNextSelectionMenuItem(buttons), CyAction.class, new Properties());
-		registerService(context, bioFabricActionIconBuilder.buildAToolsCompareMultipleNodesMenuItem(buttons), CyAction.class, new Properties());
-		registerService(context, bioFabricActionIconBuilder.buildAToolsSearchForNodesMenuItem(buttons), CyAction.class, new Properties());
+		registerService(context, bioFabricActionIconBuilder.buildAImportWithEdgeWeightsMenuItem(icons), CyAction.class, new Properties());
+		registerService(context, bioFabricActionIconBuilder.buildAImportWithNodeAttributesMenuItem(icons), CyAction.class, new Properties());
+		registerService(context, bioFabricActionIconBuilder.buildAEditAccumulateSelectionsMenuItem(icons), CyAction.class, new Properties());
+		registerService(context, bioFabricActionIconBuilder.buildAEditSetDisplayOptionsMenuItem(icons), CyAction.class, new Properties());
+		registerService(context, bioFabricActionIconBuilder.buildAViewSelectARectangleAndZoomMenuItem(icons), CyAction.class, new Properties());
+		registerService(context, bioFabricActionIconBuilder.buildAViewZoomToNetworkMagPositionMenuItem(icons), CyAction.class, new Properties());
+		registerService(context, bioFabricActionIconBuilder.buildAViewZoomToMousePositionMenuItem(icons), CyAction.class, new Properties());
+		registerService(context, bioFabricActionIconBuilder.buildAViewCenterOnPreviousSelectionMenuItem(icons), CyAction.class, new Properties());
+		registerService(context, bioFabricActionIconBuilder.buildAViewZoomToCurrentSelectionMenuItem(icons), CyAction.class, new Properties());
+		registerService(context, bioFabricActionIconBuilder.buildAViewCenterOnNextSelectionMenuItem(icons), CyAction.class, new Properties());
+		registerService(context, bioFabricActionIconBuilder.buildAToolsCompareMultipleNodesMenuItem(icons), CyAction.class, new Properties());
+		registerService(context, bioFabricActionIconBuilder.buildAToolsSearchForNodesMenuItem(icons), CyAction.class, new Properties());
 		bioFabricActionIconBuilder = null;//done building buttons and menu items
 		
 		//adds the magnifier and the navigation tool to the control panel
@@ -172,9 +185,14 @@ public class CyActivator extends AbstractCyActivator {
 		BioFabricShutdownListener bioFabricShutdownListener = new BioFabricShutdownListener(biofabricShutdownHandler);
 		registerService(context, bioFabricShutdownListener, CyShutdownListener.class, new Properties());
 		
-		BioFabricSetCurrentViewHandler biofabricSetCurrentViewHandler = new BioFabricSetCurrentViewHandler(bioFabricNavPanel, buttons, taskFactoryPredicate);
+		BioFabricSetCurrentViewHandler biofabricSetCurrentViewHandler = new BioFabricSetCurrentViewHandler(bioFabricNavPanel, icons, taskFactoryPredicate, 
+				taskFactorySelectedNodeEdgePredicate, taskFactoryStopButtonPredicate);
 		BioFabricSetCurrentViewListener bioFabricSetCurrentViewListener = new BioFabricSetCurrentViewListener(biofabricSetCurrentViewHandler);
-		registerService(context, bioFabricSetCurrentViewListener, SetCurrentNetworkViewListener.class, new Properties());						
+		registerService(context, bioFabricSetCurrentViewListener, SetCurrentNetworkViewListener.class, new Properties());	
+		
+		BioFabricRowSetHandler biofabricRowsSetHandler = new BioFabricRowSetHandler(applicationManager, networkViewManager);
+		BioFabricRowSetListener bioFabricRowsSetListener = new BioFabricRowSetListener(biofabricRowsSetHandler);
+		registerService(context, bioFabricRowsSetListener, RowsSetListener.class, new Properties());
 		
 		// CyBF NetworkView factory
 		/*Factory for CyNetworkView objects. Modules which need to create view models should import this as a service.
@@ -186,8 +204,7 @@ public class CyActivator extends AbstractCyActivator {
 		registerService(context, cyBFNetworkViewFactory, CyNetworkViewFactory.class, cyBFNetworkViewFactoryProps);
 		
 		// Main RenderingEngine factory
-		/*GraphicsConfiguarionFactory is an enum, values implement abstract method createGraphicsConfiguration*/
-		/*TODO: Implement graphics using Java 2D*/
+		/*GraphicsConfiguarionFactory is an enum, values implement abstract method createGraphicsConfiguration*/		
 		GraphicsConfigurationFactory mainFactory = GraphicsConfigurationFactory.MAIN_FACTORY;
 		
 		/*The RenderingEngineFactory creates an instance of RenderingEngine for the given network view.

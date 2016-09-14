@@ -81,7 +81,7 @@ public class BioFabricNavAndControl extends JPanel {
 
   public BioFabricNavAndControl(boolean isMain, JInternalFrame topWindow, String commandName) {
 
-    floc_ = new FabricLocation();
+    floc_ = new FabricLocation();//Mouse Over Node Row, Mouse Over Link, Mouse Over Node Link Zone
 
     //CommandSet fc = CommandSet.getCmds((isMain) ? "mainWindow" : "selectionWindow");
     CommandSet fc = CommandSet.getCmds(commandName);
@@ -106,13 +106,13 @@ public class BioFabricNavAndControl extends JPanel {
     
     fopan_ = new JPanel();
     fopan_.setLayout(new BorderLayout());
-    fopan_.setBorder(new LineBorder(Color.black, 2));
-    JLabel overLab = new JLabel(ResourceManager.getManager().getString("biofabric.overview"));
+    //fopan_.setBorder(new LineBorder(Color.black, 2));//TODO removed border to make panel look more like cytoscape native
+    /*JLabel overLab = new JLabel(ResourceManager.getManager().getString("biofabric.overview"));
     overLab.setBorder(new EmptyBorder(0, 5, 0, 0));
     overLab.setOpaque(true);
     overLab.setBackground(Color.white);
     overLab.setFont(labelFont);
-    fopan_.add(overLab, BorderLayout.NORTH);
+    fopan_.add(overLab, BorderLayout.NORTH);*/
     fopan_.add(bfo_, BorderLayout.CENTER);
     
     lfnt_ = new FabricNavTool.LabeledFabricNavTool(topWindow, labelFont);
@@ -129,6 +129,7 @@ public class BioFabricNavAndControl extends JPanel {
     //spot_.setResizeWeight(1.0);
 
     JSplitPane sp = new JSplitPane(JSplitPane.VERTICAL_SPLIT, fmpan, spot_); //TODO changed this hor to vert
+    sp.setResizeWeight(0.6);//TODO added this to give the magnifier more space in the CytoPanel
     withControls_ = new JPanel();
     withControls_.setLayout(new BorderLayout());
     withControls_.add(floc_, BorderLayout.NORTH);
@@ -138,7 +139,7 @@ public class BioFabricNavAndControl extends JPanel {
     this.setLayout(clay_);
     this.add(withControls_, "cntrl");
     this.add(new JPanel(), "blank");
-    clay_.show(this, "cntrl");
+    clay_.show(this, "cntrl"); 
     collapsed_ = false;
     
     return;

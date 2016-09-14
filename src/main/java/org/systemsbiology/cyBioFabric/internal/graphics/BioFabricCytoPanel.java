@@ -114,10 +114,12 @@ public class BioFabricCytoPanel extends JPanel implements CytoPanelComponent {
 	    return resizedImg;
 	}	
 	
+	/*
+	 * Set the correct NAC panel in this BioFabricCytoPanel
+	 * 
+	 * */
 	public void setNavAndControl(BioFabricNavAndControl nac){
-		this.removeAll();
-		this.revalidate();
-		this.add(nac);
-		this.revalidate();
+		this.removeAll();		
+		this.add(nac);		
 	}
 }

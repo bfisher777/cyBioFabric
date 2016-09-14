@@ -24,7 +24,7 @@ public class ToolBarZoomToRectAction extends AbstractCyAction implements BioFabr
 	private static final long serialVersionUID = -1796000090394162849L;	
 	
 	public ToolBarZoomToRectAction(Map<String, String> configProps,  CyApplicationManager applicationManager, 
-			CyNetworkViewManager networkViewManager, TaskFactoryPredicate taskFactoryPredicate){
+			CyNetworkViewManager networkViewManager, BioFabricViewFactoryPredicate taskFactoryPredicate){
 	    super(configProps, applicationManager, networkViewManager, taskFactoryPredicate);	    	    
 	    	           
         URL ugif = getClass().getResource("/images/ZoomToFabricRect24.gif");          

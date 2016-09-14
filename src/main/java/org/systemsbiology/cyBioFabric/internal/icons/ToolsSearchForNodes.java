@@ -20,7 +20,7 @@ public class ToolsSearchForNodes extends AbstractCyAction implements BioFabricIm
 	private String COMMAND_SET_NAME;	
 	
 	public ToolsSearchForNodes(Map<String, String> configProps,  CyApplicationManager applicationManager, 
-			CyNetworkViewManager networkViewManager, TaskFactoryPredicate taskFactoryPredicate){
+			CyNetworkViewManager networkViewManager, BioFabricViewFactoryPredicate taskFactoryPredicate){
 	    super(configProps, applicationManager, networkViewManager, taskFactoryPredicate);	    	    	    	   
 	}
 	

@@ -47,6 +47,7 @@ import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 
+import org.cytoscape.work.swing.DialogTaskManager;
 import org.systemsbiology.cyBioFabric.internal.biofabric.cmd.CommandSet;
 import org.systemsbiology.cyBioFabric.internal.biofabric.ui.display.BioFabricNavAndControl;
 import org.systemsbiology.cyBioFabric.internal.biofabric.ui.display.BioFabricOverview;
@@ -82,10 +83,12 @@ public class BioFabricWindow extends JInternalFrame implements BackgroundWorkerC
   private FixedJComboBox gaggleGooseCombo_;
   private JPanel hidingPanel_;
   private CardLayout myCard_;
-  private JSplitPane sp_;
+  private JSplitPane sp_;//TODO can I remove this?
   private double savedSplitFrac_;
   private static final long serialVersionUID = 1L;
   public final String COMMAND_NAME;
+  
+  private DialogTaskManager dialogTaskManager_; //TODO added this to support the popmenu used in FabricPanel
    
   ////////////////////////////////////////////////////////////////////////////
   //
@@ -256,9 +259,9 @@ public class BioFabricWindow extends JInternalFrame implements BackgroundWorkerC
     blankPanel.setBackground(Color.white);
     hidingPanel_.add(blankPanel, "Hiding");
 
-    sp_ = new JSplitPane(JSplitPane.VERTICAL_SPLIT, hidingPanel_, nac_);
-    sp_.setDividerLocation((int)(dim.height * 0.50));       
-    sp_.setResizeWeight(1.0);
+    sp_ = null;//new JSplitPane(JSplitPane.VERTICAL_SPLIT, hidingPanel_, nac_);TODO changed this
+    //sp_.setDividerLocation((int)(dim.height * 0.50));       
+    //sp_.setResizeWeight(1.0);
 
 
     cpane.add(hidingPanel_, BorderLayout.CENTER);//TODO changed this    
@@ -349,12 +352,12 @@ public class BioFabricWindow extends JInternalFrame implements BackgroundWorkerC
   ** Hide/show nav and controls
   */
   
-  public void showNavAndControl(boolean show) {
-    if (show) {
+  public void showNavAndControl(boolean show) {//TODO can I remove this?
+    if (show && sp_ != null) {
       sp_.setEnabled(true);
       nac_.setToBlank(!show);
       sp_.setDividerLocation(savedSplitFrac_);
-    } else {
+    } else if(sp_ != null){
       nac_.setToBlank(!show);
       int lastLoc = sp_.getDividerLocation();
       savedSplitFrac_ = (double)lastLoc / (double)sp_.getHeight();
@@ -369,8 +372,8 @@ public class BioFabricWindow extends JInternalFrame implements BackgroundWorkerC
   ** Hide/show nav and controls
   */
   
-  public void showTour(boolean show) {
-    if (nac_.showTour(show)) {
+  public void showTour(boolean show) {//TODO can I remove this?
+    if (nac_.showTour(show) && sp_ != null) {
       sp_.resetToPreferredSizes();
     }
     return;
@@ -576,7 +579,7 @@ public class BioFabricWindow extends JInternalFrame implements BackgroundWorkerC
     //toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.ZOOM_IN)));
     //toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.ZOOM_TO_MODEL)));
     //toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.ZOOM_TO_RECT)));    
-    toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.ZOOM_TO_SELECTIONS)));
+    //toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.ZOOM_TO_SELECTIONS)));
     //toolBar.addSeparator();
     //toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.CENTER_ON_PREVIOUS_SELECTION)));
     //toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.ZOOM_TO_CURRENT_SELECTION)));
@@ -585,7 +588,7 @@ public class BioFabricWindow extends JInternalFrame implements BackgroundWorkerC
     toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.ADD_FIRST_NEIGHBORS)));
     //toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.CLEAR_SELECTIONS)));
     //toolBar.addSeparator();        
-    toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.CANCEL)));
+    //toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.CANCEL)));
     //toolBar.addSeparator();    
     //toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.SEARCH)));
     if (isMain) {
@@ -631,4 +634,12 @@ public class BioFabricWindow extends JInternalFrame implements BackgroundWorkerC
   public BioFabricOverview getThumbnailView(){ 
 	  return thumbnailView_;
   }  
+  
+  public void setDialogTaskManager(DialogTaskManager dialogTaskManager){
+	  this.dialogTaskManager_ = dialogTaskManager;
+  }
+  
+  public DialogTaskManager getDialogTaskManager(){
+	  return this.dialogTaskManager_;
+  }
 }

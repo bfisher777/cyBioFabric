@@ -419,7 +419,7 @@ public class FabricMagnifier extends JPanel {
     painter_.paintIt(g2, true, clipRec_, false);
     g2.setTransform(saveTrans);
     if (selectionPainter_.needToPaint()) {
-    	System.out.println("YA NEED");
+    	//System.out.println("YA NEED");
   //    drawSelections(g2, clipRec_);
     }    
     if (floaters_ != null) {

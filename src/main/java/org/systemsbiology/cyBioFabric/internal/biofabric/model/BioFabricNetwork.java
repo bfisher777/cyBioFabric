@@ -49,6 +49,7 @@ import org.systemsbiology.cyBioFabric.internal.biofabric.io.FabricFactory;
 import org.systemsbiology.cyBioFabric.internal.biofabric.layouts.DefaultEdgeLayout;
 import org.systemsbiology.cyBioFabric.internal.biofabric.layouts.DefaultLayout;
 import org.systemsbiology.cyBioFabric.internal.biofabric.model.FabricLink;
+import org.systemsbiology.cyBioFabric.internal.biofabric.model.BioFabricNetwork.NodeInfo;
 import org.systemsbiology.cyBioFabric.internal.biofabric.parser.AbstractFactoryClient;
 import org.systemsbiology.cyBioFabric.internal.biofabric.parser.GlueStick;
 import org.systemsbiology.cyBioFabric.internal.biofabric.ui.FabricColorGenerator;
@@ -138,6 +139,10 @@ public class BioFabricNetwork {
   
   public BuildData bd_; //added to pass to cytoscape renderer
   
+  
+  //hold a reference to the networkView
+  public CyNetworkView networkView;
+  
   ////////////////////////////////////////////////////////////////////////////
   //
   // PUBLIC CONSTRUCTORS
@@ -150,7 +155,7 @@ public class BioFabricNetwork {
   */
 
   public BioFabricNetwork(BuildData bd) {
-    BuildMode mode = bd.getMode();
+    BuildMode mode = bd.getMode();    
     bd_ = bd;
     switch (mode) {
       case DEFAULT_LAYOUT:  
@@ -195,7 +200,8 @@ public class BioFabricNetwork {
         break;
       case BUILD_FROM_SIF:
       case BUILD_FROM_GAGGLE:
-        RelayoutBuildData obd = (RelayoutBuildData)bd;    
+        RelayoutBuildData obd = (RelayoutBuildData)bd;
+        this.networkView = obd.networkView;
         normalCols_ = new ColumnAssign();
         shadowCols_ = new ColumnAssign();
         rowToTarg_ = new HashMap<Integer, String>(); 
@@ -1123,6 +1129,44 @@ public class BioFabricNetwork {
       }
     }
     nodeSet.addAll(newNodes);
+    
+    for(String node : nodeSet){//TODO added selected nodes here make sure this is correct
+		NodeInfo nodeInfo = getNodeDefinition(node);		
+		
+		if(networkView != null){
+			long nodeSUID = nodeInfo.getNodeSUID();
+			CyNode cyNode = networkView.getModel().getNode(nodeSUID); 
+	    	  
+	    	Boolean isSelected = networkView.getModel().getRow(cyNode).get(CyNetwork.SELECTED, Boolean.class);
+	    	
+	    	if(!isSelected){
+	    		//set node row table value
+		    	networkView.getModel().getRow(cyNode).set(CyNetwork.SELECTED, true);      	
+		    	//Set view model
+		    	View<CyNode> view = networkView.getNodeView(cyNode);
+		    	view.setVisualProperty(BioFabricVisualLexicon.NODE_SELECTED, true);
+	    	}
+		}
+    }
+		
+	for(FabricLink edge : linkSet){//TODO added selected edges here make sure this is correct
+		
+		if(networkView != null){
+			long edgeSUID = edge.getEdgeModelSUID();
+			CyEdge cyEdge = networkView.getModel().getEdge(edgeSUID); 
+	    	  
+	    	Boolean isSelected = networkView.getModel().getRow(cyEdge).get(CyNetwork.SELECTED, Boolean.class);
+	    	
+	    	if(!isSelected){
+	    		//set node row table value
+		    	networkView.getModel().getRow(cyEdge).set(CyNetwork.SELECTED, true);      	
+		    	//Set view model
+		    	View<CyEdge> view = networkView.getEdgeView(cyEdge);
+		    	view.setVisualProperty(BioFabricVisualLexicon.NODE_SELECTED, true);
+	    	}
+		}
+	}
+    
     return;
   }
 
@@ -1850,7 +1894,7 @@ public class BioFabricNetwork {
     private int noShadowColumn_;
     private int shadowColumn_;
     private String colorKey_;
-    private CyNetworkView networkView_;
+    private CyNetworkView networkView_;//TODO don't need to store reference to network if bfn stores the reference
     private long edgeModelSUID_;
     
     public LinkInfo(FabricLink flink, int startRow, int endRow, int noShadowColumn, int shadowColumn, String colorKey) {
@@ -1958,7 +2002,7 @@ public class BioFabricNetwork {
     public String colorKey;
     private String cluster_;
     private long nodeSUID;
-    private CyNetworkView network;
+    private CyNetworkView networkView;//TODO don't need to store reference to network if bfn stores the reference
         
     private MinMax colRangeSha_;
     private MinMax colRangePln_;
@@ -1978,8 +2022,8 @@ public class BioFabricNetwork {
       cluster_ = null;
     }
     
-    NodeInfo(CyNetworkView network, String nodeName, int nodeRow, String colorKey) {
-        this.network = network;
+    NodeInfo(CyNetworkView networkView, String nodeName, int nodeRow, String colorKey) {
+        this.networkView = networkView;
 
         this.nodeRow = nodeRow;
         this.colorKey = colorKey;
@@ -1991,14 +2035,13 @@ public class BioFabricNetwork {
         shadowDrainZone_ = null;
         cluster_ = null;
         
-        if(this.network != null){
+        if(this.networkView != null){
       	  nodeSUID = Long.parseLong(nodeName);
-      	  CyNode node = network.getModel().getNode(nodeSUID); 
+      	  CyNode node = networkView.getModel().getNode(nodeSUID); 
       	  
-      	  //TODO figure out why names not printing
-      	  this.nodeName = network.getModel().getRow(node).get(CyNetwork.NAME, String.class);
+      	  this.nodeName = networkView.getModel().getRow(node).get(CyNetwork.NAME, String.class);
       	  
-      	  View<CyNode> view = network.getNodeView(node);
+      	  View<CyNode> view = networkView.getNodeView(node);
       	  view.setVisualProperty(BioFabricVisualLexicon.NODE_NAME, this.nodeName);
       	  view.setVisualProperty(BioFabricVisualLexicon.NODE_COLOR_KEY, colorKey);
       	  view.setVisualProperty(BioFabricVisualLexicon.NODE_ROW, nodeRow);
@@ -2011,6 +2054,10 @@ public class BioFabricNetwork {
         }
       }
     
+    //TODO Added these two methods to allow NodeInfo objects to access and update table property values
+    public long getNodeSUID(){ return nodeSUID; }
+    public CyNetworkView getNetworkView(){ return networkView; }
+    
     public MinMax getDrainZone(boolean forShadow) { 
       return (forShadow) ? shadowDrainZone_ : plainDrainZone_;
     }
@@ -2019,9 +2066,9 @@ public class BioFabricNetwork {
       
 
         View<CyNode> view = null;
-        if(this.network != null){  	    
-    	    CyNode node = network.getModel().getNode(nodeSUID);   	    
-    	    view = network.getNodeView(node);
+        if(this.networkView != null){  	    
+    	    CyNode node = networkView.getModel().getNode(nodeSUID);   	    
+    	    view = networkView.getNodeView(node);
   	  }
       	
         if (forShadow) {
@@ -2048,9 +2095,9 @@ public class BioFabricNetwork {
       
     void updateMinMaxCol(int i, boolean forShadow) {
     	View<CyNode> view = null;
-        if(this.network != null){  	    
-  	    CyNode node = network.getModel().getNode(nodeSUID);   	    
-  	    view = network.getNodeView(node);
+        if(this.networkView != null){  	    
+  	    CyNode node = networkView.getModel().getNode(nodeSUID);   	    
+  	    view = networkView.getNodeView(node);
     	  }
         if (forShadow){    	      	  
       	  colRangeSha_.update(i);
@@ -2243,7 +2290,7 @@ public class BioFabricNetwork {
   }
  
   /***************************************************************************
-  **
+  ** TODO understand this
   ** For passing around build data
   */  
   
