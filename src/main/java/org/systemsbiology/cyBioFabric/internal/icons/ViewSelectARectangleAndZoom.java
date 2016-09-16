@@ -7,7 +7,9 @@ import org.cytoscape.application.CyApplicationManager;
 import org.cytoscape.application.swing.AbstractCyAction;
 import org.cytoscape.event.CyEventHelper;
 import org.cytoscape.view.model.CyNetworkViewManager;
+import org.cytoscape.view.model.events.UpdateNetworkPresentationEvent;
 import org.systemsbiology.cyBioFabric.internal.biofabric.cmd.CommandSet;
+import org.systemsbiology.cyBioFabric.internal.icons.actions.ZoomToRectAction;
 
 public class ViewSelectARectangleAndZoom extends AbstractCyAction implements BioFabricImageIcon{
 	
@@ -15,27 +17,24 @@ public class ViewSelectARectangleAndZoom extends AbstractCyAction implements Bio
 	 * 
 	 */
 	private static final long serialVersionUID = -7715729109562083703L;
-	private String COMMAND_SET_NAME;
-	private final CyEventHelper eventHelper;
+	private String commandSetName;
+	private ZoomToRectAction zoomToRectAction;
 	
 	public ViewSelectARectangleAndZoom(Map<String, String> configProps,  CyApplicationManager applicationManager, 
 			CyNetworkViewManager networkViewManager, BioFabricViewFactoryPredicate taskFactoryPredicate, CyEventHelper eventHelper){
 	    super(configProps, applicationManager, networkViewManager, taskFactoryPredicate);	    	    
-	    this.eventHelper = eventHelper;
+	    
+	    this.zoomToRectAction = new ZoomToRectAction(taskFactoryPredicate, eventHelper, commandSetName);
 	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {		
-		CommandSet fc = CommandSet.getCmds(COMMAND_SET_NAME);
-	    fc.getAction(CommandSet.ZOOM_TO_RECT, false, null).actionPerformed(null);		
-	    
-		 // This is necessary, otherwise, this does not update presentation!  This will unhide the stop/cancel button
-		//TODO this is not working properly, not sure where
-		 eventHelper.fireEvent(null);
+		zoomToRectAction.fireEvent();
 	}
 	
 	@Override
 	public void registerCommandSetName(String commandSetName){
-		this.COMMAND_SET_NAME = commandSetName;
+		this.commandSetName = commandSetName;
+		zoomToRectAction.updateName(commandSetName);
 	}	
 }

@@ -10,6 +10,7 @@ import org.cytoscape.application.CyApplicationManager;
 import org.cytoscape.application.swing.AbstractCyAction;
 import org.cytoscape.view.model.CyNetworkViewManager;
 import org.systemsbiology.cyBioFabric.internal.biofabric.cmd.CommandSet;
+import org.systemsbiology.cyBioFabric.internal.icons.actions.CenterOnPrevSelectionAction;
 
 public class ToolBarCenterOnPreviousAction extends AbstractCyAction implements BioFabricImageIcon{
 		
@@ -17,7 +18,8 @@ public class ToolBarCenterOnPreviousAction extends AbstractCyAction implements B
 	 * 
 	 */
 	private static final long serialVersionUID = -6057238176130426712L;
-	private String COMMAND_SET_NAME;	
+	private String commandSetName;	
+	private CenterOnPrevSelectionAction centerOnPrevSelectionAction;
 	
 	public ToolBarCenterOnPreviousAction(Map<String, String> configProps,  CyApplicationManager applicationManager, 
 			CyNetworkViewManager networkViewManager, BioFabricViewFactoryPredicate taskFactoryPredicate){
@@ -27,17 +29,19 @@ public class ToolBarCenterOnPreviousAction extends AbstractCyAction implements B
 	    ImageIcon icon = new ImageIcon(ugif);
 	
 	    putValue(LARGE_ICON_KEY, icon);	    
-	    setToolbarGravity(5);	    
+	    setToolbarGravity(5);	
+	    
+	    centerOnPrevSelectionAction = new CenterOnPrevSelectionAction(taskFactoryPredicate, commandSetName);
 	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {		
-		CommandSet fc = CommandSet.getCmds(COMMAND_SET_NAME);
-	    fc.getAction(CommandSet.CENTER_ON_PREVIOUS_SELECTION, false, null).actionPerformed(null);		
+		centerOnPrevSelectionAction.fireEvent();	
 	}
 	
 	@Override
 	public void registerCommandSetName(String commandSetName){
-		this.COMMAND_SET_NAME = commandSetName;
+		this.commandSetName = commandSetName;
+		centerOnPrevSelectionAction.updateName(commandSetName);
 	}	
 }

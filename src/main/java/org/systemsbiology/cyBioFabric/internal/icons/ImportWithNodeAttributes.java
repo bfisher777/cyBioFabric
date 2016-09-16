@@ -22,6 +22,7 @@ public class ImportWithNodeAttributes extends AbstractCyAction implements BioFab
 		    
 	}
 	
+	//TODO make a action class to fire the event
 	@Override
 	public void actionPerformed(ActionEvent e) {		
 		CommandSet fc = CommandSet.getCmds(COMMAND_SET_NAME);

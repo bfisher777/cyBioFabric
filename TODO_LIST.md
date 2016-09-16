@@ -5,22 +5,22 @@ cyBioFabric list of things that need to be completed or sorted out.
 - [ ] Add / update comments
 - [ ] Create a test suite
 - [ ] Refactor code... remove unused / reorganize (this would be much easier with test suite)
+- [ ] Rewrite a way to get bioFabric view info from layout algorithm (currently in network view model not serializable, make new columns in network table?).  Ideally layout algorithm would set Cytoscape View properties, and then BioFabric would render using Cytoscape View Properties
+- [ ] Fix / implement BioFabric layout algorithms
 - [ ] Implement a way to export / import using CX data model, http://www.home.ndexbio.org/data-model/
 - [ ] Add a right click feature with menu items add, remove, edit, select (Though commands will not be supported)
-- [ ] Move BioFabric task bar items into Cytoscape as buttons and implement
-- [ ] Implement BioFabric menu items.
-- [ ] Create task factories to disable / enable biofabric menu items tool bar buttons for correct state of application
+- [ ] Move BioFabric task bar items into Cytoscape and implement
+- [ ] Add Tunables to retrieve user data when menu items or buttons are selected
 - [ ] Need to add short cuts (cytoscape calls them accelerators, see BioFabricAbstractCyActionBuilder class) to menu items and buttons
-- [ ] Add Tunables to retrieve users data when menu items or buttons are selected
-- [ ] Add node added and node removed event listeners / handlers?
-- [ ] Add edge added and edge removed event listeners / handlers?
-- [ ] Add group node /group edges added and removed listeners / handlers?
-- [ ] Rewrite a way to get view info from layout algorithm (currently in network view model, make new columns in network table?)
-- [ ] Fix / implement BioFabric layout algorithms
-- [ ] Update visual property value node / edge selected
-- [ ] Implement / disable menu item choices in the Cytoscape select menu
+- [ ] Add node added and node removed event listeners / handlers (relayout network on event)?
+- [ ] Add edge added and edge removed event listeners / handlers (relayout network on event)?
+- [ ] Add group node /group edges added and removed listeners / handlers (relayout network on event)?
+- [ ] Relayout network button not implemented
+- [ ] Implement / disable icons, currently sending out a UpdateNetworkPresentationEvent event, calls redraw from renderer (may need to change)
 - [ ] Cytoscape implementation of first neighbors doesn't select edges?
-- [ ] Implement undo support? 
+- [ ] Implement undo support?
+- [ ] Subnetwork button clicks throwing a bunch of errors
+- [ ] icons package lots of duplicated code across buttons and menu items.  
 
 
 

@@ -198,7 +198,7 @@ public class CyActivator extends AbstractCyActivator {
 		/*Factory for CyNetworkView objects. Modules which need to create view models should import this as a service.
 		 * Create a CyBFNetworkView*/
 		CyBFNetworkViewFactory cyBFNetworkViewFactory = new CyBFNetworkViewFactory(cyBFVisualLexicon, 
-				visualMappingManagerService, layoutAlgorithmManager, bfLayoutAlg);
+				visualMappingManagerService, layoutAlgorithmManager, bfLayoutAlg, cyEventHelperRef);
 		Properties cyBFNetworkViewFactoryProps = new Properties();
 		cyBFNetworkViewFactoryProps.setProperty("serviceType", "factory");
 		registerService(context, cyBFNetworkViewFactory, CyNetworkViewFactory.class, cyBFNetworkViewFactoryProps);

@@ -7,6 +7,7 @@ import org.cytoscape.application.CyApplicationManager;
 import org.cytoscape.application.swing.AbstractCyAction;
 import org.cytoscape.view.model.CyNetworkViewManager;
 import org.systemsbiology.cyBioFabric.internal.biofabric.cmd.CommandSet;
+import org.systemsbiology.cyBioFabric.internal.icons.actions.ZoomToCurrentSelectionAction;
 
 public class ViewZoomToCurrentSelection extends AbstractCyAction implements BioFabricImageIcon{
 		
@@ -14,22 +15,24 @@ public class ViewZoomToCurrentSelection extends AbstractCyAction implements BioF
 	 * 
 	 */
 	private static final long serialVersionUID = 3492288790169342737L;
-	private String COMMAND_SET_NAME;	
+	private String commandSetName;	
+	private ZoomToCurrentSelectionAction zoomToCurrentSelectionAction;
 	
 	public ViewZoomToCurrentSelection(Map<String, String> configProps,  CyApplicationManager applicationManager, 
 			CyNetworkViewManager networkViewManager, BioFabricViewFactoryPredicate taskFactoryPredicate){
 	    super(configProps, applicationManager, networkViewManager, taskFactoryPredicate);	    	    
-		    
+		
+	    zoomToCurrentSelectionAction = new ZoomToCurrentSelectionAction(taskFactoryPredicate, commandSetName);
 	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {		
-		CommandSet fc = CommandSet.getCmds(COMMAND_SET_NAME);
-	    fc.getAction(CommandSet.ZOOM_TO_CURRENT_SELECTION, false, null).actionPerformed(null);		
+		zoomToCurrentSelectionAction.fireEvent();		
 	}
 	
 	@Override
 	public void registerCommandSetName(String commandSetName){
-		this.COMMAND_SET_NAME = commandSetName;
+		this.commandSetName = commandSetName;
+		zoomToCurrentSelectionAction.updateName(commandSetName);
 	}	
 }

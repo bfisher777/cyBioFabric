@@ -7,6 +7,7 @@ import org.cytoscape.application.CyApplicationManager;
 import org.cytoscape.application.swing.AbstractCyAction;
 import org.cytoscape.view.model.CyNetworkViewManager;
 import org.systemsbiology.cyBioFabric.internal.biofabric.cmd.CommandSet;
+import org.systemsbiology.cyBioFabric.internal.icons.actions.ZoomToMagnifierAction;
 
 public class ViewZoomToNetworkMagPosition extends AbstractCyAction implements BioFabricImageIcon{
 	
@@ -14,22 +15,23 @@ public class ViewZoomToNetworkMagPosition extends AbstractCyAction implements Bi
 	 * 
 	 */
 	private static final long serialVersionUID = 6620081450114742745L;
-	private String COMMAND_SET_NAME;	
+	private String commandSetName;	
+	private ZoomToMagnifierAction zoomToMagnifierAction;
 	
 	public ViewZoomToNetworkMagPosition(Map<String, String> configProps,  CyApplicationManager applicationManager, 
 			CyNetworkViewManager networkViewManager, BioFabricViewFactoryPredicate taskFactoryPredicate){
 	    super(configProps, applicationManager, networkViewManager, taskFactoryPredicate);	    	    
-		    
+		zoomToMagnifierAction = new ZoomToMagnifierAction(taskFactoryPredicate, commandSetName);    
 	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {		
-		CommandSet fc = CommandSet.getCmds(COMMAND_SET_NAME);
-	    fc.getAction(CommandSet.ZOOM_TO_CURRENT_MAGNIFY, false, null).actionPerformed(null);		
+		zoomToMagnifierAction.fireEvent();		
 	}
 	
 	@Override
 	public void registerCommandSetName(String commandSetName){
-		this.COMMAND_SET_NAME = commandSetName;
+		this.commandSetName = commandSetName;
+		zoomToMagnifierAction.updateName(commandSetName);
 	}	
 }

@@ -12,11 +12,10 @@ import org.cytoscape.view.model.VisualProperty;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 
 public class BioFabricViewPropertySelectedPredicate extends BioFabricViewFactoryPredicate {	
-		
-		CyNetworkView networkView;
+				
 		
 		public BioFabricViewPropertySelectedPredicate(){
-			this.networkView = null;
+			super();
 		}
 
 
@@ -41,9 +40,5 @@ public class BioFabricViewPropertySelectedPredicate extends BioFabricViewFactory
 				}
 			}								
 			return ready;
-		}	
-		
-		public void registerNetwork(CyNetworkView networkView){
-			this.networkView = networkView;
-		}
+		}					
 }

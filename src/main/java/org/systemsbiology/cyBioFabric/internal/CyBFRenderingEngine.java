@@ -1,12 +1,9 @@
 package org.systemsbiology.cyBioFabric.internal;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Container;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.print.PageFormat;
@@ -118,6 +115,10 @@ public class CyBFRenderingEngine implements RenderingEngine<CyNetwork>, Printabl
 			pane.setLayout(new BorderLayout());
 			pane.add(bioFabricWindow, BorderLayout.CENTER);
 			
+			//TODO revisit this, passing around large non-serializable object,
+			/*
+			 * Currently the BNVisualPropertyValue is created when the layout algorithm is executed
+			 * */
 			BNVisualPropertyValue bnvpv = networkView.getVisualProperty(BioFabricVisualLexicon.BIOFABRIC_NETWORK);
 			BioFabricNetwork bfn = bnvpv.getBioFabricNetwork();			
 			

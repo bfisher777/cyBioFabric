@@ -134,8 +134,6 @@ public class CyBFRenderingEngineFactory implements RenderingEngineFactory<CyNetw
 		// apply the layout
 		TaskIterator taskIterator = layout.createTaskIterator(cyBFViewModel, layout.getDefaultLayoutContext(), CyLayoutAlgorithm.ALL_NODE_VIEWS, null);
 		taskManager.execute(taskIterator);
-	}*/
-	
-	public void setBioFabricApplication(){}
+	}*/		
 }
 

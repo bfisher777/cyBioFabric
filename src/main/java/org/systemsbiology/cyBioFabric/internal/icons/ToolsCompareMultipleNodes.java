@@ -25,6 +25,7 @@ public class ToolsCompareMultipleNodes extends AbstractCyAction implements BioFa
 	    super(configProps, applicationManager, networkViewManager, taskFactoryPredicate);	    	    	       
 	}
 	
+	//TODO make a action class to fire the event
 	@Override
 	public void actionPerformed(ActionEvent e) {		
 		CommandSet fc = CommandSet.getCmds(COMMAND_SET_NAME);

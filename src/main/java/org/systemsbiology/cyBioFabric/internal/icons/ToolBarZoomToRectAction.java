@@ -8,8 +8,11 @@ import javax.swing.ImageIcon;
 
 import org.cytoscape.application.CyApplicationManager;
 import org.cytoscape.application.swing.AbstractCyAction;
+import org.cytoscape.event.CyEventHelper;
 import org.cytoscape.view.model.CyNetworkViewManager;
+import org.cytoscape.view.model.events.UpdateNetworkPresentationEvent;
 import org.systemsbiology.cyBioFabric.internal.biofabric.cmd.CommandSet;
+import org.systemsbiology.cyBioFabric.internal.icons.actions.ZoomToRectAction;
 
 /*
  * Called ZoomToRect in biofabric command set class
@@ -20,28 +23,33 @@ import org.systemsbiology.cyBioFabric.internal.biofabric.cmd.CommandSet;
  * */
 public class ToolBarZoomToRectAction extends AbstractCyAction implements BioFabricImageIcon{
     	
-	private String COMMAND_SET_NAME;
-	private static final long serialVersionUID = -1796000090394162849L;	
+	private String commandSetName;
+	private static final long serialVersionUID = -1796000090394162849L;
+
+	ZoomToRectAction zoomToRectAction;
 	
 	public ToolBarZoomToRectAction(Map<String, String> configProps,  CyApplicationManager applicationManager, 
-			CyNetworkViewManager networkViewManager, BioFabricViewFactoryPredicate taskFactoryPredicate){
+			CyNetworkViewManager networkViewManager, BioFabricViewFactoryPredicate taskFactoryPredicate, 
+			CyEventHelper eventHelper){
 	    super(configProps, applicationManager, networkViewManager, taskFactoryPredicate);	    	    
-	    	           
+
         URL ugif = getClass().getResource("/images/ZoomToFabricRect24.gif");          
 	    ImageIcon icon = new ImageIcon(ugif);
 	
 	    putValue(LARGE_ICON_KEY, icon);	    
-	    setToolbarGravity(5);	    
+	    setToolbarGravity(5);
+	    
+	    this.zoomToRectAction = new ZoomToRectAction(taskFactoryPredicate, eventHelper, commandSetName);
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent e) {		
-		CommandSet fc = CommandSet.getCmds(COMMAND_SET_NAME);
-	    fc.getAction(CommandSet.ZOOM_TO_RECT, false, null).actionPerformed(null);		
+		zoomToRectAction.fireEvent();
 	}
 
 	@Override
 	public void registerCommandSetName(String commandSetName){
-		this.COMMAND_SET_NAME = commandSetName;
-	}	
+		this.commandSetName = commandSetName;
+		zoomToRectAction.updateName(commandSetName);
+	}		
 }

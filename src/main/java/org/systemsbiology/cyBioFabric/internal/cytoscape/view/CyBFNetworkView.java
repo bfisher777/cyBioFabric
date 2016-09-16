@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.cytoscape.event.CyEventHelper;
 import org.cytoscape.model.CyEdge;
 import org.cytoscape.model.CyIdentifiable;
 import org.cytoscape.model.CyNetwork;
@@ -68,7 +69,8 @@ public class CyBFNetworkView extends CyBFView<CyNetwork> implements CyNetworkVie
 	//keeping track of last networkScaleFactor
 	private double  networkScaleFactor;	
 	
-	public CyBFNetworkView(CyNetwork network, VisualLexicon visualLexicon, VisualMappingManager visualMappingManager, int appNum) {
+	public CyBFNetworkView(CyNetwork network, VisualLexicon visualLexicon, VisualMappingManager visualMappingManager, int appNum, 
+			CyEventHelper cyEventHelper) {
 		super(new DefaultValueVault(visualLexicon));
 		
 		this.network = network;
@@ -91,7 +93,7 @@ public class CyBFNetworkView extends CyBFView<CyNetwork> implements CyNetworkVie
 		this.bioFabricViewListeners = new ArrayList<BioFabricViewListenerInterface>();
 		this.networkScaleFactor = this.getVisualProperty(BasicVisualLexicon.NETWORK_SCALE_FACTOR);
 		//the number of biofabric applications created giving a unique number to each application
-		this.bioFabricApplication = new BioFabricApplication(false, appNum);
+		this.bioFabricApplication = new BioFabricApplication(false, appNum, cyEventHelper);
 				
 	}
 	
@@ -411,6 +413,7 @@ public class CyBFNetworkView extends CyBFView<CyNetwork> implements CyNetworkVie
 	}
 	
 	//TODO: may not need to have to implement this button, need to make sure the correct layout is applied
+	//TODO: Find event that triggers re-layout and handle
 	// I think the button will re-layout the network using the default layout.
 	private boolean refreshChanged(){
 		return false;

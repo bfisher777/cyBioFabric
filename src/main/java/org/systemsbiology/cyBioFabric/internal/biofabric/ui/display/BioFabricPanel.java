@@ -61,6 +61,7 @@ import org.cytoscape.model.CyNetwork;
 import org.cytoscape.model.CyNode;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.model.View;
+import org.cytoscape.view.model.events.UpdateNetworkPresentationEvent;
 import org.systemsbiology.cyBioFabric.internal.biofabric.app.BioFabricApplication;
 import org.systemsbiology.cyBioFabric.internal.biofabric.app.BioFabricWindow;
 import org.systemsbiology.cyBioFabric.internal.biofabric.cmd.CommandSet;
@@ -129,7 +130,6 @@ public class BioFabricPanel extends JPanel implements ZoomTarget, ZoomPresentati
   ////////////////////////////////////////////////////////////////////////////
    
   private JScrollPane jsp_;
-
   
   //
   // Note on zoom implementation.  This one class is serving
@@ -496,8 +496,7 @@ public class BioFabricPanel extends JPanel implements ZoomTarget, ZoomPresentati
    */
 
    public void selectFromCytoscape(List<CyNode> nodes, List<CyEdge> edges) {
-	   
-	 System.out.println("selectFromCytoscape called!");  
+	   	 
      if (!doBuildSelect_) {       
        clearSelectionSets();
        currSel_ = -1;
@@ -533,7 +532,7 @@ public class BioFabricPanel extends JPanel implements ZoomTarget, ZoomPresentati
 	       
 	       String name = bfn_.networkView.getModel().getRow(edgeModel).get(CyNetwork.NAME, String.class);
 	       FabricLink nextLink = new FabricLink(source, target, rel, false, edgeModel.getSUID(), nodeSource.getSUID(), nodeTarget.getSUID());
-	       System.out.println("selectFromCytoscape: Added selection link");     
+	           
 	       currLinkSelections_.add(nextLink);       
 	     }
      }
@@ -2354,7 +2353,7 @@ public class BioFabricPanel extends JPanel implements ZoomTarget, ZoomPresentati
 	  }
   
   /***************************************************************************
-  ** TODO understand this
+  ** 
   ** Build needed selection geometry
   */  
   
@@ -2794,6 +2793,14 @@ public class BioFabricPanel extends JPanel implements ZoomTarget, ZoomPresentati
             zoomToRectangle(zoomTo);
           }
           collectingZoomMode_ = false;
+          //TODO fireEvent here to disable the cancel button?
+          /* If something has been changed in the view model, presentation layer should
+          * catch the event and update its visualization. This event will be used in such
+          * objects, mainly rendering engines, in the presentation layer. This means by
+          * firing this event, Cytoscape will invoke "redraw" method in the rendering
+          * engine.*/
+          bfa_.getEventHelper().fireEvent(new UpdateNetworkPresentationEvent(bfn_.networkView));
+          
           firstZoomPoint_ = null;
           cursorMgr_.showDefaultCursor();
           bfw_.reenableControls();
@@ -3043,7 +3050,7 @@ public class BioFabricPanel extends JPanel implements ZoomTarget, ZoomPresentati
     }         
   } 
   
-  
+  //TODO add this to help enable disable the cancel icon in Cytoscape
   public boolean getCollectingZoomMode(){//TODO added this to help activate deactivate cancel button
 	  return collectingZoomMode_;
   }

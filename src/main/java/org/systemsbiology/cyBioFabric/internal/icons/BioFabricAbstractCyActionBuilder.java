@@ -94,7 +94,8 @@ public class BioFabricAbstractCyActionBuilder {
 		
 		configureZoomRectProperties(configProps, title, preferredMenu, largeIconURL, smallIconURL, tooltip, inMenuBar, inToolBar,
 				insertSeparatorBefore, insertSeparatorAfter, enableFor, accelerator, menuGravity, toolBarGravity);
-		ToolBarCancel cancelAction = new ToolBarCancel(configProps, applicationManager, networkViewManager, taskFactoryStopButtonPredicate);
+		ToolBarCancel cancelAction = new ToolBarCancel(configProps, applicationManager, networkViewManager, 
+				taskFactoryStopButtonPredicate, cyEventHelperRef);
 		buttons.add(cancelAction);
 		return cancelAction;	
 	}
@@ -186,7 +187,8 @@ public class BioFabricAbstractCyActionBuilder {
 		
 		configureZoomRectProperties(configProps, title, preferredMenu, largeIconURL, smallIconURL, tooltip, inMenuBar, inToolBar,
 				insertSeparatorBefore, insertSeparatorAfter, enableFor, accelerator, menuGravity, toolBarGravity);
-		ToolBarZoomToRectAction zoomToRectAction = new ToolBarZoomToRectAction(configProps, applicationManager, networkViewManager, taskFactoryPredicate);
+		ToolBarZoomToRectAction zoomToRectAction = new ToolBarZoomToRectAction(configProps, applicationManager, networkViewManager, 
+				taskFactoryPredicate, cyEventHelperRef);
 		buttons.add(zoomToRectAction);
 		return zoomToRectAction;	
 	}

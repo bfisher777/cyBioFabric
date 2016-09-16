@@ -223,9 +223,9 @@ public class BioFabricWindow extends JInternalFrame implements BackgroundWorkerC
       
     //TODO move menu to Cytoscape frame
     //menuInstall(fc, isMain_, gaggleGooseChooseMenu);
-    toolBar = new JToolBar();
+    //toolBar = new JToolBar();
     stockActionMap(fc, isMain_);
-    stockToolBar(toolBar, isMain_, fc);
+    //stockToolBar(toolBar, isMain_, fc);
        
     thumbnailView_ = new BioFabricOverview();
     nac_ = new BioFabricNavAndControl(isMain_, this, COMMAND_NAME);
@@ -585,7 +585,7 @@ public class BioFabricWindow extends JInternalFrame implements BackgroundWorkerC
     //toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.ZOOM_TO_CURRENT_SELECTION)));
     //toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.CENTER_ON_NEXT_SELECTION)));
     //toolBar.addSeparator();        
-    toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.ADD_FIRST_NEIGHBORS)));
+    //toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.ADD_FIRST_NEIGHBORS)));
     //toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.CLEAR_SELECTIONS)));
     //toolBar.addSeparator();        
     //toolBar.add(actionMap_.get(Integer.valueOf(CommandSet.CANCEL)));

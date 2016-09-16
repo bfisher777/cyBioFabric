@@ -27,6 +27,7 @@ import java.util.Map;
 import javax.swing.JComponent;
 import javax.swing.WindowConstants;
 
+import org.cytoscape.event.CyEventHelper;
 import org.systemsbiology.cyBioFabric.internal.biofabric.cmd.CommandSet;
 import org.systemsbiology.cyBioFabric.internal.biofabric.gaggle.DeadFabricGoose;
 import org.systemsbiology.cyBioFabric.internal.biofabric.gaggle.FabricGooseInterface;
@@ -59,6 +60,8 @@ public class BioFabricApplication {
   private BioFabricWindow selectionWindow_;
   private int count; //used to increment class name in init CommandSet  
   private JComponent inputComponent;
+//TODO added this to allow events to be fired in Cytoscape
+  private CyEventHelper eventHelper_;
   
   ////////////////////////////////////////////////////////////////////////////
   //
@@ -71,10 +74,11 @@ public class BioFabricApplication {
   ** Now supporting Cytoscape App usage
   */
   
-  public BioFabricApplication(boolean forCyto, int count){
+  public BioFabricApplication(boolean forCyto, int count, CyEventHelper eventHelper){
 	  
     forCyto_ = forCyto;
-    this.count = count;    
+    this.count = count;
+    eventHelper_ = eventHelper;
   }
   
   ////////////////////////////////////////////////////////////////////////////
@@ -83,6 +87,11 @@ public class BioFabricApplication {
   //
   ////////////////////////////////////////////////////////////////////////////
     
+  //TODO added this to allow app to access event helper
+  public CyEventHelper getEventHelper(){
+	  return eventHelper_;
+  }
+  
   public void attachInputComponent(JComponent inputComponent){
 	  this.inputComponent = inputComponent;
   }

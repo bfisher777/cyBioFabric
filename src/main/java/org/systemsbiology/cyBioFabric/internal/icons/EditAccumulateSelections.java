@@ -24,6 +24,7 @@ public class EditAccumulateSelections extends AbstractCyAction implements BioFab
 		this.useCheckBoxMenuItem();    
 	}
 	
+	//TODO make a action class to fire the event
 	@Override
 	public void actionPerformed(ActionEvent e) {	
 		

@@ -7,6 +7,7 @@ import org.cytoscape.application.CyApplicationManager;
 import org.cytoscape.application.swing.AbstractCyAction;
 import org.cytoscape.view.model.CyNetworkViewManager;
 import org.systemsbiology.cyBioFabric.internal.biofabric.cmd.CommandSet;
+import org.systemsbiology.cyBioFabric.internal.icons.actions.ZoomToMousePositionAction;
 
 public class ViewZoomToMousePosition extends AbstractCyAction implements BioFabricImageIcon{
 	
@@ -14,22 +15,24 @@ public class ViewZoomToMousePosition extends AbstractCyAction implements BioFabr
 	 * 
 	 */
 	private static final long serialVersionUID = -3607653691681519032L;
-	private String COMMAND_SET_NAME;	
+	private String commandSetName;	
+	private ZoomToMousePositionAction zoomToMousePositionAction;
 	
 	public ViewZoomToMousePosition(Map<String, String> configProps,  CyApplicationManager applicationManager, 
 			CyNetworkViewManager networkViewManager, BioFabricViewFactoryPredicate taskFactoryPredicate){
-	    super(configProps, applicationManager, networkViewManager, taskFactoryPredicate);	    	    
-		    
+	    super(configProps, applicationManager, networkViewManager, taskFactoryPredicate);
+	    
+	    zoomToMousePositionAction = new ZoomToMousePositionAction(taskFactoryPredicate, commandSetName);		    
 	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {		
-		CommandSet fc = CommandSet.getCmds(COMMAND_SET_NAME);
-	    fc.getAction(CommandSet.ZOOM_TO_CURRENT_MOUSE, false, null).actionPerformed(null);		
+		zoomToMousePositionAction.fireEvent();		
 	}
 	
 	@Override
 	public void registerCommandSetName(String commandSetName){
-		this.COMMAND_SET_NAME = commandSetName;
+		this.commandSetName = commandSetName;
+		zoomToMousePositionAction.updateName(commandSetName);
 	}	
 }

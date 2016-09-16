@@ -19,6 +19,12 @@ import org.systemsbiology.cyBioFabric.internal.icons.BioFabricStopButtonFactoryP
 import org.systemsbiology.cyBioFabric.internal.icons.BioFabricViewFactoryPredicate;
 import org.systemsbiology.cyBioFabric.internal.icons.BioFabricViewPropertySelectedPredicate;
 
+/*
+ * Class responsible for; 
+ * Registering view with task factory predicates which handle enabling and disabling of icons
+ * Handles setting the CytoPanel for the magnifier when a BioFabric network is set to current
+ * Handles registering the correct BioFabric application name with the icons to handle events properly
+ * */
 public class BioFabricSetCurrentViewHandler {	
 	
 	BioFabricCytoPanel panel;
@@ -50,10 +56,11 @@ public class BioFabricSetCurrentViewHandler {
 			bfNetworkView = (CyBFNetworkView)view;
 			panel.setNavAndControl(bfNetworkView.getBioFabricApplication().getBioFabricWindow().getNAC());
 			
+			taskFactoryPredicate.registerNetwork(bfNetworkView);
 			taskFactoryPredicate.setIsBioFabricView(true);
-			taskFactoryStopButtonPredicate.registerNetworkView(bfNetworkView);
+			taskFactoryStopButtonPredicate.registerNetwork(bfNetworkView);
 			taskFactoryStopButtonPredicate.setIsBioFabricView(true);
-			taskFactorySelectedNodeEdgePredicate.registerNetwork(view);
+			taskFactorySelectedNodeEdgePredicate.registerNetwork(bfNetworkView);
 			taskFactorySelectedNodeEdgePredicate.setIsBioFabricView(true);
 		}else{			
 			panel.removeAll();

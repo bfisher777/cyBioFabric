@@ -10,6 +10,7 @@ import org.cytoscape.application.CyApplicationManager;
 import org.cytoscape.application.swing.AbstractCyAction;
 import org.cytoscape.view.model.CyNetworkViewManager;
 import org.systemsbiology.cyBioFabric.internal.biofabric.cmd.CommandSet;
+import org.systemsbiology.cyBioFabric.internal.icons.actions.SearchAction;
 
 public class ToolBarSearchAction extends AbstractCyAction implements BioFabricImageIcon{
 	
@@ -17,7 +18,8 @@ public class ToolBarSearchAction extends AbstractCyAction implements BioFabricIm
 	 * 
 	 */
 	private static final long serialVersionUID = 5485787271891602701L;
-	private String COMMAND_SET_NAME;	
+	private String commandSetName;
+	private SearchAction searchAction;
 	
 	public ToolBarSearchAction(Map<String, String> configProps,  CyApplicationManager applicationManager, 
 			CyNetworkViewManager networkViewManager, BioFabricViewFactoryPredicate taskFactoryPredicate){
@@ -29,16 +31,19 @@ public class ToolBarSearchAction extends AbstractCyAction implements BioFabricIm
 		
 		 putValue(LARGE_ICON_KEY, icon);	    
 		 setToolbarGravity(5);
+		 
+		 searchAction = new SearchAction(taskFactoryPredicate, commandSetName);
 	}
 	
+	//TODO make a action class to fire the event
 	@Override
-	public void actionPerformed(ActionEvent e) {		
-		CommandSet fc = CommandSet.getCmds(COMMAND_SET_NAME);
-	    fc.getAction(CommandSet.SEARCH, false, null).actionPerformed(null);		
+	public void actionPerformed(ActionEvent e) {				
+	    searchAction.fireEvent();
 	}
 	
 	@Override
 	public void registerCommandSetName(String commandSetName){
-		this.COMMAND_SET_NAME = commandSetName;
+		this.commandSetName = commandSetName;
+		searchAction.updateName(commandSetName);
 	}	
 }

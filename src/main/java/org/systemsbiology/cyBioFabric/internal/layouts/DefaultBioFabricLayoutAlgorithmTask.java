@@ -24,7 +24,8 @@ public class DefaultBioFabricLayoutAlgorithmTask extends AbstractLayoutTask {
 	}
 
 	@Override
-	protected void doLayout(TaskMonitor taskMonitor) {		
+	protected void doLayout(TaskMonitor taskMonitor) {	
+		//TODO: revisit this, passing around large non-serializable object,  
 		BNVisualPropertyValue bnvp = networkView.getVisualProperty(BioFabricVisualLexicon.BIOFABRIC_NETWORK);
 		
 		DefaultBioFabricLayoutBuildTool onCommand = new DefaultBioFabricLayoutBuildTool();				
